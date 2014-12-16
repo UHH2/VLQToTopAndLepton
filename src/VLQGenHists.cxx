@@ -85,10 +85,6 @@ GenHists::GenHists(Context & ctx, const string & dirname): Hists(ctx, dirname){
   Z_phi_subl = book<TH1F>("Z_phi_subl", "#phi_{Z}(sublead)", 64, -3.2, 3.2);
 
  
-  
-
-
-
 }
 
 
@@ -98,24 +94,23 @@ void GenHists::fill(const Event & event){
     
     std::vector<GenParticle> const * genparticles = event.genparticles;
     
-    GenParticle const * tp1 = 0;
-    GenParticle const * tp2 = 0;
-    GenParticle const * t1 = 0;
-    GenParticle const * t2 = 0;
-    GenParticle const * h1 = 0;
-    GenParticle const * h2 = 0;
-        
-    vector<GenParticle const *> bs;
-    map<double, GenParticle const *> electrons;
-    map<double, GenParticle const *> muons;
+    GenParticle const * vlq1 = 0;
+    GenParticle const * vlq2 = 0;
     
+    
+    vector<GenParticle const *> bottoms;
+    vector<GenParticle const *> electrons;
+    vector<GenParticle const *> muons;
+     
 //     int number_mu = 0;
 //     int number_e = 0;
 //     int number_lept = 0;
     
     for (GenParticle const & igenp : *genparticles){
-        if (abs(igenp.pdgId()) == 8){
-            if (!tp1) tp1 = &igenp;
+        
+        
+        if (abs(igenp.pdgId()) == 8 && abs(igenp.pdgId()) == 7 ){
+            if (!vlq1) vlq1 = &igenp;
             else if (igenp.pt() > tp1->pt()) {tp2 = tp1; tp1 = &igenp;}
             else if (!tp2) tp2 = &igenp;
         }
@@ -155,99 +150,7 @@ void GenHists::fill(const Event & event){
     hist("Nmu")->Fill(muons.size());
     hist("Ne")->Fill(electrons.size());
     
-    if (tp1) {
-        hist("tpPt_lead")->Fill(tp1->pt());
-        hist("eta_lead")->Fill(tp1->eta());
-        hist("phi_lead")->Fill(tp1->phi());
-        GenParticle const * daughter1 = tp1->daughter(genparticles);
-        GenParticle const * daughter2 = tp1->daughter(genparticles, 2);
-        int decay1 = 0;
-        int decay2 = 0;
-        if (daughter1) decay1 = abs(daughter1->pdgId());
-        if (daughter2) decay2 = abs(daughter2->pdgId());
-        hist("tp_decay")->Fill(decay1);
-        hist("tp_decay")->Fill(decay2);
-    }
     
-    if (tp2) {
-        hist("tpPt_subl")->Fill(tp2->pt());
-        hist("eta_subl")->Fill(tp2->eta());
-        hist("phi_subl")->Fill(tp2->phi());
-        GenParticle const * daughter1 = tp2->daughter(genparticles);
-        GenParticle const * daughter2 = tp2->daughter(genparticles, 2);
-        int decay1 = 0;
-        int decay2 = 0;
-        if (daughter1) decay1 = abs(daughter1->pdgId());
-        if (daughter2) decay2 = abs(daughter2->pdgId());
-        hist("tp_decay")->Fill(decay1);
-        hist("tp_decay")->Fill(decay2);
-    }
-    
-    if (t1) {
-        hist("tPt_lead")->Fill(t1->pt());
-    }
-    
-    if (t2) {
-        hist("tPt_subl")->Fill(t2->pt());
-    }
-    
-    if (h1){
-        hist("hPt_lead")->Fill(h1->pt());
-        GenParticle const * daughter1 = h1->daughter(genparticles);
-        GenParticle const * daughter2 = h1->daughter(genparticles, 2);
-        int decay1 = 0;
-        int decay2 = 0;
-        if (daughter1) decay1 = abs(daughter1->pdgId());
-        if (daughter2) decay2 = abs(daughter2->pdgId());
-        hist("h_decay")->Fill(decay1);
-        hist("h_decay")->Fill(decay2);
-    }
-    
-    if (h2){
-        hist("hPt_subl")->Fill(h2->pt());
-        GenParticle const * daughter1 = h2->daughter(genparticles);
-        GenParticle const * daughter2 = h2->daughter(genparticles, 2);
-        int decay1 = 0;
-        int decay2 = 0;
-        if (daughter1) decay1 = abs(daughter1->pdgId());
-        if (daughter2) decay2 = abs(daughter2->pdgId());
-        hist("h_decay")->Fill(decay1);
-        hist("h_decay")->Fill(decay2);
-    }
-    
-    double bTpPt_lead = 0.;
-    double bTpPt_subl = 0.;
-    double bHPt_lead = 0.;
-    double bHPt_subl = 0.;
-    
-    for (vector<GenParticle const *>::const_iterator it = bs.begin(); it != bs.end(); ++it){
-        GenParticle const * ib = *it;
-        GenParticle const * imother = findMother(*ib, genparticles);
-        if (!imother) continue;
-        if (abs(imother->pdgId()) == 8){
-            if (ib->pt() > bTpPt_lead) {bTpPt_subl = bTpPt_lead; bTpPt_lead = ib->pt();}
-            else if (ib->pt() > bTpPt_subl) bTpPt_subl = ib->pt();
-        }
-        else if (abs(imother->pdgId()) == 25){
-            if (ib->pt() > bHPt_lead) {bHPt_subl = bHPt_lead; bHPt_lead = ib->pt();}
-            else if (ib->pt() > bHPt_subl) bHPt_subl = ib->pt();
-            for (vector<GenParticle const *>::const_iterator iit = it+1; iit != bs.end(); ++iit){
-                GenParticle const * ib2 = *iit;
-                GenParticle const * imother2 = findMother(*ib2, genparticles);
-                if (!imother2) continue;
-                if (imother->index() == imother2->index()){
-                    double dR = deltaR(*ib, *ib2);
-                    hist("DeltaR_bb")->Fill(dR);
-                    break;
-                }
-            }
-        }
-    }
-    
-    if (bTpPt_lead) hist("bTpPt_lead")->Fill(bTpPt_lead);
-    if (bTpPt_subl) hist("bTpPt_subl")->Fill(bTpPt_subl);
-    if (bHPt_lead) hist("bHPt_lead")->Fill(bHPt_lead);
-    if (bHPt_subl) hist("bHPt_subl")->Fill(bHPt_subl);
     
 //     if (b1 && b2){
 //         double deltaR = b1->deltaR(*b2);
