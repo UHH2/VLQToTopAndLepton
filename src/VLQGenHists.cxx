@@ -1,24 +1,18 @@
+//framework includes
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 #include "UHH2/core/include/Event.h"
 
-
+//general includes
 #include <iostream>
 
 using namespace std;
 using namespace uhh2;
 
-namespace genhists
-{
-    GenParticle const * findMother (GenParticle const &, vector<GenParticle> const *);
-}
-
-using namespace genhists;
 
 VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirname){
   // book all histograms here
-  // kinematical variables 
-
   
+  //histograms for vector like quarks
   VLQ_Number =  book<TH1F>("VLQ_number", "Number of VLQ", 5, -0.5, 4.5);
   VLQ_pdgId =  book<TH1F>("VLQ_pdgId", "pdgId", 5, 4.5, 9.5); 
 
@@ -41,7 +35,7 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
 
   //number of quarks
   Nbottom = book<TH1F>("Nbottom", "Number of bs", 8, 0, 8);
-  Ntop = book<TH1F>("Ntop"   , "Number of tops", 5, 0, 5);
+  Ntop    = book<TH1F>("Ntop"   , "Number of tops", 5, 0, 5);
 
   //number of leptons
   Nlept      = book<TH1F>("Nlept"     , "Number of leptons", 15, 0, 15);
@@ -51,6 +45,11 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
   //higgs 
   higgs_decay    = book<TH1F>("higgs_decay"     , "Higgs decay modes", 30, 0, 30);
   DeltaR_bb      = book<TH1F>("DeltaR_bb"   , "#Delta R_{bb}", 50, 0, 5); //b variable
+  
+  higgs_pt       = book<TH1F>("higgs_pt" , "p_{T}^{higgs} [GeV/c]", 200, 0, 2000);
+  higgs_eta      = book<TH1F>("higgs_eta", "#eta_{higgs}", 40, -2.5, 2.5);
+  higgs_phi      = book<TH1F>("higgs_phi", "#phi_{higgs}", 64, -3.2, 3.2);
+    
   higgs_pt_lead  = book<TH1F>("higgs_pt_lead" , "p_{T}^{higgs}(lead) [GeV/c]", 200, 0, 2000);
   higgs_pt_subl  = book<TH1F>("higgs_pt_subl" , "p_{T}^{higgs}(sublead) [GeV/c]", 200, 0, 2000);
   higgs_eta_lead = book<TH1F>("higgs_eta_lead", "#eta_{higgs}(lead)", 40, -2.5, 2.5);
@@ -60,6 +59,11 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
 
   //W
   W_decay    = book<TH1F>("W_decay"   , "W decay modes", 30, 0, 30);
+  
+  W_pt_lead  = book<TH1F>("W_pt" , "p_{T}^{W} [GeV/c]", 200, 0, 2000);
+  W_eta      = book<TH1F>("W_eta", "#eta_{W}", 40, -2.5, 2.5);     
+  W_phi      = book<TH1F>("W_phi", "#phi_{W}", 64, -3.2, 3.2);
+   
   W_pt_lead  = book<TH1F>("W_pt_lead" , "p_{T}^{W}(lead) [GeV/c]", 200, 0, 2000);
   W_pt_subl  = book<TH1F>("W_pt_subl" , "p_{T}^{W}(sublead) [GeV/c]", 200, 0, 2000);
   W_eta_lead = book<TH1F>("W_eta_lead", "#eta_{W}(lead)", 40, -2.5, 2.5);
@@ -69,6 +73,11 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
 
   //Z 
   Z_decay    = book<TH1F>("Z_decay"   , "Z decay modes", 30, 0, 30);
+  
+  Z_pt       = book<TH1F>("Z_pt" , "p_{T}^{Z} [GeV/c]", 200, 0, 2000);
+  Z_eta      = book<TH1F>("Z_eta", "#eta_{Z}", 40, -2.5, 2.5);
+  Z_phi      = book<TH1F>("Z_phi", "#phi_{Z}", 64, -3.2, 3.2);
+  
   Z_pt_lead  = book<TH1F>("Z_pt_lead" , "p_{T}^{Z}(lead) [GeV/c]", 200, 0, 2000);
   Z_pt_subl  = book<TH1F>("Z_pt_subl" , "p_{T}^{Z}(sublead) [GeV/c]", 200, 0, 2000);
   Z_eta_lead = book<TH1F>("Z_eta_lead", "#eta_{Z}(lead)", 40, -2.5, 2.5);
@@ -79,6 +88,11 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
 
   //top 
   top_decay    = book<TH1F>("top_decay"   , "Top decay modes", 30, 0, 30);
+  
+  top_pt       = book<TH1F>("top_pt" , "p_{T}^{top} [GeV/c]", 200, 0, 2000);
+  top_eta      = book<TH1F>("top_eta", "#eta_{top}(lead)", 40, -2.5, 2.5);
+  top_phi      = book<TH1F>("top_phi", "#phi_{top}(lead)", 64, -3.2, 3.2);
+  
   top_pt_lead  = book<TH1F>("top_pt_lead" , "p_{T}^{top}(lead) [GeV/c]", 200, 0, 2000);
   top_pt_subl  = book<TH1F>("top_pt_subl" , "p_{T}^{top}(sublead) [GeV/c]", 200, 0, 2000);
   top_eta_lead = book<TH1F>("top_eta_lead", "#eta_{top}(lead)", 40, -2.5, 2.5);
@@ -114,6 +128,7 @@ void VLQGenHists::fill(const Event & event){
 
 
   for(auto igenp : *genparticles){
+    //put all the particles in vectors
     if (abs(igenp.pdgId()) == 8 || abs(igenp.pdgId()) == 7)
       vlq.push_back(&igenp);
     else if(abs(igenp.pdgId()) == 5 )
@@ -130,6 +145,18 @@ void VLQGenHists::fill(const Event & event){
       wboson.push_back(&igenp);
     else if(abs(igenp.pdgId()) == 25 )
       higgs.push_back(&igenp);
+  
+    //Fill decay histograms
+    if(abs(igen.mother1().pdgId())== 8 || abs(igen.mother1().pdgId())== 7 || abs(igen.mother2().pdgId())== 8 || abs(igen.mother2().pdgId())== 7 )
+        VLQ_decay->Fill(igen.pdgId());
+    if(abs(igen.mother1().pdgId())== 6) || abs(igen.mother2().pdgId())== 6)
+        top_decay->Fill(igen.pdgId()); 
+    if(abs(igen.mother1().pdgId())== 23 || abs(igen.mother2().pdgId())== 23)
+        Z_decay->Fill(igen.pdgId()); 
+    if(abs(igen.mother1().pdgId())== 24 || abs(igen.mother2().pdgId())== 24)
+        W_decay ->Fill(igen.pdgId()); 
+    if(abs(igen.mother1().pdgId())== 25 || abs(igen.mother2().pdgId())== 25)
+        higgs_decay->Fill(igen.pdgId());
   }
 
 
@@ -146,17 +173,47 @@ void VLQGenHists::fill(const Event & event){
 
   VLQ_Number->Fill(vlq.size(),weight);
   
+  
+  sort(vlq.begin(),vlq.end(),HigherPt);
+  sort(higgs.begin(),higgs.end(),HigherPt);
+  sort(wboson.begin(),wboson.end(),HigherPt);
+  sort(zboson.begin(),zboson.end(),HigherPt);
+
+  sort(top.begin(),top.end(),HigherPt);
+  sort(bquarks.begin(),bquarks.end(),HigherPt);
+  sort(electrons.begin(),electrons.end(),HigherPt);
+  sort(muons.begin(),mouns.end(),HigherPt);
+   
+   
   for(auto particle: vlq){
     VLQ_pdgId->Fill(particle.pdgId());
-    
   }
+        
+  if(vlq.size()>0){
+      VLQ_eta_lead->Fill(vlq[0]->eta(),weight);
+      VLQ_phi_lead->Fill(vlq[0]->phi(),weight);
+      VLQ_pt_lead->Fill(vlq[0]->pt(),weight);   
+  }
+  if(vlq.size()>1){
+      VLQ_eta_subl->Fill(vlq[1]->eta(),weight);
+      VLQ_phi_subl->Fill(vlq[1]->phi(),weight);
+      VLQ_pt_subl->Fill(vlq[1]->pt(),weight);   
+  }
+  
+  
+  
+  
+  DeltaR_bb
+          
+  higgs_pt_lead  
+  higgs_eta_lead 
+  higgs_phi_lead 
+  
+  higgs_phi_subl 
+  higgs_eta_subl 
+  higgs_pt_subl  
+
   
 }
 
 VLQGenHists::~VLQGenHists(){}
-
-GenParticle const * genhists::findMother (GenParticle const & igenp, vector<GenParticle> const * genparticles){
-    GenParticle const * imother = igenp.mother(genparticles);
-    if (!imother) imother = igenp.mother(genparticles, 2);
-    return imother;
-}
