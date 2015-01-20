@@ -4,9 +4,16 @@
 #include "UHH2/core/include/AnalysisModule.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/common/include/CleaningModules.h"
+
+#include "UHH2/common/include/MuonHists.h"
 #include "UHH2/common/include/ElectronHists.h"
+#include "UHH2/common/include/JetHists.h"
+
+#include "UHH2/common/include/TriggerSelection.h" 
+
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonSelections.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonHists.h"
+#include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 
 using namespace std;
 using namespace uhh2;
@@ -18,53 +25,63 @@ using namespace uhh2;
  */
 class VLQToTopAndLeptonModule: public AnalysisModule {
 public:
-    
-    explicit VLQToTopAndLeptonModule(Context & ctx);
-    virtual bool process(Event & event) override;
-
+  
+  explicit VLQToTopAndLeptonModule(Context & ctx);
+  virtual bool process(Event & event) override;
+  
 private:
-    
-    std::unique_ptr<JetCleaner> jetcleaner;
+  
+  std::unique_ptr<JetCleaner> jetcleaner;
    
-    // declare the Selections to use. Use unique_ptr to ensure automatic call of delete in the destructor,
-    // to avoid memory leaks.
-    std::unique_ptr<Selection> njet_sel, bsel;
-    
-    // store the Hists collection as member variables. Again, use unique_ptr to avoid memory leaks.
-    std::unique_ptr<Hists> h_nocuts, h_njet, h_bsel, h_ele;
+  // declare the Selections to use. Use unique_ptr to ensure automatic call of delete in the destructor,
+  // to avoid memory leaks.
+  std::unique_ptr<Selection> njet_sel, bsel, trigger;
+  
+  // store the Hists collection as member variables. Again, use unique_ptr to avoid memory leaks.
+  std::unique_ptr<Hists> h_nocuts, h_njet, h_bsel, h_ele, h_ele_trigger, h_vlqGen;
+
 };
 
 
 VLQToTopAndLeptonModule::VLQToTopAndLeptonModule(Context & ctx){
-    // In the constructor, the typical tasks are to create
-    // other modules like cleaners (1), selections (2) and Hist classes (3).
-    // But you can do more and e.g. access the configuration, as shown below.
+  // In the constructor, the typical tasks are to create
+  // other modules like cleaners (1), selections (2) and Hist classes (3).
+  // But you can do more and e.g. access the configuration, as shown below.
+  
     
-    cout << "Hello World from VLQToTopAndLeptonModule!" << endl;
-    
-    // If needed, access the configuration of the module here, e.g.:
-    string testvalue = ctx.get("TestKey", "<not set>");
-    cout << "TestKey in the configuration was: " << testvalue << endl;
-    
-    // If running in SFrame, the keys "dataset_version", "dataset_type" and "dataset_lumi"
-    // are set to the according values in the xml file. For CMSSW, these are
-    // not set automatically, but can be set in the python config file.
-    for(auto & kv : ctx.get_all()){
-        cout << " " << kv.first << " = " << kv.second << endl;
-    }
-    
-    // 1. setup other modules. Here, only the jet cleaner
-    jetcleaner.reset(new JetCleaner(30.0, 2.4));
-    
-    // 2. set up selections:
-    njet_sel.reset(new NJetSelection(2));
-    bsel.reset(new NBTagSelection(1));
+  // If needed, access the configuration of the module here, e.g.:
+  
+  
+  // If running in SFrame, the keys "dataset_version", "dataset_type" and "dataset_lumi"
+  // are set to the according values in the xml file. For CMSSW, these are
+  // not set automatically, but can be set in the python config file.
 
-    // 3. Set up Hists classes:
-    h_nocuts.reset(new VLQToTopAndLeptonHists(ctx, "NoCuts"));
-    h_njet.reset(new VLQToTopAndLeptonHists(ctx, "Njet"));
-    h_bsel.reset(new VLQToTopAndLeptonHists(ctx, "Bsel"));
-    h_ele.reset(new ElectronHists(ctx, "ele_nocuts"));
+  string testvalue = ctx.get("SelectionTriggerName", "<not set>");
+  cout << "Trigger in the configuration was: " << testvalue << endl;
+  
+  for(auto & kv : ctx.get_all()){
+    cout << " " << kv.first << " = " << kv.second << endl;
+  }
+  
+  //setup trigger
+  trigger.reset(new TriggerSelection(testvalue));
+
+
+  // 1. setup other modules. Here, only the jet cleaner
+  jetcleaner.reset(new JetCleaner(30.0, 2.4));
+  
+  // 2. set up selections:
+  njet_sel.reset(new NJetSelection(2));
+  bsel.reset(new NBTagSelection(1));
+  
+  // 3. Set up Hists classes:
+  h_vlqGen.reset(new VLQGenHists(ctx,"VLQGenHists"));
+  
+  h_nocuts.reset(new VLQToTopAndLeptonHists(ctx, "NoCuts"));
+  h_njet.reset(new VLQToTopAndLeptonHists(ctx, "Njet"));
+  h_bsel.reset(new VLQToTopAndLeptonHists(ctx, "Bsel"));
+  h_ele.reset(new ElectronHists(ctx, "ele_nocuts"));
+  h_ele_trigger.reset(new ElectronHists(ctx, "ele_nocuts"));
 }
 
 
@@ -79,13 +96,15 @@ bool VLQToTopAndLeptonModule::process(Event & event) {
     // returns true, the event is kept; if it returns false, the event
     // is thrown away.
     
-    cout << "VLQToTopAndLeptonModule: Starting to process event (runid, eventid) = (" << event.run << ", " << event.event << "); weight = " << event.weight << endl;
+    //cout << "VLQToTopAndLeptonModule: Starting to process event (runid, eventid) = (" << event.run << ", " << event.event << "); weight = " << event.weight << endl;
     
     // 1. run all modules; here: only jet cleaning.
     jetcleaner->process(event);
     
     // 2. test selections and fill histograms
     
+    h_vlqGen->fill(event);
+
     h_nocuts->fill(event);
     
     bool njet_selection = njet_sel->passes(event);
@@ -97,6 +116,14 @@ bool VLQToTopAndLeptonModule::process(Event & event) {
         h_bsel->fill(event);
     }
     h_ele->fill(event);
+
+
+    if(trigger->passes(event)){
+      h_ele_trigger->fill(event);
+
+    }
+
+
     
     // 3. decide whether or not to keep the current event in the output:
     return njet_selection && bjet_selection;

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd">
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
+
+
+<!ENTITY TTbar SYSTEM "TTbar_usai.xml">
+]>
+
+
 
 <!-- OutputLevel controls which messages are printed; set to VERBOSE or DEBUG for more verbosity, to WARNING or ERROR for less -->
 <JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
@@ -8,7 +14,7 @@
 
    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./" PostFix="" TargetLumi="1" >
    <!-- <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/ottjoc/proof-wd/" ProofNodes="2" OutputDirectory="./" PostFix="" TargetLumi="1" >  -->
-        <InputData Lumi="1" NEventsMax="100" Type="MC" Version="BpJ_TW_800" Cacheable="False">
+        <InputData Lumi="1" NEventsMax="-1" Type="MC" Version="BpJ_TW_800" Cacheable="False">
             <In FileName="/nfs/dust/cms/user/ottjoc/gc-output/PHYS14v1/signals/MC_BpJ_TW_M800_20x25_14_Ntuple.root" Lumi="0.0"/> 
             <In FileName="/nfs/dust/cms/user/ottjoc/gc-output/PHYS14v1/signals/MC_BpJ_TW_M800_20x25_15_Ntuple.root" Lumi="0.0"/> 
             <In FileName="/nfs/dust/cms/user/ottjoc/gc-output/PHYS14v1/signals/MC_BpJ_TW_M800_20x25_16_Ntuple.root" Lumi="0.0"/> 
@@ -17,12 +23,26 @@
                 If no OutputTree is given, no events will be written. Please do use "AnalysisTree" as Name. -->
             <!-- <OutputTree Name="AnalysisTree" /> -->
         </InputData>
-        
-        <InputData Lumi="1" NEventsMax="100" Type="MC" Version="BpJ_TW_1200" Cacheable="False">
+       
+        <InputData Lumi="1" NEventsMax="1" Type="MC" Version="BpJ_TW_1200" Cacheable="False">
             <In FileName="/nfs/dust/cms/user/ottjoc/gc-output/PHYS14v1/signals/MC_BpJ_TW_M1200_20x25_19_Ntuple.root" Lumi="0.0"/> 
             <InputTree Name="AnalysisTree" /> 
         </InputData>
-            
+
+        <!--     
+	<InputData Lumi="1" NEventsMax="100" Type="MC" Version="TTJets" Cacheable="False">
+	  <In FileName="/nfs/dust/cms/user/usaiem/gc-output/PHYS14v0/ttbar/
+	  <In FileName="/nfs/dust/cms/user/nowatsd/grid_control_new/gc-output/PHYS14v1-1/backgrounds/MC_TTJets_MSDecaysCKM_central_20x25_0_Ntuple.root" Lumi="1.0"/>
+	  <In FileName="/nfs/dust/cms/user/nowatsd/grid_control_new/gc-output/PHYS14v1-1/backgrounds/MC_TTJets_MSDecaysCKM_central_20x25_1_Ntuple.root" Lumi="1.0"/>
+	  <In FileName="/nfs/dust/cms/user/nowatsd/grid_control_new/gc-output/PHYS14v1-1/backgrounds/MC_TTJets_MSDecaysCKM_central_20x25_2_Ntuple.root" Lumi="1.0"/>
+	  <InputTree Name="AnalysisTree" />
+	</InputData>
+
+	<InputData Lumi="1" NEventsMax="1" Type="MC" Version="TTJets" Cacheable="False">
+	  &TTbar;
+	  <InputTree Name="AnalysisTree" />
+	</InputData>
+	-->
         <UserConfig>
             <!-- define which collections to read from the input. Only specify what you need to save I/O time -->
             <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices" /> 
@@ -31,7 +51,11 @@
             <Item Name="TauCollection" Value="slimmedTaus" />
             <Item Name="JetCollection" Value="slimmedJets" />
             <Item Name="METName" Value="slimmedMETs" />
+            <Item Name="GenParticleCollection" Value="GenParticles" /> 
             
+	    <Item Name="SelectionTriggerName" Value="HLT_Ele27_eta2p1_WP85_Gsf_v*"/>
+
+
             <!-- The list of available collections to read in corresponds to the pointer members in event. The 'Name's to use here in the configuration are:
             
                  PrimaryVertexCollection
