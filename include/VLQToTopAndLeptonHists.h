@@ -9,6 +9,7 @@
  * many histograms. Therefore, it is recommended to use histogram
  * pointers as member data instead, like in 'common/include/ElectronHists.h'.
  */
+
 class VLQToTopAndLeptonHists: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:
@@ -16,4 +17,6 @@ public:
 
     virtual void fill(const uhh2::Event & ev) override;
     virtual ~VLQToTopAndLeptonHists();
+
+
 };

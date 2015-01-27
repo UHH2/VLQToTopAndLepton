@@ -34,13 +34,13 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
   NZ     = book<TH1F>("NZ"     , "Number of Z", 5, -0.5, 4.5);
 
   //number of quarks
-  Nbottom = book<TH1F>("Nbottom", "Number of b", 8, 0, 8);
-  Ntop    = book<TH1F>("Ntop"   , "Number of top", 5, 0, 5);
+  Nbottom = book<TH1F>("Nbottom", "Number of b", 9, -.5, 8.5);
+  Ntop    = book<TH1F>("Ntop"   , "Number of top", 6, -0.5, 5.5);
 
   //number of leptons
-  Nlept      = book<TH1F>("Nlept"     , "Number of leptons", 15, 0, 15);
-  Nmu        = book<TH1F>("Nmu"       , "Number of muons", 15, 0, 15);
-  Nelectrons = book<TH1F>("Nelectrons", "Number of electrons", 15, 0, 15);
+  Nlept      = book<TH1F>("Nlept"     , "Number of leptons", 7, -.5, 6.5);
+  Nmu        = book<TH1F>("Nmu"       , "Number of muons", 5, -.5, 4.5);
+  Nelectrons = book<TH1F>("Nelectrons", "Number of electrons",5, -.5, 4.5);
   
   //higgs 
   higgs_decay    = book<TH1F>("higgs_decay"     , "Higgs decay modes", 61, -30.5, 30.5);
@@ -126,10 +126,7 @@ void VLQGenHists::fill(const Event & event){
   // for (unsigned int i=0; i<event.get_current_triggernames().size();i++)
   //  cout<< event.get_current_triggernames()[i]<<endl;
 
-  
-
-
-   
+     
   const vector<GenParticle> * genparticles = event.genparticles;
   
   vector<GenParticle> vlq;
@@ -187,12 +184,14 @@ void VLQGenHists::fill(const Event & event){
     if(daughter2) daughter2_pdgId = daughter2->pdgId();
 
 
-
-    cout<<"pdgId GenParticle: "<<igenp.pdgId() <<" mom1: "<<  mother1_pdgId<<" mom2: "<< mother2_pdgId <<" daughter1: "<<  daughter1_pdgId<<" daughter2: "<< daughter2_pdgId<<endl;
+    // if(abs(igenp.pdgId())==25 ||abs(igenp.pdgId())==23)
+    // cout<<"pdgId GenParticle: "<<igenp.pdgId() <<" mom1: "<<  mother1_pdgId<<" mom2: "<< mother2_pdgId <<" daughter1: "<<  daughter1_pdgId<<" daughter2: "<< daughter2_pdgId<<endl;
   
     //Fill decay histograms
-    if(abs(mother1_pdgId)== 600008 || abs(mother1_pdgId)== 600007 || abs(mother2_pdgId)== 600008 || abs(mother2_pdgId)== 600007 )
-      VLQ_decay->Fill(igenp.pdgId()>0 ? igenp.pdgId()-600000:igenp.pdgId()+600000);
+    if(abs(mother1_pdgId)== 6000007 || abs(mother1_pdgId)== 6000008 || abs(mother2_pdgId)== 6000008 || abs(mother2_pdgId)== 6000007 ){
+      VLQ_decay->Fill(igenp.pdgId());
+      //cout<<igenp.pdgId()<<endl;
+    }
     if(abs(mother1_pdgId)== 6 || abs(mother2_pdgId)== 6)
       top_decay->Fill(igenp.pdgId()); 
     if(abs(mother1_pdgId)== 23 || abs(mother2_pdgId)== 23)
@@ -218,6 +217,7 @@ void VLQGenHists::fill(const Event & event){
     } 
   }
   
+ 
   NHiggs->Fill(higgs.size(),weight);
   NW->Fill(wboson.size(),weight);
   NZ->Fill(zboson.size(),weight);

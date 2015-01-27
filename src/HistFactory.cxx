@@ -6,80 +6,151 @@
 #include "UHH2/common/include/EventHists.h"
 
 
-HistFactory::HistFactory(Context& ctx):m_ctx(ctx){}
+HistFactory::HistFactory(Context& ctx,
+			 string effiFileName):m_ctx(ctx){
 
+  sample = ctx.get("dataset_version");
+  effiFile.open(sample+string("_")+effiFileName);
+
+  weighted_count.push_back(0);//for the count without cut
+  count.push_back(0);
+
+  effiprint = true;
+ 
+}
+
+HistFactory::HistFactory(Context& ctx):m_ctx(ctx){
+
+  effiprint = false;
+}
 					
-HistFactory::~HistFactory(){}
+HistFactory::~HistFactory(){
+
+  if(effiprint){
+    effiFile << sample << "\n" << "\n";
+    //cout<<cutNames.size()<<" "<<count.size()<<endl;
+    
+    
+    for(unsigned int i = 1; i<count.size(); i++ ){
+      effiFile << cutNames[i-1] << "\n";
+      effiFile << "Total\n"; 
+      effiFile << "effi: "<< count[i]<<"/"<<count[0]<<" = "<<count[i]/count[0]<<" rel effi :"<<  count[i]<<"/"<<count[i-1]<<" = "<<count[i]/count[i-1]<<"\n";
+      effiFile << "Weighted\n";
+      effiFile << "effi: "<< weighted_count[i]<<"/"<<weighted_count[0]<<" = "<<weighted_count[i]/weighted_count[0]<<" rel effi: "<<  weighted_count[i]<<"/"<<weighted_count[i-1]<<" = "<<weighted_count[i]/weighted_count[i-1]<<"\n";
+      effiFile << "\n";
+    }
+    
+    effiFile << "---------------------------------\n";
+    effiFile << "---------------------------------\n";
+    effiFile.close();
+  
+
+  }
+}
 
 
+void HistFactory::addSelection(unique_ptr<Selection> selection, string cutName){
+  selectionClasses.push_back(move(selection)); 
+  cutNames.push_back(cutName);
+  if(effiprint)addCounter();
+}
+/*
+void HistFactory::addSelection(unique_ptr<Selection> selection, string cutName){
+  selectionClasses.push_back(move(selection)); 
+  cutNames.push_back(cutName);
+  if(effiprint)addCounter();
+}
+*/
+
+void HistFactory::addCounter(){
+  
+  weighted_count.push_back(0);
+  count.push_back(0);
+}
 
 void HistFactory::addHists(string histClass, string histName){
-
   //no cut Histograms
+  unique_ptr<Hists> histTemplate;
+  
   if(histClass.compare("ElectronHists")==0) {
-    factoryHists.push_back(new ElectronHists(m_ctx,histName));
+    histTemplate.reset(new ElectronHists(m_ctx,histName.c_str()));
   }
   else if(histClass.compare("MuonHists")==0){
-    factoryHists.push_back(new MuonHists(m_ctx,histName));
+    histTemplate.reset(new MuonHists(m_ctx,histName.c_str()));
   }
   else if(histClass.compare("JetHists")==0){
-    factoryHists.push_back(new JetHists(m_ctx,histName));
+    histTemplate.reset(new JetHists(m_ctx,histName.c_str()));
   }
   else if(histClass.compare("EventHists")==0){
-    factoryHists.push_back(new EventHists(m_ctx,histName));
+    histTemplate.reset(new EventHists(m_ctx,histName.c_str()));
   }
+  else if(histClass.compare("TopJetHists")==0){
+    histTemplate.reset(new TopJetHists(m_ctx,histName.c_str()));
+  }
+  
+
+  factoryHists.push_back(move(histTemplate));
 
   //Histograms with cuts
   for(auto cutName : cutNames){
 
+    
     stringstream ss;
     ss<<cutName<<"_"<<histName;
-
+   
     if(histClass.compare("ElectronHists")==0) {
-      factoryHists.push_back(new ElectronHists(m_ctx,ss.str().c_str()));
+      histTemplate.reset(new ElectronHists(m_ctx,ss.str().c_str()));
     }
     else if(histClass.compare("MuonHists")==0){
-      factoryHists.push_back(new MuonHists(m_ctx,ss.str().c_str()));
+      histTemplate.reset(new MuonHists(m_ctx,ss.str().c_str()));
     }
     else if(histClass.compare("JetHists")==0){
-      factoryHists.push_back(new JetHists(m_ctx,ss.str().c_str()));
+      histTemplate.reset(new JetHists(m_ctx,ss.str().c_str()));
     }
     else if(histClass.compare("EventHists")==0){
-      factoryHists.push_back(new EventHists(m_ctx,ss.str().c_str()));
+      histTemplate.reset(new EventHists(m_ctx,ss.str().c_str()));
     }
+    else if(histClass.compare("TopJetHists")==0){
+      histTemplate.reset(new TopJetHists(m_ctx,ss.str().c_str()));
+    }
+
+    factoryHists.push_back(move(histTemplate));
+   
   }
   
 }
 
 bool HistFactory::passAndFill(Event & event, int passOption){
   bool passCuts =true;
+  
+  unsigned int hist_number = factoryHists.size()/(selectionClasses.size()+1);
+  unsigned int cuti = 0; 
 
-  for(unsigned int i = 0;i<selectionClasses.size();++i)
-    factoryHists[i*selectionClasses.size()].fill(event);
 
-
-  for(auto & selection : selectionClasses){
-    if(selection.passes(event)){
-      for(unsigned int i = 0;i<selectionClasses.size();++i)
-	factoryHists[(i+1)*selectionClasses.size()].fill(event);
-    }
-    if(!selection.passes(event) && passOption==1) return false;
-    if(!selection.passes(event)) passCuts = false;
+  if(effiprint){
+    count[cuti] = count[cuti]+1;
+    weighted_count[cuti] = weighted_count[cuti]+event.weight;
   }
 
+  for(unsigned int i = 0;i<hist_number;++i)
+    factoryHists[i*(selectionClasses.size()+1)]->fill(event);
+ 
+
+  for(auto & selection : selectionClasses){
+    cuti++;
+    if(selection->passes(event)){
+      for(unsigned int i = 0;i<hist_number;++i)
+	factoryHists[cuti+i*(selectionClasses.size()+1)]->fill(event);
+      if(effiprint){
+	count[cuti] = count[cuti]+1;
+	weighted_count[cuti] = weighted_count[cuti]+event.weight;
+      }
+    }
+    if(!selection->passes(event) && passOption==0) return false;
+    if(!selection->passes(event)) passCuts = false;
+    }
+ 
   return passCuts;
 
 }
 
-
-
-
-
-
-
-/*
- h_ele_jetCuts.reset(new ElectronHists(ctx, "ele_jetCuts"));
-  h_jets_jetCuts.reset(new JetHists(ctx, "jets_jetCuts"));
-  h_muon_jetCuts.reset(new MuonHists(ctx, "muon_jetCuts"));
-  h_event_jetCuts.reset(new EventHists(ctx,"even_jetCuts"));
-*/

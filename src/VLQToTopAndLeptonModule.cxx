@@ -3,20 +3,38 @@
 
 #include "UHH2/core/include/AnalysisModule.h"
 #include "UHH2/core/include/Event.h"
+#include "UHH2/core/include/Utils.h" 
+
+
 #include "UHH2/common/include/CleaningModules.h"
+
+#include "UHH2/common/include/EventVariables.h"
+
+#include "UHH2/common/include/ElectronIds.h"
+#include "UHH2/common/include/MuonIds.h"
 
 #include "UHH2/common/include/MuonHists.h"
 #include "UHH2/common/include/ElectronHists.h"
 #include "UHH2/common/include/JetHists.h"
+#include "UHH2/common/include/EventHists.h"
 
 #include "UHH2/common/include/TriggerSelection.h" 
+#include "UHH2/common/include/NSelections.h"
+#include "UHH2/common/include/JetCorrections.h" 
+#include "UHH2/common/include/JetIds.h"
+
+
 
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonSelections.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonHists.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 
+#include "UHH2/VLQToTopAndLepton/include/HistFactory.h"
+
+
 using namespace std;
 using namespace uhh2;
+
 
 /** \brief Basic analysis example of an AnalysisModule (formerly 'cycle') in UHH2
  * 
@@ -30,15 +48,40 @@ public:
   virtual bool process(Event & event) override;
   
 private:
+
   
+  std::unique_ptr<HistFactory> muonFactory, eleFactory;
+
+  // object cleaner
+
+  std::unique_ptr<AnalysisModule>  jetCorr; 
+  std::unique_ptr<ElectronCleaner> elecleaner;
+  std::unique_ptr<MuonCleaner> mucleaner;  
   std::unique_ptr<JetCleaner> jetcleaner;
-   
+
+  //special ids btag, toptag...
+  JetId btag_medium;
+
+
   // declare the Selections to use. Use unique_ptr to ensure automatic call of delete in the destructor,
   // to avoid memory leaks.
-  std::unique_ptr<Selection> njet_sel, bsel, trigger;
-  
+  std::unique_ptr<Selection> njetSel, trigger, muonSel, eleSel;
+
+  std::unique_ptr<Selection> muonTrigger, muonMuon, muonJets, muonTop;
+  std::unique_ptr<Selection> eleTrigger, eleEle, eleJets, eleTop;
+
   // store the Hists collection as member variables. Again, use unique_ptr to avoid memory leaks.
-  std::unique_ptr<Hists> h_nocuts, h_njet, h_bsel, h_ele, h_ele_trigger, h_vlqGen;
+  std::unique_ptr<Hists> h_vlqGen;
+
+
+  //no cuts
+  std::unique_ptr<Hists> h_jets_noCuts, h_muon_noCuts, h_ele_noCuts, h_event_noCuts;
+  //Lepton Selection
+  std::unique_ptr<Hists> h_jets_leptonCuts, h_muon_leptonCuts, h_ele_leptonCuts, h_event_leptonCuts;
+  //Jets Selection
+  std::unique_ptr<Hists> h_jets_jetCuts, h_muon_jetCuts, h_ele_jetCuts, h_event_jetCuts;
+  //Lepton+Jet Selection
+  std::unique_ptr<Hists> h_jets_jetLepCuts, h_muon_jetLepCuts, h_ele_jetLepCuts, h_event_jetLepCuts;
 
 };
 
@@ -63,25 +106,82 @@ VLQToTopAndLeptonModule::VLQToTopAndLeptonModule(Context & ctx){
     cout << " " << kv.first << " = " << kv.second << endl;
   }
   
-  //setup trigger
-  trigger.reset(new TriggerSelection(testvalue));
-
-
+ 
   // 1. setup other modules. Here, only the jet cleaner
   jetcleaner.reset(new JetCleaner(30.0, 2.4));
   
   // 2. set up selections:
-  njet_sel.reset(new NJetSelection(2));
-  bsel.reset(new NBTagSelection(1));
   
+  jetCorr.reset(new JetCorrector(JERFiles::PHYS14_L123_MC));
+  elecleaner.reset(new ElectronCleaner(AndId<Electron>(ElectronID_CSA14_50ns_medium, PtEtaCut(20.0, 2.4))));
+  mucleaner.reset(new MuonCleaner(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 2.1))));
+
+  muonSel.reset(new NMuonSelection(1));
+  eleSel.reset(new NElectronSelection(1));
+  njetSel.reset(new NJetSelection(2));
+
+  //HLT_Mu40_v1 HLT_Ele32_eta2p1_WP85_Gsf_v1
+
+  btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
+
+  muonTrigger.reset(new TriggerSelection("HLT_Mu40_v*")); muonMuon.reset(new NMuonSelection(1)); muonJets.reset(new NJetSelection(2));muonTop.reset(new NTopJetSelection(1));
+  eleTrigger.reset(new TriggerSelection("HLT_Ele32_eta2p1_WP85_Gsf_v*")); eleEle.reset(new NElectronSelection(1)); eleJets.reset(new NJetSelection(2));eleTop.reset(new NTopJetSelection(1));
+
+  muonFactory.reset(new HistFactory(ctx,"muonEffis.txt"));
+  muonFactory->addSelection(make_unique<TriggerSelection>("HLT_Mu40_v*"),"muonTrigger");
+  muonFactory->addSelection(move(muonMuon),"muonChannel_muonCut");
+  muonFactory->addSelection(move(muonJets),"muonChannel_JetCut");
+  muonFactory->addSelection(move(muonTop), "muonChannel_TopJetCut");
+  muonFactory->addSelection(make_unique<NJetSelection>(2,-1, btag_medium), "muonChannel_BTagMedium");
+ 
+  muonFactory->addHists("ElectronHists","muonChannel_ElectronHists");
+  muonFactory->addHists("MuonHists","muonChannel_MuonHists");
+  muonFactory->addHists("EventHists","muonChannel_EventHists");
+  muonFactory->addHists("JetHists","muonChannel_JetHists");
+  muonFactory->addHists("TopJetHists","muonChannel_TopJetHists");
+
+
+  eleFactory.reset(new HistFactory(ctx,"eleEffis.txt"));
+  eleFactory->addSelection(move(eleTrigger),"eleChannel_Trigger");
+  eleFactory->addSelection(move(eleEle),"eleChannel_eleCut");
+  eleFactory->addSelection(move(eleJets),"eleChannel_JetCut");
+  eleFactory->addSelection(move(eleTop),"eleChannel_TopJetCut");
+  eleFactory->addSelection(make_unique<NJetSelection>(2,-1, btag_medium), "eleChannel_BTagMedium");
+
+  eleFactory->addHists("ElectronHists","eleChannel_ElectronHists");
+  eleFactory->addHists("MuonHists","eleChannel_MuonHists");
+  eleFactory->addHists("EventHists","eleChannel_EventHists");
+  eleFactory->addHists("JetHists","eleChannel_JetHists");
+  eleFactory->addHists("TopJetHists","eleChannel_TopJetHists");
+  
+
   // 3. Set up Hists classes:
   h_vlqGen.reset(new VLQGenHists(ctx,"VLQGenHists"));
   
-  h_nocuts.reset(new VLQToTopAndLeptonHists(ctx, "NoCuts"));
-  h_njet.reset(new VLQToTopAndLeptonHists(ctx, "Njet"));
-  h_bsel.reset(new VLQToTopAndLeptonHists(ctx, "Bsel"));
-  h_ele.reset(new ElectronHists(ctx, "ele_nocuts"));
-  h_ele_trigger.reset(new ElectronHists(ctx, "ele_nocuts"));
+  //no cuts
+  h_ele_noCuts.reset(new ElectronHists(ctx, "ele_noCuts"));
+  h_jets_noCuts.reset(new JetHists(ctx, "jets_noCuts"));
+  h_muon_noCuts.reset(new MuonHists(ctx, "muon_noCuts"));
+  h_event_noCuts.reset(new EventHists(ctx,"event_noCuts"));
+  
+  //Lep cut
+  h_ele_leptonCuts.reset(new ElectronHists(ctx, "ele_leptonCuts"));
+  h_jets_leptonCuts.reset(new JetHists(ctx, "jets_leptonCuts"));
+  h_muon_leptonCuts.reset(new MuonHists(ctx, "muon_leptonCuts"));
+  h_event_leptonCuts.reset(new EventHists(ctx,"event_leptonCuts"));
+
+  //jet cut
+  h_ele_jetCuts.reset(new ElectronHists(ctx, "ele_jetCuts"));
+  h_jets_jetCuts.reset(new JetHists(ctx, "jets_jetCuts"));
+  h_muon_jetCuts.reset(new MuonHists(ctx, "muon_jetCuts"));
+  h_event_jetCuts.reset(new EventHists(ctx,"event_jetCuts"));
+
+  //lep+jet cuts
+  h_ele_jetLepCuts.reset(new ElectronHists(ctx, "ele_jetLepCuts"));
+  h_jets_jetLepCuts.reset(new JetHists(ctx, "jets_jetLepCuts"));
+  h_muon_jetLepCuts.reset(new MuonHists(ctx, "muon_jetLepCuts"));
+  h_event_jetLepCuts.reset(new EventHists(ctx,"event_jetLepCuts"));
+
 }
 
 
@@ -99,34 +199,55 @@ bool VLQToTopAndLeptonModule::process(Event & event) {
     //cout << "VLQToTopAndLeptonModule: Starting to process event (runid, eventid) = (" << event.run << ", " << event.event << "); weight = " << event.weight << endl;
     
     // 1. run all modules; here: only jet cleaning.
+
+    jetCorr->process(event);
     jetcleaner->process(event);
-    
+    elecleaner->process(event);
+    mucleaner->process(event);
+
+    //trigger->passes(event);
+
     // 2. test selections and fill histograms
     
     h_vlqGen->fill(event);
 
-    h_nocuts->fill(event);
+    h_ele_noCuts->fill(event);
+    h_jets_noCuts->fill(event);
+    h_muon_noCuts->fill(event);
+    h_event_noCuts->fill(event);
+
+
+    if(muonSel->passes(event) || eleSel->passes(event)){
+      h_ele_leptonCuts->fill(event);
+      h_jets_leptonCuts->fill(event);
+      h_muon_leptonCuts->fill(event);
+      h_event_leptonCuts->fill(event);
+    }
     
-    bool njet_selection = njet_sel->passes(event);
-    if(njet_selection){
-        h_njet->fill(event);
+    if(njetSel->passes(event)){
+      h_ele_jetCuts->fill(event);
+      h_jets_jetCuts->fill(event);
+      h_muon_jetCuts->fill(event);
+      h_event_jetCuts->fill(event);
     }
-    bool bjet_selection = bsel->passes(event);
-    if(bjet_selection){
-        h_bsel->fill(event);
+
+    if((muonSel->passes(event) || eleSel->passes(event)) && njetSel->passes(event)){
+      h_ele_jetLepCuts->fill(event);
+      h_jets_jetLepCuts->fill(event);
+      h_muon_jetLepCuts->fill(event);
+      h_event_jetLepCuts->fill(event);
     }
-    h_ele->fill(event);
+    
 
 
-    if(trigger->passes(event)){
-      h_ele_trigger->fill(event);
 
-    }
+    muonFactory->passAndFill(event);
+    eleFactory->passAndFill(event);
 
 
     
     // 3. decide whether or not to keep the current event in the output:
-    return njet_selection && bjet_selection;
+    return true;//njet_selection && bjet_selection;
 }
 
 // as we want to run the ExampleCycleNew directly with AnalysisModuleRunner,
