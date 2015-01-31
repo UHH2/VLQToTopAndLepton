@@ -18,25 +18,25 @@
    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Output/" PostFix="" TargetLumi="19.5" >
    <!-- <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/ottjoc/proof-wd/" ProofNodes="2" OutputDirectory="./" PostFix="" TargetLumi="1" >  -->
 
-        <InputData Lumi="83604" NEventsMax="-1" Type="MC" Version="BpJ_TW_800" Cacheable="False">
+        <InputData Lumi="83604" NEventsMax="15" Type="MC" Version="BpJ_TW_800" Cacheable="False">
           &BpJ_TW_800;
           <InputTree Name="AnalysisTree" /> 
           <!-- uncomment to write tree of selected events, i.e. of those events for which the AnalysisModule::process method  returns true
                If no OutputTree is given, no events will be written. Please do use "AnalysisTree" as Name. -->
           <!-- <OutputTree Name="AnalysisTree" /> -->
         </InputData>
-
-        <InputData Lumi="32916" NEventsMax="-1" Type="MC" Version="BpJ_TW_1200" Cacheable="False">
+<!--
+        <InputData Lumi="32916" NEventsMax="10" Type="MC" Version="BpJ_TW_1200" Cacheable="False">
           &BpJ_TW_1200;
           <InputTree Name="AnalysisTree" /> 
         </InputData>
 
-	<InputData Lumi="2097.3" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
+	<InputData Lumi="2097.3" NEventsMax="10" Type="MC" Version="WJets" Cacheable="False">
           &WJets;
           <InputTree Name="AnalysisTree" /> 
         </InputData>
 
-	<InputData Lumi="245.8" NEventsMax="-1" Type="MC" Version="TTJets" Cacheable="False">
+	<InputData Lumi="245.8" NEventsMax="10" Type="MC" Version="TTJets" Cacheable="False">
 	  &TTbar;
 	  <InputTree Name="AnalysisTree" />
 	</InputData>
@@ -46,7 +46,7 @@
           &ZJets;
           <InputTree Name="AnalysisTree" /> 
         </InputData>
-	
+-->	
  
         <UserConfig>
             <!-- define which collections to read from the input. Only specify what you need to save I/O time -->
@@ -88,8 +88,9 @@
             -->
             
             <!-- the class name of the AnalysisModule subclasses to run: -->
-            <Item Name="AnalysisModule" Value="VLQToTopAndLeptonModule" /> 
-            
+            <!--<Item Name="AnalysisModule" Value="VLQToTopAndLeptonModule" /> -->
+            <Item Name="AnalysisModule" Value="GenTestModule" />
+
             <!-- set this to the name of an AndSelection to control what is written to the output. If not given, *all* events are written to the output tree. -->
             <Item Name="TestKey" Value="TestKeyValue" />
         </UserConfig>

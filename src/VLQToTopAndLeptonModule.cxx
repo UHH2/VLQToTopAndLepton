@@ -22,7 +22,7 @@
 #include "UHH2/common/include/NSelections.h"
 #include "UHH2/common/include/JetCorrections.h" 
 #include "UHH2/common/include/JetIds.h"
-
+//#include "UHH2/common/include/HTCalc.h"
 
 
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonSelections.h"
@@ -53,7 +53,7 @@ private:
   std::unique_ptr<HistFactory> muonFactory, eleFactory;
 
   // object cleaner
-
+  //std::unique_ptr<AnalysisModule> ht;
   std::unique_ptr<AnalysisModule>  jetCorr; 
   std::unique_ptr<ElectronCleaner> elecleaner;
   std::unique_ptr<MuonCleaner> mucleaner;  
@@ -113,6 +113,7 @@ VLQToTopAndLeptonModule::VLQToTopAndLeptonModule(Context & ctx){
   // 2. set up selections:
   
   jetCorr.reset(new JetCorrector(JERFiles::PHYS14_L123_MC));
+  //ht.reset(new HTCalc(ctx));
   elecleaner.reset(new ElectronCleaner(AndId<Electron>(ElectronID_CSA14_50ns_medium, PtEtaCut(20.0, 2.4))));
   mucleaner.reset(new MuonCleaner(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 2.1))));
 
@@ -205,6 +206,7 @@ bool VLQToTopAndLeptonModule::process(Event & event) {
     elecleaner->process(event);
     mucleaner->process(event);
 
+    //ht->process(event);
     //trigger->passes(event);
 
     // 2. test selections and fill histograms
