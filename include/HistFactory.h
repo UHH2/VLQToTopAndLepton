@@ -17,20 +17,20 @@ using namespace std;
 class HistFactory{
  public:
   HistFactory(Context& ctx,
-	      string effiFileName);
+	      const string& effiFileName);
   HistFactory(Context& ctx);
 
   ~HistFactory();
 
-  void addSelection(unique_ptr<Selection> selection, string cutName);
+  void addSelection(unique_ptr<Selection> selection, const string& cutName);
   //void addSelection(shared_ptr<Selection> selection, string cutName);
 
 
-  void addHists(string histClass, string histName);
+  void addHists(const string& histClass, const string& histName);
 
-  bool passAndFill(Event & event, int passOption=0);
+  bool passAndFill(const Event& event, int passOption=0);
 
-  void printEffiToFile(string filename){dumpFile=filename;};
+  void printEffiToFile(const string& filename){dumpFile=filename;};
 
  private:
   void addCounter();

@@ -8,7 +8,7 @@
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 
 HistFactory::HistFactory(Context& ctx,
-			 string effiFileName):m_ctx(ctx){
+			 const string& effiFileName):m_ctx(ctx){
 
   sample = ctx.get("dataset_version");
   effiFile.open(sample+string("_")+effiFileName);
@@ -50,7 +50,7 @@ HistFactory::~HistFactory(){
 }
 
 
-void HistFactory::addSelection(unique_ptr<Selection> selection, string cutName){
+void HistFactory::addSelection(unique_ptr<Selection> selection, const string& cutName){
   selectionClasses.push_back(move(selection)); 
   cutNames.push_back(cutName);
   if(effiprint)addCounter();
@@ -69,8 +69,9 @@ void HistFactory::addCounter(){
   count.push_back(0);
 }
 
-void HistFactory::addHists(string histClass, string histName){
+void HistFactory::addHists(const string& histClass, const  string& histName){
   //no cut Histograms
+
   unique_ptr<Hists> histTemplate;
   
   if(histClass.compare("ElectronHists")==0) {
@@ -131,7 +132,7 @@ void HistFactory::addHists(string histClass, string histName){
   
 }
 
-bool HistFactory::passAndFill(Event & event, int passOption){
+bool HistFactory::passAndFill(const Event & event, int passOption){
   bool passCuts =true;
   
   unsigned int hist_number = factoryHists.size()/(selectionClasses.size()+1);
