@@ -5,6 +5,7 @@
 #include "UHH2/common/include/JetHists.h"
 #include "UHH2/common/include/EventHists.h"
 
+#include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 
 HistFactory::HistFactory(Context& ctx,
 			 string effiFileName):m_ctx(ctx){
@@ -87,7 +88,12 @@ void HistFactory::addHists(string histClass, string histName){
   else if(histClass.compare("TopJetHists")==0){
     histTemplate.reset(new TopJetHists(m_ctx,histName.c_str()));
   }
+  else if(histClass.compare("VLQGenHists")==0){
+    histTemplate.reset(new VLQGenHists(m_ctx,histName.c_str()));
+  }
   
+
+
 
   factoryHists.push_back(move(histTemplate));
 
@@ -113,6 +119,11 @@ void HistFactory::addHists(string histClass, string histName){
     else if(histClass.compare("TopJetHists")==0){
       histTemplate.reset(new TopJetHists(m_ctx,ss.str().c_str()));
     }
+    else if(histClass.compare("VLQGenHists")==0){
+      histTemplate.reset(new VLQGenHists(m_ctx,ss.str().c_str()));
+    }
+
+
 
     factoryHists.push_back(move(histTemplate));
    
@@ -139,6 +150,8 @@ bool HistFactory::passAndFill(Event & event, int passOption){
   for(auto & selection : selectionClasses){
     cuti++;
     if(selection->passes(event)){
+
+      //cout<<"passes"<<endl;
       for(unsigned int i = 0;i<hist_number;++i)
 	factoryHists[cuti+i*(selectionClasses.size()+1)]->fill(event);
       if(effiprint){
@@ -146,10 +159,11 @@ bool HistFactory::passAndFill(Event & event, int passOption){
 	weighted_count[cuti] = weighted_count[cuti]+event.weight;
       }
     }
-    if(!selection->passes(event) && passOption==0) return false;
-    if(!selection->passes(event)) passCuts = false;
+    else{
+      if(passOption==0) return false;
+      else passCuts = false;
     }
- 
+  }
   return passCuts;
 
 }

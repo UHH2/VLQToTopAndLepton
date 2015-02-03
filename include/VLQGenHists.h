@@ -8,7 +8,7 @@
 
 
 #include "TH1F.h"
-
+#include "TH2F.h"
 
 #include <vector>
 
@@ -18,7 +18,7 @@
 
 struct singleHists
 {
-  TH1F *pt, *eta, *phi, *mass;
+  TH1F *pt, *eta, *phi, *mass, *charge;
 };
 
 
@@ -50,5 +50,8 @@ class VLQGenHists: public uhh2::Hists {
 
   TH1F* particles_noMother, *particles_noMother_pT, *particles_noMother_eta, *particles_noMother_phi;
   TH1F* particles_noMotherNoDaughter, *particles_noMotherNoDaughter_pT, *particles_noMotherNoDaughter_eta, *particles_noMotherNoDaughter_phi;
+
+  TH1F* VLQ_mother;
+  TH2F* VLQ_mother1_mother2;
 
 };

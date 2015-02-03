@@ -28,7 +28,8 @@ GenParticleHists VLQGenHists::histoBooker(string HistName, double minMass, doubl
     single.pt  = book<TH1F>((HistName+string("_pt")+suffix).c_str(), (string("p_{T}^{")+HistName+string(" ")+axisSuffix+string("} [GeV/c]")).c_str(), 200, 0, 1500);
     single.eta = book<TH1F>((HistName+string("_eta")+suffix).c_str(),(string("#eta_{")+HistName+string(" ")+axisSuffix+string("}")).c_str(), 100, -4, 4);
     single.phi = book<TH1F>((HistName+string("_phi")+suffix).c_str(),(string("#phi_{")+HistName+string(" ")+axisSuffix+string("}")).c_str(), 100, -3.2, 3.2);
-    single.mass = book<TH1F>((HistName+string("_mass")+suffix).c_str(),(string("#mass_{")+HistName+string(" ")+axisSuffix+string("}")).c_str(), 100, minMass, maxMass);
+    single.mass = book<TH1F>((HistName+string("_mass")+suffix).c_str(),(string("mass_{")+HistName+string(" ")+axisSuffix+string("}")).c_str(), 100, minMass, maxMass);
+    single.charge = book<TH1F>((HistName+string("_charge")+suffix).c_str(),(string("charge_{")+HistName+string(" ")+axisSuffix+string("}")).c_str(), 100, -1, 1);
     
     hists.stdHists.push_back(single);
     
@@ -45,14 +46,15 @@ void VLQGenHists::histoFiller(vector<GenParticle> & particles, int partNumber, d
 
   int count = 0;
   for(auto part : particles){
+    count++;
     for(int it = 0; it<3; ++it){
       if(count==it || it==0 ) m_Hists.at(partNumber).stdHists.at(it).pt->Fill(part.pt(),weight);
       if(count==it || it==0 ) m_Hists.at(partNumber).stdHists.at(it).eta->Fill(part.eta(),weight);
       if(count==it || it==0 ) m_Hists.at(partNumber).stdHists.at(it).phi->Fill(part.phi(),weight);
-      //if(count==it || it==0 ) m_Hists.at(partNumber).stdHists.at(it).mass->Fill(part.v4().M(),weight);
-      if(count==it || it ==0) m_Hists.at(partNumber).stdHists.at(it).mass->Fill(sqrt(part.energy()*part.energy()-part.pt()*part.pt()),weight);
+      if(count==it || it==0 ) m_Hists.at(partNumber).stdHists.at(it).mass->Fill(part.v4().M(),weight);
+      //if(count==it || it ==0) m_Hists.at(partNumber).stdHists.at(it).mass->Fill(sqrt(part.energy()*part.energy()-part.pt()*part.pt()),weight);
+      if(count==it || it ==0) m_Hists.at(partNumber).stdHists.at(it).charge->Fill(part.charge(),weight);
     }
-    count++;
   }
 }
 
@@ -110,6 +112,9 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
   particles_noMotherNoDaughter_eta = book<TH1F>("particles_noMotherNoDaughter_eta", "#eta ", 40, -2.5, 2.5);
   particles_noMotherNoDaughter_phi = book<TH1F>("particles_noMotherNoDaughter_phi", "#phi", 64, -3.2, 3.2);
 
+  VLQ_mother = book<TH1F>("VLQ_mothers"   , "VLQ mothers", 61, -30.5, 30.5);
+  VLQ_mother1_mother2= book<TH2F>("VLQ_mother1_mother2"   , "VLQ mothers", 61, -30.5, 30.5,61, -30.5, 30.5);
+
 }
 
  
@@ -157,43 +162,49 @@ void VLQGenHists::fill(const Event & event){
     if(daughter2) daughter2_pdgId = daughter2->pdgId();
 
 
+
+    if(abs(daughter1_pdgId)==6000008 ||abs(daughter1_pdgId)==6000007 || abs(daughter2_pdgId)==6000008 ||abs(daughter2_pdgId)==6000007){
+      VLQ_mother->Fill(igenp.pdgId(),weight);
+    }
+
+
     //put all the particles in vectors
     if (abs(igenp.pdgId()) == 6000008 || abs(igenp.pdgId()) == 6000007){
       vlq.push_back(igenp);
       decayFiller(weight,positionHelper("VLQ") , 0,0,daughter1_pdgId,daughter2_pdgId);
+      VLQ_mother1_mother2->Fill(mother1_pdgId,mother2_pdgId,weight);
     }
     else if(abs(igenp.pdgId()) == 5 ){
       bquarks.push_back(igenp);
       decayFiller(weight,positionHelper("B") , 0,0,daughter1_pdgId,daughter2_pdgId);
-}
+    }
     else if(abs(igenp.pdgId()) == 6 ){
       top.push_back(igenp);     
       decayFiller(weight,positionHelper("Top") , 0,0,daughter1_pdgId,daughter2_pdgId);
-
-}
-   else if (abs(igenp.pdgId()) == 11 ){
+    }
+    else if (abs(igenp.pdgId()) == 11 ){
       electrons.push_back(igenp);
       decayFiller(weight,positionHelper("Electron") , 0,0,daughter1_pdgId,daughter2_pdgId);
-}
-   else if (abs(igenp.pdgId()) == 13 ){
+    }
+    else if (abs(igenp.pdgId()) == 13 ){
       muons.push_back(igenp);
       decayFiller(weight,positionHelper("Muon") , 0,0,daughter1_pdgId,daughter2_pdgId);
-}
+    }
     else if(abs(igenp.pdgId()) == 23 ){
       zboson.push_back(igenp);
       decayFiller(weight,positionHelper("Z") , 0,0,daughter1_pdgId,daughter2_pdgId);
-}
+    }
     else if(abs(igenp.pdgId()) == 24 ){
       wboson.push_back(igenp);
       decayFiller(weight,positionHelper("W") , 0,0,daughter1_pdgId,daughter2_pdgId);
-}
+    }
     else if(abs(igenp.pdgId()) == 25 ){
       higgs.push_back(igenp);
       decayFiller(weight,positionHelper("Higgs") , 0,0,daughter1_pdgId,daughter2_pdgId);
-}
-  
+    }
+    
     //if(abs(igenp.pdgId())==25 ||abs(igenp.pdgId())==23)
-    //  cout<<"pdgId GenParticle: "<<igenp.pdgId() <<" mom1: "<<  mother1_pdgId<<" mom2: "<< mother2_pdgId <<" daughter1: "<<  daughter1_pdgId<<" daughter2: "<< daughter2_pdgId<<endl;
+    //cout<<"pdgId GenParticle: "<<igenp.pdgId() <<" mom1: "<<  mother1_pdgId<<" mom2: "<< mother2_pdgId <<" daughter1: "<<  daughter1_pdgId<<" daughter2: "<< daughter2_pdgId<<endl;
   
     //Fill decay histograms
 
