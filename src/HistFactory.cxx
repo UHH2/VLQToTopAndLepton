@@ -7,8 +7,13 @@
 
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 
+
+#include "TH1D.h"
+
+
+
 HistFactory::HistFactory(Context& ctx,
-			 const string& effiFileName):m_ctx(ctx){
+			 const string& effiFileName):m_ctx(ctx), cutflow_raw(0), cutflow_weighted(0){
 
   sample = ctx.get("dataset_version");
   effiFile.open(sample+string("_")+effiFileName);
@@ -20,7 +25,7 @@ HistFactory::HistFactory(Context& ctx,
  
 }
 
-HistFactory::HistFactory(Context& ctx):m_ctx(ctx){
+HistFactory::HistFactory(Context& ctx):m_ctx(ctx), cutflow_raw(0), cutflow_weighted(0){
 
   effiprint = false;
 }
@@ -35,7 +40,7 @@ HistFactory::~HistFactory(){
     for(unsigned int i = 1; i<count.size(); i++ ){
       effiFile << cutNames[i-1] << "\n";
       effiFile << "Total\n"; 
-      effiFile << "effi: "<< count[i]<<"/"<<count[0]<<" = "<<count[i]/count[0]<<" rel effi :"<<  count[i]<<"/"<<count[i-1]<<" = "<<count[i]/count[i-1]<<"\n";
+      effiFile << "effi: "<< count[i]<<"/"<<count[0]<<" = "<<count[i]/count[0]<<" rel effi: "<<  count[i]<<"/"<<count[i-1]<<" = "<<count[i]/count[i-1]<<"\n";
       effiFile << "Weighted\n";
       effiFile << "effi: "<< weighted_count[i]<<"/"<<weighted_count[0]<<" = "<<weighted_count[i]/weighted_count[0]<<" rel effi: "<<  weighted_count[i]<<"/"<<weighted_count[i-1]<<" = "<<weighted_count[i]/weighted_count[i-1]<<"\n";
       effiFile << "\n";
@@ -93,9 +98,6 @@ void HistFactory::addHists(const string& histClass, const  string& histName){
     histTemplate.reset(new VLQGenHists(m_ctx,histName.c_str()));
   }
   
-
-
-
   factoryHists.push_back(move(histTemplate));
 
   //Histograms with cuts
@@ -119,6 +121,7 @@ void HistFactory::addHists(const string& histClass, const  string& histName){
     }
     else if(histClass.compare("TopJetHists")==0){
       histTemplate.reset(new TopJetHists(m_ctx,ss.str().c_str()));
+
     }
     else if(histClass.compare("VLQGenHists")==0){
       histTemplate.reset(new VLQGenHists(m_ctx,ss.str().c_str()));
@@ -138,6 +141,12 @@ bool HistFactory::passAndFill(const Event & event, int passOption){
   unsigned int hist_number = factoryHists.size()/(selectionClasses.size()+1);
   unsigned int cuti = 0; 
 
+  if(!effiHistName.empty() && cutflow_raw==NULL ) create_histos();
+
+  if(cutflow_raw){
+    cutflow_raw->Fill(cuti);
+    cutflow_weighted->Fill(cuti, event.weight);
+  }
 
   if(effiprint){
     count[cuti] = count[cuti]+1;
@@ -146,13 +155,14 @@ bool HistFactory::passAndFill(const Event & event, int passOption){
 
   for(unsigned int i = 0;i<hist_number;++i)
     factoryHists[i*(selectionClasses.size()+1)]->fill(event);
- 
 
   for(auto & selection : selectionClasses){
     cuti++;
     if(selection->passes(event)){
-
-      //cout<<"passes"<<endl;
+      if(cutflow_raw){
+	cutflow_raw->Fill(cuti);
+	cutflow_weighted->Fill(cuti, event.weight);
+      }
       for(unsigned int i = 0;i<hist_number;++i)
 	factoryHists[cuti+i*(selectionClasses.size()+1)]->fill(event);
       if(effiprint){
@@ -169,3 +179,17 @@ bool HistFactory::passAndFill(const Event & event, int passOption){
 
 }
 
+void HistFactory::create_histos(){
+
+  cutflow_weighted = new TH1D(( effiHistName ).c_str(), ("Cutflow '" + effiHistName + "' using weights").c_str(), cutNames.size()+1, 0, cutNames.size()+1);
+  cutflow_raw = new TH1D((effiHistName + "_raw").c_str(), ("Cutflow '" + effiHistName + "' unweighted").c_str(), cutNames.size()+1, 0, cutNames.size()+1);
+  for(TAxis * ax : {cutflow_raw->GetXaxis(), cutflow_weighted->GetXaxis()}){
+    ax->SetBinLabel(1, "all");
+    for(size_t i=0; i<cutNames.size(); ++i){
+      ax->SetBinLabel(i+2, cutNames.at(i).c_str());
+    }
+  }
+  m_ctx.put("cutflow", cutflow_raw);
+  m_ctx.put("cutflow", cutflow_weighted);
+
+}
