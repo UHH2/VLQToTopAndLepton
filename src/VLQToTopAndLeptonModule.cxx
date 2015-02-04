@@ -22,12 +22,13 @@
 #include "UHH2/common/include/NSelections.h"
 #include "UHH2/common/include/JetCorrections.h" 
 #include "UHH2/common/include/JetIds.h"
-#include "UHH2/common/include/HTCalc.h"
+
 
 
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonSelections.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonHists.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
+#include "UHH2/VLQToTopAndLepton/include/HTCalc.h"
 
 #include "UHH2/VLQToTopAndLepton/include/HistFactory.h"
 

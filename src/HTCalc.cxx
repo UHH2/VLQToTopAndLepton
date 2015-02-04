@@ -1,4 +1,4 @@
-#include "UHH2/common/include/HTCalc.h"
+#include "UHH2/VLQToTopAndLepton/include/HTCalc.h"
 
 using namespace uhh2;
 using namespace std;

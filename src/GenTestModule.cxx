@@ -22,7 +22,7 @@
 #include "UHH2/common/include/NSelections.h"
 #include "UHH2/common/include/JetCorrections.h" 
 #include "UHH2/common/include/JetIds.h"
-#include "UHH2/common/include/HTCalc.h"
+
 
 #include "UHH2/common/include/TTbarReconstruction.h"
 
@@ -34,7 +34,7 @@
 //#include "UHH2/VLQToTopAndLepton/include/HTSelection.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 #include "UHH2/VLQToTopAndLepton/include/HistFactory.h"
-
+#include "UHH2/VLQToTopAndLepton/include/HTCalc.h"
 
 using namespace std;
 using namespace uhh2;
@@ -49,7 +49,6 @@ public:
 private:
 
   string Version;
-
 
   std::unique_ptr<VLQGenHists> vlqGenHists;
   std::unique_ptr<AnalysisModule> ht;
@@ -74,8 +73,8 @@ private:
 
   JetId btag_medium;
   MuonId muid_cut;
-  JetId jet_cut;
-  TopJetId topjet_cut;
+  JetId twojet, onejet;
+  TopJetId topjet;
 };
 
 
@@ -99,22 +98,26 @@ GenTestModule::GenTestModule(Context& ctx){
 
   vlqGenHists.reset(new VLQGenHists(ctx,"GenHists"));
 
-  muonTrigger.reset(new HistFactory(ctx,"triggerEffis.txt"));
+  //muonTrigger.reset(new HistFactory(ctx,"triggerEffis.txt"));
+  muonTrigger.reset(new HistFactory(ctx));
   muonTrigger->addSelection(make_unique<GenNSelection>(13,1,1,30,-1),"1_GenSel");
   muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu40_v*"),"muonTrigger");
   muonTrigger->addHists("MuonHists","triggerChannel_MuonHists");
 
   muid_cut = AndId<Muon>(MuonIDTight(), PtEtaCut(50.0, 2.4));
-  jet_cut = PtEtaCut(50.0, 2.4);
-  topjet_cut = PtEtaCut(150.0,2.4);
+  onejet = PtEtaCut(150.0, 2.4); twojet = PtEtaCut(50.0, 2.4);
+  topjet = PtEtaCut(150.0,2.4);
   
-  muonFactory.reset(new HistFactory(ctx,"muonEffis.txt"));	
-  muonFactory->addSelection(make_unique<TriggerSelection>("HLT_Mu40_v*"),"muonTrigger");
+  //muonFactory.reset(new HistFactory(ctx,"muonEffis.txt"));
+  muonFactory.reset(new HistFactory(ctx));
+  muonFactory->setEffiHistName("muonEffis");
+  //muonFactory->addSelection(make_unique<TriggerSelection>("HLT_Mu40_v*"),"muonTrigger");
   muonFactory->addSelection(make_unique<NElectronSelection>(0,0),"0_eleCut");
   muonFactory->addSelection(make_unique<NMuonSelection>(1,1,muid_cut),"1_muonCut");
-  muonFactory->addSelection(make_unique<NJetSelection>(3,-1,jet_cut),"2_JetCut");
   muonFactory->addSelection(make_unique<STSelection>(ctx,500),"500_ST");
-  muonFactory->addSelection(make_unique<NTopJetSelection>(2,-1,topjet_cut), "TopJetCut");
+  muonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
+  muonFactory->addSelection(make_unique<NJetSelection>(3,-1,twojet),"3_JetCut");
+  muonFactory->addSelection(make_unique<NTopJetSelection>(1,-1,topjet), "TopJetCut");
   muonFactory->addSelection(make_unique<NJetSelection>(1,-1, btag_medium), "BTagMedium");
 
   muonFactory->addHists("ElectronHists","muonChannel_ElectronHists");
@@ -167,14 +170,17 @@ GenTestModule::GenTestModule(Context& ctx){
   vector<int> wLep {24,13};
 
 
-  topWMuonFactory.reset(new HistFactory(ctx,"topLep.txt"));	
+  //topWMuonFactory.reset(new HistFactory(ctx,"topLep.txt"));
+  topWMuonFactory.reset(new HistFactory(ctx));
+  topWMuonFactory->setEffiHistName("topLep");
   topWMuonFactory->addSelection(make_unique<GenFamilySelection>(topLep,2),"topLep");
   topWMuonFactory->addSelection(make_unique<GenFamilySelection>(wHad,2),"wHad");
   topWMuonFactory->addSelection(make_unique<NElectronSelection>(0,0),"0_eleCut");
   topWMuonFactory->addSelection(make_unique<NMuonSelection>(1,1,muid_cut),"1_muonCut");
-  topWMuonFactory->addSelection(make_unique<NJetSelection>(3,-1,jet_cut),"2_JetCut");
   topWMuonFactory->addSelection(make_unique<STSelection>(ctx,500),"500_ST");
-  topWMuonFactory->addSelection(make_unique<NTopJetSelection>(2,-1,topjet_cut), "TopJetCut");
+  topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"150GeV_JetCut");
+  topWMuonFactory->addSelection(make_unique<NJetSelection>(3,-1,twojet),"2_JetCut");
+  topWMuonFactory->addSelection(make_unique<NTopJetSelection>(1,-1,topjet), "TopJetCut");
   topWMuonFactory->addSelection(make_unique<NJetSelection>(2,-1, btag_medium), "BTagMedium");
 
 
@@ -186,14 +192,17 @@ GenTestModule::GenTestModule(Context& ctx){
   topWMuonFactory->addHists("VLQGenHists","topLep_VLQGenHists");
 
 
-  wMuonFactory.reset(new HistFactory(ctx,"topHad.txt"));	
+  //wMuonFactory.reset(new HistFactory(ctx,"topHad.txt"));
+  wMuonFactory.reset(new HistFactory(ctx));
+  wMuonFactory->setEffiHistName("topHad");	
   wMuonFactory->addSelection(make_unique<GenFamilySelection>(topHad,2),"topHad");
   wMuonFactory->addSelection(make_unique<GenFamilySelection>(wLep,2),"wLep");
   wMuonFactory->addSelection(make_unique<NElectronSelection>(0,0),"0_eleCut");
   wMuonFactory->addSelection(make_unique<NMuonSelection>(1,1,muid_cut),"1_muonCut");
-  wMuonFactory->addSelection(make_unique<NJetSelection>(3,-1,jet_cut),"2_JetCut");
   wMuonFactory->addSelection(make_unique<STSelection>(ctx,500),"500_ST");
-  wMuonFactory->addSelection(make_unique<NTopJetSelection>(2,-1,topjet_cut), "TopJetCut");
+  wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"150GeV_JetCut");
+  wMuonFactory->addSelection(make_unique<NJetSelection>(3,-1,twojet),"2_JetCut");
+  wMuonFactory->addSelection(make_unique<NTopJetSelection>(2,-1,topjet), "TopJetCut");
   wMuonFactory->addSelection(make_unique<NJetSelection>(2,-1, btag_medium), "BTagMedium");
 
   wMuonFactory->addHists("ElectronHists","topHad_ElectronHists");
@@ -230,7 +239,7 @@ bool GenTestModule::process(Event & event){
     if(!HiggsFilter->passes(event)||!ZFilter->passes(event)) return false;
   
   muonTrigger->passAndFill(event);
-  
+ 
   wMuonFactory->passAndFill(event);
   topWMuonFactory->passAndFill(event);
 

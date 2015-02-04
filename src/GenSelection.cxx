@@ -78,7 +78,7 @@ bool GenFamilySelection::searchDaughter(const uhh2::Event & event){
      if(abs(genp.pdgId()) == familyTies.at(0)){
        const GenParticle* daughter1 = genp.daughter(event.genparticles,1);
        const GenParticle* daughter2 = genp.daughter(event.genparticles,2);
-       for(int m = 1; m < familyTies.size(); ++m){
+       for(unsigned int m = 1; m < familyTies.size(); ++m){
          ///cout<<"search "  <<familyTies.at(m);//<<endl;
          int daughter1_pdgId =0;
          int daughter2_pdgId =0;
@@ -96,7 +96,7 @@ bool GenFamilySelection::searchDaughter(const uhh2::Event & event){
 	   if(!hadronic) break;
 	 }
 
-         if(m==(familyTies.size()-1)) ;return true;
+         if(m==(familyTies.size()-1))return true;
 
          if(abs(daughter1_pdgId)==familyTies.at(m)){
            daughter1 = daughter1->daughter(event.genparticles,1);
