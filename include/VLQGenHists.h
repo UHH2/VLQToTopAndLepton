@@ -24,7 +24,7 @@ struct singleHists
 
 struct GenParticleHists
 {
-  TH1F* number, *decay_mom, *decay_daughter;
+  TH1F* number, *decay_mom, *decay_daughter, *deltaRmin, *nextParticle;
   std::vector<singleHists> stdHists;
 };
 
@@ -36,17 +36,19 @@ class VLQGenHists: public uhh2::Hists {
   
   virtual void fill(const uhh2::Event & ev) override;
   virtual ~VLQGenHists();
-    
+  
  private:
-
-  GenParticleHists histoBooker(std::string HistName, double minMass, double maxMass);
+  
+  GenParticleHists histoBooker(const std::string& HistName, double minMass, double maxMass);
   void histoFiller(std::vector<GenParticle> & particles, int partNumber, double weight);
-  void decayFiller(double weight, int partNumber, int mother1, int mother2, int daughter1, int daughter2);	
-
-  int positionHelper(std::string Name);
+  void decayFiller(double weight, int partNumber, int mother1, int mother2, int daughter1, int daughter2);
+  void fill_nearest(int position, double weight, double deltaRmin, double pdgId);
+    
+  int positionHelper(const std::string& Name);
 
   std::vector<GenParticleHists> m_Hists;
   std::vector<std::string> PartNames;
+  std::vector<int> PartPdgId;
 
   TH1F* particles_noMother, *particles_noMother_pT, *particles_noMother_eta, *particles_noMother_phi;
   TH1F* particles_noMotherNoDaughter, *particles_noMotherNoDaughter_pT, *particles_noMotherNoDaughter_eta, *particles_noMotherNoDaughter_phi;
