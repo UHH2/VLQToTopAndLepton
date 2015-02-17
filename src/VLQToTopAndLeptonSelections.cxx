@@ -28,7 +28,6 @@ HTSelection::HTSelection(Context & ctx, double HTmin_): HTmin(HTmin_){
 }
 
 bool HTSelection::passes(const Event & event){
-  event.get_state(ht);
   return HTmin<event.get(ht);
   //return false;
 }
