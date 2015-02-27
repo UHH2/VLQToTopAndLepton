@@ -6,7 +6,6 @@
 
 #include "UHH2/common/include/Utils.h"
 
-
 #include "TH1F.h"
 #include "TH2F.h"
 
@@ -19,13 +18,16 @@
 struct singleHists
 {
   TH1F *pt, *eta, *phi, *mass, *charge;
+  TH2F* pt_eta;
 };
 
 
 struct GenParticleHists
-{
-  TH1F* number, *decay_mom, *decay_daughter, *deltaRmin, *nextParticle;
+{ 
+  TH1F* number, *decay_mom, *decay_daughter, *deltaRmin, *nextParticle, *deltaR_daughters;
   std::vector<singleHists> stdHists;
+  
+
 };
 
 
@@ -43,7 +45,8 @@ class VLQGenHists: public uhh2::Hists {
   void histoFiller(std::vector<GenParticle> & particles, int partNumber, double weight);
   void decayFiller(double weight, int partNumber, int mother1, int mother2, int daughter1, int daughter2);
   void fill_nearest(int position, double weight, double deltaRmin, double pdgId);
-    
+  void fillDaughterDistance(int position, double deltaR, double weight);
+
   int positionHelper(const std::string& Name);
 
   std::vector<GenParticleHists> m_Hists;
@@ -56,4 +59,5 @@ class VLQGenHists: public uhh2::Hists {
   TH1F* VLQ_mother;
   TH2F* VLQ_mother1_mother2;
 
+  TH1F* deltaR_w, *deltaPhi_w;
 };

@@ -13,21 +13,18 @@
 
 
 HistFactory::HistFactory(Context& ctx,
-			 const string& effiFileName):m_ctx(ctx), cutflow_raw(0), cutflow_weighted(0){
+			 const string& effiFileName_):m_ctx(ctx), cutflow_raw(0), cutflow_weighted(0){
 
   sample = ctx.get("dataset_version");
-  effiFile.open(sample+string("_")+effiFileName);
+  effiFileName=effiFileName_;
 
-  weighted_count.push_back(0);//for the count without cut
-  count.push_back(0);
-
-  effiprint = true;
- 
-}
-
-HistFactory::HistFactory(Context& ctx):m_ctx(ctx), cutflow_raw(0), cutflow_weighted(0){
-
-  effiprint = false;
+  if(!effiFileName.empty()){
+    effiFile.open(sample+string("_")+effiFileName);
+    effiprint = true;
+    weighted_count.push_back(0);//for the count without cut
+    count.push_back(0);
+  }
+  else effiprint = false;
 }
 					
 HistFactory::~HistFactory(){
@@ -50,7 +47,6 @@ HistFactory::~HistFactory(){
     effiFile << "---------------------------------\n";
     effiFile.close();
   
-
   }
 }
 
@@ -78,6 +74,9 @@ void HistFactory::addHists(const string& histClass, const  string& histName){
   //no cut Histograms
 
   unique_ptr<Hists> histTemplate;
+  //histNames.push_back(histName);
+  //histClasses.push_back(histClass);
+
   
   if(histClass.compare("ElectronHists")==0) {
     histTemplate.reset(new ElectronHists(m_ctx,histName.c_str()));
@@ -99,11 +98,9 @@ void HistFactory::addHists(const string& histClass, const  string& histName){
   }
   
   factoryHists.push_back(move(histTemplate));
-
   //Histograms with cuts
-  for(auto cutName : cutNames){
+  for(const auto & cutName : cutNames){
 
-    
     stringstream ss;
     ss<<cutName<<"_"<<histName;
    
@@ -126,8 +123,6 @@ void HistFactory::addHists(const string& histClass, const  string& histName){
     else if(histClass.compare("VLQGenHists")==0){
       histTemplate.reset(new VLQGenHists(m_ctx,ss.str().c_str()));
     }
-
-
 
     factoryHists.push_back(move(histTemplate));
    
@@ -193,3 +188,14 @@ void HistFactory::create_histos(){
   m_ctx.put("cutflow", cutflow_weighted);
 
 }
+
+/*
+HistFactory HistFactory::clone(string addCutname){
+  HistFactory clone(m_ctx,effiFileName);
+  for(unsigned int i = 0; i<selectionClasses.size(); ++i)
+    clone.addSelection(selectionClasses.at(i), cutNames.at(i)+name);      
+  for(unsigned int i = 0; i<histNames.size(); ++i)
+    clone.addHists(histClasses[i],histNames[i])
+  return clone;  
+}
+*/

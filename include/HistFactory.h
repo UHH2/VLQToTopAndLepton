@@ -17,10 +17,10 @@ using namespace std;
 class HistFactory{
  public:
   HistFactory(Context& ctx,
-	      const string& effiFileName);
-  HistFactory(Context& ctx);
-
+	      const string& effiFileName="");
   ~HistFactory();
+
+  //HistFactory clone(string addCutname);
 
   void addSelection(unique_ptr<Selection> selection, const string& cutName);
   //void addSelection(shared_ptr<Selection> selection, string cutName);
@@ -29,30 +29,21 @@ class HistFactory{
   void setEffiHistName(const string& name){effiHistName=name;}
 
  private:
-  void addCounter();
-  
+  void addCounter(); 
   void create_histos();
 
   vector<unique_ptr<Selection>> selectionClasses;
-  vector<unique_ptr<Hists>> factoryHists;
-
   vector<string> cutNames;
-    
+  vector<unique_ptr<Hists>> factoryHists;
+  //vector<string> histNames,histClasses;
   vector<double> weighted_count;
   vector<double> count;
-
   Context& m_ctx;
+
   TH1D * cutflow_raw, * cutflow_weighted; // owned by Context
-
   ofstream effiFile;
-  string sample;
   bool effiprint;
-
-
-  string effiHistName;
-
-
-
+  string sample, effiHistName, effiFileName;
 };
 
 

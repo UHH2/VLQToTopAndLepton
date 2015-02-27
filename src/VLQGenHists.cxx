@@ -20,7 +20,9 @@ GenParticleHists VLQGenHists::histoBooker(const string& HistName, double minMass
   hists.decay_daughter = book<TH1F>(HistName+"_decay_daughter", HistName+" decay modes daughter", 61, -30.5, 30.5);
   hists.deltaRmin = book<TH1F>(HistName+"_deltaRmin","DeltaRmin of "+HistName, 40, 0, 8);
   hists.nextParticle = book<TH1F>(HistName+"_nextParticle","Nearest particle of "+HistName, 61, -30.5,30.5);
-			    
+  hists.deltaR_daughters = book<TH1F>(HistName+"_deltaR_daughters","DeltaR daughters "+HistName, 100, 0,10);
+  
+		    
   string suffix ="";
   string axisSuffix ="";
 
@@ -33,6 +35,7 @@ GenParticleHists VLQGenHists::histoBooker(const string& HistName, double minMass
     single.phi = book<TH1F>(HistName+"_phi"+suffix,"#phi_{"+HistName+" "+axisSuffix+"}", 100, -3.2, 3.2);
     single.mass = book<TH1F>(HistName+"_mass"+suffix,"mass_{"+HistName+" "+axisSuffix+"}", 100, minMass, maxMass);
     single.charge = book<TH1F>(HistName+"_charge"+suffix,"charge_{"+HistName+" "+axisSuffix+"}", 100, -1, 1);
+    single.pt_eta = book<TH2F>(HistName+"_pT_eta"+suffix,"pT & eta "+HistName+" "+axisSuffix, 150, 0, 800, 100, -4, 4);
 
     hists.stdHists.push_back(single);
     
@@ -41,7 +44,7 @@ GenParticleHists VLQGenHists::histoBooker(const string& HistName, double minMass
   return hists;
 }
 
-void VLQGenHists::histoFiller(vector<GenParticle> & particles, int partNumber, double weight){
+void VLQGenHists::histoFiller(vector<GenParticle> & particles,  int partNumber, double weight){
   if(partNumber==-1) assert(0==1);
 
   sort_by_pt(particles);  
@@ -56,12 +59,18 @@ void VLQGenHists::histoFiller(vector<GenParticle> & particles, int partNumber, d
       if(count==it || it==0 ) m_Hists.at(partNumber).stdHists.at(it).phi->Fill(part.phi(),weight);
       if(count==it || it==0 ) m_Hists.at(partNumber).stdHists.at(it).mass->Fill(part.v4().M(),weight);
       if(count==it || it ==0) m_Hists.at(partNumber).stdHists.at(it).charge->Fill(part.charge(),weight);
+      if(count==it || it ==0) m_Hists.at(partNumber).stdHists.at(it).pt_eta->Fill(part.pt(),part.eta(),weight);
+
     }
   }
 }
 void VLQGenHists::fill_nearest(int position, double weight, double deltaRmin, double pdgId){
   m_Hists.at(position).deltaRmin->Fill(deltaRmin,weight);
   m_Hists.at(position).nextParticle->Fill(pdgId,weight);
+}
+
+void VLQGenHists::fillDaughterDistance(int position, double deltaR, double weight){
+  m_Hists.at(position).deltaR_daughters->Fill(deltaR,weight);
 }
 
 void VLQGenHists::decayFiller(double weight, int partNumber, int mother1, int mother2, int daughter1, int daughter2){
@@ -83,12 +92,14 @@ int VLQGenHists::positionHelper(const string& Name){
   return -1;
 }
 
+
+
 VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirname){
   // book all histograms here
 
   //make sure that these two vectors corresspond, vlq are not considered
-  vector<string> names {"VLQ","Higgs","Z","W","Top","B","Muon","Electron"};
-  vector<int> pdgIds {25,23,24,6,5,13,11};
+  vector<string> names {"VLQ","Higgs","Z","W","Top","B","Muon","muNeutrino","Electron","eleNeutrino"};
+  vector<int> pdgIds {25,23,24,6,5,13,14,11,12};
 
    for (unsigned int i = 0; i< names.size(); ++i) {
     PartNames.push_back(names.at(i));
@@ -114,6 +125,10 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
 
   VLQ_mother = book<TH1F>("VLQ_mothers"   , "VLQ mothers", 61, -30.5, 30.5);
   VLQ_mother1_mother2= book<TH2F>("VLQ_mother1_mother2"   , "VLQ mothers", 61, -30.5, 30.5,61, -30.5, 30.5);
+
+  deltaR_w   = book<TH1F>("deltaR_w "   , "#Delta R(W_{1},W_{2})", 100, 0, 8);
+  deltaPhi_w = book<TH1F>("deltaPhi_w"  , "#Delta #phi(W_{1},W_{2})", 100, 0, 4);
+
 }
 
 
@@ -160,7 +175,8 @@ void VLQGenHists::fill(const Event & event){
       if(PartPdgId.at(i) == abs(igenp.pdgId())){
 	particleStore.at(i).push_back(igenp);
         decayFiller(weight,i+1,0,0,daughter1_pdgId,daughter2_pdgId);
-        fill_nearest(i+1,weight,uhh2::deltaR(*nearGen,igenp),nearGen->pdgId());  
+        fill_nearest(i+1,weight,uhh2::deltaR(*nearGen,igenp),nearGen->pdgId());
+	if(daughter1 && daughter2 )fillDaughterDistance(i+1, uhh2::deltaR(*daughter1,*daughter2),weight);
 	break;
       }
     }
@@ -174,6 +190,7 @@ void VLQGenHists::fill(const Event & event){
       vlq.push_back(igenp);
       decayFiller(weight,positionHelper("VLQ"),0,0,daughter1_pdgId,daughter2_pdgId);
       VLQ_mother1_mother2->Fill(mother1_pdgId,mother2_pdgId,weight);
+      if(daughter1 && daughter2 )fillDaughterDistance(0, uhh2::deltaR(*daughter1,*daughter2),weight);
       fill_nearest(0,weight, uhh2::deltaR(*nearGen,igenp),nearGen->pdgId());  
     }
     
@@ -198,8 +215,14 @@ void VLQGenHists::fill(const Event & event){
       decayFiller(weight,positionHelper("W") , mother1_pdgId, mother2_pdgId,0,0); 
     if(abs(mother1_pdgId)== 25 || abs(mother2_pdgId)== 25)
       decayFiller(weight,positionHelper("Higgs") , mother1_pdgId, mother2_pdgId,0,0); 
-    
-    
+    if(abs(mother1_pdgId)== 12 || abs(mother2_pdgId)== 12)
+      decayFiller(weight,positionHelper("eleNeutrino") , mother1_pdgId, mother2_pdgId,0,0);
+    if(abs(mother1_pdgId)== 14 || abs(mother2_pdgId)== 14)
+      decayFiller(weight,positionHelper("muNeutrino") , mother1_pdgId, mother2_pdgId,0,0);
+    if(abs(mother1_pdgId)==5  || abs(mother2_pdgId)==5 )
+      decayFiller(weight,positionHelper("B") , mother1_pdgId, mother2_pdgId,0,0);
+
+
     if(abs(mother1_pdgId)== 0 && abs(mother2_pdgId)== 0){
       particles_noMother->Fill(igenp.pdgId());           
       particles_noMother_pT->Fill(igenp.pt());  
@@ -215,10 +238,17 @@ void VLQGenHists::fill(const Event & event){
     } 
   }
   
+
   histoFiller(vlq, positionHelper("VLQ"), weight);
   
   for(unsigned int i =0; i<PartPdgId.size();++i)
     histoFiller(particleStore.at(i),i+1,weight); 
+
+
+  if(particleStore.at(positionHelper("W")-1).size()==2){
+    deltaR_w->Fill(deltaR(particleStore.at(positionHelper("W")-1).at(0),particleStore.at(positionHelper("W")-1).at(1)),weight);
+    deltaPhi_w->Fill(deltaPhi(particleStore.at(positionHelper("W")-1).at(0),particleStore.at(positionHelper("W")-1).at(1)),weight);
+  }
 
 }
 
