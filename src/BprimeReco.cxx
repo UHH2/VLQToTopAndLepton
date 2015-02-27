@@ -20,6 +20,7 @@ bool BprimeReco::process(uhh2::Event & event){
 
 bool BprimeReco::massReco(uhh2::Event & event){
   vector<Jet>* jets = event.jets;
+  vector<BprimeContainer> recoWHyps;
   vector<BprimeContainer> recoHyps;
   BprimeContainer tmp_hyp;
 
@@ -46,7 +47,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
 	  tmp_hyp.set_wJets(bitmask);
 	  tmp_hyp.set_wHad(whad);
 	  tmp_hyp.set_wLep(neutrino+lep);
-	  recoHyps.emplace_back(tmp_hyp);
+	  recoWHyps.emplace_back(tmp_hyp);
 	  //cout<<whad.M()<<" "<<(neutrino+lep).M()<<endl;
 	}
       }
@@ -55,7 +56,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
   }
 
   //permutation of top jets
-  for(auto & hyp : recoHyps){
+  for(auto & hyp : recoWHyps){
     vector<Jet> unusedJets;
     for(unsigned int i=0; i<jets->size();++i)
       if(!hyp.get_wJets()[i]) unusedJets.emplace_back(jets->at(i)); 
@@ -70,6 +71,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
 	for (unsigned int i = 0; i < N; ++i) // [0..N-1] integers
 	  if (bitmask[i]) top = top+unusedJets.at(i).v4();
 	hyp.set_topJets(top);
+  	recoHyps.emplace_back(hyp);
       } while(std::prev_permutation(bitmask.begin(), bitmask.end()));   
     }
   }
