@@ -8,7 +8,8 @@ BprimeRecoHists::BaseHists BprimeRecoHists::book_BaseHists(const std::string & n
   hists.pt   = book<TH1F>("pt_"+name,"p_{T} "+label,100,minPt,maxPt);
   hists.eta  = book<TH1F>("eta_"+name,"#eta "+label,100,-4,4);
   hists.phi  = book<TH1F>("phi_"+name,"#phi "+label,100,-3.2,3.2);
-  hists.mass = book<TH1F>("phi_"+name,"#phi "+label,100,0,600);
+  hists.mass = book<TH1F>("mass_"+name,"Mass "+label,100,0,600);
+  return hists;
 }
 
 template<typename T>
@@ -24,7 +25,8 @@ BprimeRecoHists::BprimeRecoHists(Context & ctx, const string & dirname): Hists(c
   wLep_all = book_BaseHists("wLep_all","all W_{lep} Hypothesis"); 
   topLep_all = book_BaseHists("topLep_all","all Top_{lep} Hypothesis");
   topHad_all = book_BaseHists("topHad_all","all Top_{had} Hypothesis");
-  
+  Bprime = book_BaseHists("Bprime","Bprime Hypothesis"); 
+ 
   deltaR_w_all    = book<TH1F>("deltaR_w","#Delta R (W_{lep},W_{had})", 100, 0, 8);
   deltaPhi_w_all  = book<TH1F>("deltaPhi_w","#Delta #phi (W_{lep},W_{had})", 100, 0, 4);
   
@@ -57,24 +59,34 @@ void BprimeRecoHists::fill(const uhh2::Event & event){
 
     fill_BaseHists(whad, wHad_all, weight);
     fill_BaseHists(wlep, wLep_all, weight);
-    fill_BaseHists(topJets+whad,topHad_all,weight);
-    fill_BaseHists(topJets+wlep,topLep_all,weight);
+    if(fabs((topJets+whad).M()-175)<fabs((topJets+wlep).M()-175)){
+      fill_BaseHists(topJets+whad,topHad_all,weight);
+    }
+    else
+      fill_BaseHists(topJets+wlep,topLep_all,weight);
 
     deltaR_w_all->Fill(deltaR(whad,wlep),weight);
     deltaPhi_w_all->Fill(deltaPhi(whad,wlep),weight);
 
-    if(abs(whad_best.M()-82) > abs(whad.M()-82)){
+    //if(abs(whad_best.M()-82) > abs(whad.M()-82)){
+    if(fabs((topJets+whad).M()-175)+fabs((wlep).M()-82)<fabs((topJets_best+whad_best).M()-175)+fabs((wlep_best).M()-82) || fabs((topJets+wlep).M()-175)+fabs((whad).M()-82)<fabs((topJets_best+wlep_best).M()-175)+fabs((whad_best).M()-82)){
       whad_best=whad;
       wlep_best=wlep;
       topJets_best=topJets;
     }
   }
-
-  whad_best_pt->Fill(whad_best.pt(), weight);
   fill_BaseHists(whad_best, wHad_best, weight);
   fill_BaseHists(wlep_best, wLep_best, weight);
-  fill_BaseHists(topJets_best+whad_best,topHad_best,weight);
-  fill_BaseHists(topJets_best+wlep_best,topLep_best,weight);
+  if(fabs((topJets_best+whad_best).M()-175)<fabs((topJets_best+wlep_best).M()-175)){
+    fill_BaseHists(topJets_best+whad_best,topHad_best,weight);
+    //cout<<fabs((topJets_best+whad_best).M()-175)+fabs(wlep_best.M()-80.4)<<endl;
+  }
+  else{
+    fill_BaseHists(topJets_best+wlep_best,topLep_best,weight);
+    //cout<<fabs((topJets_best+wlep_best).M()-175)+fabs(whad_best.M()-80.4)<<endl;
+  }
+
+  fill_BaseHists(topJets_best+whad_best+wlep_best,Bprime,weight);
 
   deltaR_w_best->Fill(deltaR(whad_best,wlep_best),weight);
   deltaPhi_w_best->Fill(deltaPhi(whad_best,wlep_best),weight);

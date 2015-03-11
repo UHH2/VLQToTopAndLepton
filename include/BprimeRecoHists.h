@@ -29,6 +29,7 @@ class BprimeRecoHists: public uhh2::Hists {
   BaseHists wHad_all, wLep_all, topLep_all, topHad_all;
   //best hypothesis
   BaseHists wHad_best, wLep_best, topLep_best, topHad_best;
+  BaseHists Bprime;	
   //DeltaR & DeltaPhi. top referece to top -> w
   TH1F* deltaR_w_all, *deltaPhi_w_all, *deltaR_top_all;
   TH1F* deltaR_w_best, *deltaPhi_w_best, *deltaR_top_best;
