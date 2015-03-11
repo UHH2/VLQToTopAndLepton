@@ -17,16 +17,21 @@ class BprimeRecoHists: public uhh2::Hists {
   BprimeRecoHists(uhh2::Context & ctx, const std::string & dirname);
   virtual ~BprimeRecoHists();
   virtual void fill(const uhh2::Event & ev) override;
-
- private:
-  //string HistoNames;    
-  TH1F* whad_pt, *whad_phi, *whad_eta, *whad_mass;
-  TH1F* wlep_pt, *wlep_phi, *wlep_eta, *wlep_mass;
-  TH1F* deltaR_w, *deltaPhi_w;
-
-  TH1F* whad_best_pt, *whad_best_phi, *whad_best_eta, *whad_best_mass;
-  TH1F* wlep_best_pt, *wlep_best_phi, *wlep_best_eta, *wlep_best_mass;
-  TH1F* deltaR_w_best, *deltaPhi_w_best;
-
+ protected:
+  struct BaseHists{
+    TH1F* pt, *eta, *phi, *mass; 
+  };
+  BaseHists book_BaseHists(const std::string & name, const std::string & label, double minPt=0, double maxPt=2000);
+  template<typename T>
+    void fill_BaseHists(const T & particle, BaseHists & hists, double weight);
+ private: 
+  //all hypothesis
+  BaseHists wHad_all, wLep_all, topLep_all, topHad_all;
+  //best hypothesis
+  BaseHists wHad_best, wLep_best, topLep_best, topHad_best;
+  //DeltaR & DeltaPhi. top referece to top -> w
+  TH1F* deltaR_w_all, *deltaPhi_w_all, *deltaR_top_all;
+  TH1F* deltaR_w_best, *deltaPhi_w_best, *deltaR_top_best;
+  
   uhh2::Event::Handle<std::vector<BprimeContainer>> hyps;
 };

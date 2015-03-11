@@ -43,7 +43,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
 	  if(whad.M()>500) break;
       }
       for(auto & neutrino:neutrinos){
-	if(whad.M()<200 && whad.M()>40 ){
+	if(whad.M()<300 && whad.M()>40 ){
 	  tmp_hyp.set_wJets(bitmask);
 	  tmp_hyp.set_wHad(whad);
 	  tmp_hyp.set_wLep(neutrino+lep);
@@ -59,8 +59,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
   for(auto & hyp : recoWHyps){
     vector<Jet> unusedJets;
     for(unsigned int i=0; i<jets->size();++i)
-      if(!hyp.get_wJets()[i]) unusedJets.emplace_back(jets->at(i)); 
-    
+      if(!hyp.get_wJets()[i]) unusedJets.emplace_back(jets->at(i));
     for(unsigned int K=1; K<unusedJets.size(); ++K){
       unsigned int N = unusedJets.size();
       string bitmask(K, 1); // K leading 1's
@@ -71,6 +70,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
 	for (unsigned int i = 0; i < N; ++i) // [0..N-1] integers
 	  if (bitmask[i]) top = top+unusedJets.at(i).v4();
 	hyp.set_topJets(top);
+	//hyp.set_topJets(bitmask); //intendet for a string to see which where taken
   	recoHyps.emplace_back(hyp);
       } while(std::prev_permutation(bitmask.begin(), bitmask.end()));   
     }

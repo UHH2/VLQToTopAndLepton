@@ -3,36 +3,38 @@
 using namespace std;
 using namespace uhh2;
 
+BprimeRecoHists::BaseHists BprimeRecoHists::book_BaseHists(const std::string & name, const std::string & label, double minPt, double maxPt){
+  BaseHists hists;
+  hists.pt   = book<TH1F>("pt_"+name,"p_{T} "+label,100,minPt,maxPt);
+  hists.eta  = book<TH1F>("eta_"+name,"#eta "+label,100,-4,4);
+  hists.phi  = book<TH1F>("phi_"+name,"#phi "+label,100,-3.2,3.2);
+  hists.mass = book<TH1F>("phi_"+name,"#phi "+label,100,0,600);
+}
+
+template<typename T>
+void BprimeRecoHists::fill_BaseHists(const T & particle, BaseHists & hists, double weight){
+  hists.pt->Fill(particle.pt(),weight);
+  hists.eta->Fill(particle.eta(),weight);
+  hists.phi->Fill(particle.phi(),weight);
+  hists.mass->Fill(sqrt(particle.M2()),weight);
+}
+
 BprimeRecoHists::BprimeRecoHists(Context & ctx, const string & dirname): Hists(ctx, dirname){
-  whad_pt   =  book<TH1F>("whad_pt"  ,"had W p_T" , 100, 0, 1400);
-  whad_phi  =  book<TH1F>("whad_phi" ,"had W #phi", 100, -3.2, 3.2);
-  whad_eta  =  book<TH1F>("whad_eta" ,"had W #eta", 100, -4, 4);
-  whad_mass =  book<TH1F>("whad_mass","had W Mass", 100, 0, 200);
-
-  wlep_pt   =  book<TH1F>("wlep_pt"  ,"lep W p_T" , 100, 0, 1400);
-  wlep_phi  =  book<TH1F>("wlep_phi" ,"lep W #phi", 100, -3.2, 3.2);
-  wlep_eta  =  book<TH1F>("wlep_eta" ,"lep W #eta", 100, -4, 4);
-  wlep_mass =  book<TH1F>("wlep_mass","lep W Mass", 100, 0, 250);
+  wHad_all = book_BaseHists("wHad_all","all W_{had} Hypothesis");
+  wLep_all = book_BaseHists("wLep_all","all W_{lep} Hypothesis"); 
+  topLep_all = book_BaseHists("topLep_all","all Top_{lep} Hypothesis");
+  topHad_all = book_BaseHists("topHad_all","all Top_{had} Hypothesis");
   
-  deltaR_w    = book<TH1F>("deltaR_w","#Delta R (W_{lep},W_{had})", 100, 0, 8);
-  deltaPhi_w  = book<TH1F>("deltaPhi_w","#Delta #phi (W_{lep},W_{had})", 100, 0, 4);
-
-
-  whad_best_pt   =  book<TH1F>("whad_best_pt"  ,"had best W p_T" , 100, 0, 1400);
-  whad_best_phi  =  book<TH1F>("whad_best_phi" ,"had best W #phi", 100, -3.2, 3.2);
-  whad_best_eta  =  book<TH1F>("whad_best_eta" ,"had best W #eta", 100, -4, 4);
-  whad_best_mass =  book<TH1F>("whad_best_mass","had best W Mass", 100, 0, 200);
-
-  wlep_best_pt   =  book<TH1F>("wlep_best_pt"  ,"lep best W p_T" , 100, 0, 1400);
-  wlep_best_phi  =  book<TH1F>("wlep_best_phi" ,"lep best W #phi", 100, -3.2, 3.2);
-  wlep_best_eta  =  book<TH1F>("wlep_best_eta" ,"lep best W #eta", 100, -4, 4);
-  wlep_best_mass =  book<TH1F>("wlep_best_mass","lep best W Mass", 100, 0, 250);
+  deltaR_w_all    = book<TH1F>("deltaR_w","#Delta R (W_{lep},W_{had})", 100, 0, 8);
+  deltaPhi_w_all  = book<TH1F>("deltaPhi_w","#Delta #phi (W_{lep},W_{had})", 100, 0, 4);
   
+  wHad_best = book_BaseHists("wHad_best","best W_{had} Hypothesis");
+  wLep_best = book_BaseHists("wLep_best","best W_{lep} Hypothesis"); 
+  topLep_best = book_BaseHists("topLep_best","best Top_{lep} Hypothesis");
+  topHad_best = book_BaseHists("topHad_best","best Top_{had} Hypothesis");
+
   deltaR_w_best    = book<TH1F>("deltaR_w_best","#Delta R (W_{lep},W_{had})", 100, 0, 8);
   deltaPhi_w_best  = book<TH1F>("deltaPhi_w_best","#Delta #phi (W_{lep},W_{had})", 100, 0, 4);
-
-
-
 
   hyps = ctx.get_handle<std::vector<BprimeContainer>>("BprimeReco");
 
@@ -46,37 +48,33 @@ void BprimeRecoHists::fill(const uhh2::Event & event){
   
   LorentzVector whad_best(0,0,0,0);
   LorentzVector wlep_best(0,0,0,0);
-
+  LorentzVector topJets_best(0,0,0,0);
 
   for(auto hyp :  event.get(hyps)){
     LorentzVector whad = hyp.get_wHad();
     LorentzVector wlep = hyp.get_wLep();
-    whad_pt->Fill(whad.pt(), weight);
-    whad_phi->Fill(whad.phi(), weight);
-    whad_eta->Fill(whad.eta(), weight);
-    whad_mass->Fill(whad.M(), weight);
-    wlep_pt->Fill(wlep.pt(), weight);
-    wlep_phi->Fill(wlep.phi(), weight);
-    wlep_eta->Fill(wlep.eta(), weight);
-    wlep_mass->Fill(wlep.M(), weight);
+    LorentzVector topJets = hyp.get_topJets();
 
-    deltaR_w->Fill(deltaR(whad,wlep),weight);
-    deltaPhi_w->Fill(deltaPhi(whad,wlep),weight);
+    fill_BaseHists(whad, wHad_all, weight);
+    fill_BaseHists(wlep, wLep_all, weight);
+    fill_BaseHists(topJets+whad,topHad_all,weight);
+    fill_BaseHists(topJets+wlep,topLep_all,weight);
+
+    deltaR_w_all->Fill(deltaR(whad,wlep),weight);
+    deltaPhi_w_all->Fill(deltaPhi(whad,wlep),weight);
 
     if(abs(whad_best.M()-82) > abs(whad.M()-82)){
       whad_best=whad;
       wlep_best=wlep;
+      topJets_best=topJets;
     }
   }
 
   whad_best_pt->Fill(whad_best.pt(), weight);
-  whad_best_phi->Fill(whad_best.phi(), weight);
-  whad_best_eta->Fill(whad_best.eta(), weight);
-  whad_best_mass->Fill(whad_best.M(), weight);
-  wlep_best_pt->Fill(wlep_best.pt(), weight);
-  wlep_best_phi->Fill(wlep_best.phi(), weight);
-  wlep_best_eta->Fill(wlep_best.eta(), weight);
-  wlep_best_mass->Fill(wlep_best.M(), weight);
+  fill_BaseHists(whad_best, wHad_best, weight);
+  fill_BaseHists(wlep_best, wLep_best, weight);
+  fill_BaseHists(topJets_best+whad_best,topHad_best,weight);
+  fill_BaseHists(topJets_best+wlep_best,topLep_best,weight);
 
   deltaR_w_best->Fill(deltaR(whad_best,wlep_best),weight);
   deltaPhi_w_best->Fill(deltaPhi(whad_best,wlep_best),weight);
