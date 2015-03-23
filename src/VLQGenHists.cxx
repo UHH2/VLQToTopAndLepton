@@ -181,12 +181,12 @@ void VLQGenHists::fill(const Event & event){
       }
     }
     
-    if(abs(daughter1_pdgId)==6000008 ||abs(daughter1_pdgId)==6000007 || abs(daughter2_pdgId)==6000008 ||abs(daughter2_pdgId)==6000007){
+    if(abs(daughter1_pdgId)>6000000 || abs(daughter2_pdgId)>6000000){
       VLQ_mother->Fill(igenp.pdgId(),weight);
     }
     
     //put all the particles in vectors
-    if (abs(igenp.pdgId()) == 6000008 || abs(igenp.pdgId()) == 6000007){
+    if (abs(igenp.pdgId())> 6000000){
       vlq.push_back(igenp);
       decayFiller(weight,positionHelper("VLQ"),0,0,daughter1_pdgId,daughter2_pdgId);
       VLQ_mother1_mother2->Fill(mother1_pdgId,mother2_pdgId,weight);
@@ -198,7 +198,7 @@ void VLQGenHists::fill(const Event & event){
     //cout<<"pdgId GenParticle: "<<igenp.pdgId() <<" mom1: "<<  mother1_pdgId<<" mom2: "<< mother2_pdgId <<" daughter1: "<<  daughter1_pdgId<<" daughter2: "<< daughter2_pdgId<<endl;
     
     //Fill decay histograms  
-    if(abs(mother1_pdgId)== 6000007 || abs(mother1_pdgId)== 6000008 || abs(mother2_pdgId)== 6000008 || abs(mother2_pdgId)== 6000007 ){
+    if(abs(mother1_pdgId)> 6000000 || abs(mother2_pdgId)> 6000000){
       decayFiller(weight,positionHelper("VLQ") , mother1_pdgId, mother2_pdgId,0,0);    
     }
     if(abs(mother1_pdgId)== 5 || abs(mother2_pdgId)== 5)
