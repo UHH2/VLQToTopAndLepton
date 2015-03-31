@@ -15,6 +15,7 @@ BprimeReco::BprimeReco(uhh2::Context & ctx, const std::string & label){
 }
 
 bool BprimeReco::process(uhh2::Event & event){
+  cout<<"Don't use the 'process' function for the event reconstruction for Bprime"<<endl;
   return false;
 }
 
@@ -40,10 +41,10 @@ bool BprimeReco::massReco(uhh2::Event & event){
       LorentzVector whad(0,0,0,0);
       for (unsigned int i = 0; i < N; ++i){ // [0..N-1] integers
 	  if (bitmask[i]) whad = whad+jets->at(i).v4();
-	  if(whad.M()>500) break;
+	  if(whad.M()>600) break;
       }
       for(auto & neutrino:neutrinos){
-	if(whad.M()<300 && whad.M()>40 ){
+	if(whad.M()<500 && whad.M()>40 ){
 	  tmp_hyp.set_wJets(bitmask);
 	  tmp_hyp.set_wHad(whad);
 	  tmp_hyp.set_wLep(neutrino+lep);
@@ -69,6 +70,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
 	LorentzVector top(0,0,0,0);
 	for (unsigned int i = 0; i < N; ++i) // [0..N-1] integers
 	  if (bitmask[i]) top = top+unusedJets.at(i).v4();
+	if((top+hyp.get_wHad()).M()>400 && (top+hyp.get_wLep()).M()>400) break;
 	hyp.set_topJets(top);
 	//hyp.set_topJets(bitmask); //intendet for a string to see which where taken
   	recoHyps.emplace_back(hyp);

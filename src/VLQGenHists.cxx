@@ -98,8 +98,8 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
   // book all histograms here
 
   //make sure that these two vectors corresspond, vlq are not considered
-  vector<string> names {"VLQ","Higgs","Z","W","Top","B","Muon","muNeutrino","Electron","eleNeutrino"};
-  vector<int> pdgIds {25,23,24,6,5,13,14,11,12};
+  vector<string> names {"VLQ","Higgs","Z","W","Top","B","Muon","muNeutrino","Electron","eleNeutrino","forward"};
+  vector<int> pdgIds {25,23,24,6,5,13,14,11,12};  
 
    for (unsigned int i = 0; i< names.size(); ++i) {
     PartNames.push_back(names.at(i));
@@ -136,11 +136,9 @@ void VLQGenHists::fill(const Event & event){
   // fill the histograms. Don't forget to always use the weight when filling:
   //     double weight = event.weight;
   double weight = event.weight;
-  
   const vector<GenParticle> * genparticles = event.genparticles;
-  
   vector<GenParticle> vlq;
-  
+  vector<GenParticle> forwardJet;
   vector<vector<GenParticle>> particleStore;
   
   for(unsigned int i =0; i<PartPdgId.size();++i){
@@ -148,9 +146,7 @@ void VLQGenHists::fill(const Event & event){
     particleStore.push_back(oneType);
   }
   
-  for(auto & igenp : *genparticles){ 
-    
-    
+  for(auto & igenp : *genparticles){  
     const GenParticle* mother1 = igenp.mother(genparticles,1);
     const GenParticle* mother2 = igenp.mother(genparticles,2);
     
@@ -166,7 +162,6 @@ void VLQGenHists::fill(const Event & event){
     if(daughter1)daughter1_pdgId = daughter1->pdgId();
     int daughter2_pdgId = 0;
     if(daughter2) daughter2_pdgId = daughter2->pdgId();
-    
     
     auto nearGen =  closestParticle(igenp, *genparticles);
 
@@ -184,7 +179,10 @@ void VLQGenHists::fill(const Event & event){
     if(abs(daughter1_pdgId)==6000008 ||abs(daughter1_pdgId)==6000007 || abs(daughter2_pdgId)==6000008 ||abs(daughter2_pdgId)==6000007){
       VLQ_mother->Fill(igenp.pdgId(),weight);
     }
-    
+    //forwardJet
+    if(abs(daughter1_pdgId) < 5 && abs(daughter2_pdgId) > 6000000)forwardJet.push_back(*daughter1);
+    if(abs(daughter2_pdgId) < 5 && abs(daughter1_pdgId) > 6000000)forwardJet.push_back(*daughter2);
+     
     //put all the particles in vectors
     if (abs(igenp.pdgId()) == 6000008 || abs(igenp.pdgId()) == 6000007){
       vlq.push_back(igenp);
@@ -237,6 +235,10 @@ void VLQGenHists::fill(const Event & event){
       
     } 
   }
+
+  //cout<<forwardJet.size()<<endl;
+  //cout<<"--------------------------------------"<<endl;
+  //cout<<"--------------------------------------"<<endl;
   
 
   histoFiller(vlq, positionHelper("VLQ"), weight);
@@ -244,6 +246,8 @@ void VLQGenHists::fill(const Event & event){
   for(unsigned int i =0; i<PartPdgId.size();++i)
     histoFiller(particleStore.at(i),i+1,weight); 
 
+  //cout<<positionHelper("forward")<<endl;
+  histoFiller(forwardJet,positionHelper("forward"),weight);
 
   if(particleStore.at(positionHelper("W")-1).size()==2){
     deltaR_w->Fill(deltaR(particleStore.at(positionHelper("W")-1).at(0),particleStore.at(positionHelper("W")-1).at(1)),weight);

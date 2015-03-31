@@ -124,8 +124,9 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   muonFactory->addSelection(make_unique<NElectronSelection>(0,0),"0_eleCut");
   muonFactory->addSelection(make_unique<NMuonSelection>(1,1,muid_cut),"1_muonCut");
   muonFactory->addSelection(make_unique<STSelection>(ctx,500),"500_ST");
+  muonFactory->addSelection(make_unique<HTLepSelection>(ctx,300),"300_HTLep");
   muonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
-  muonFactory->addSelection(make_unique<NJetSelection>(3,-1,twojet),"3_JetCut");
+  muonFactory->addSelection(make_unique<NJetSelection>(5,-1,twojet),"5_JetCut");
   //muonFactory->addSelection(make_unique<NTopJetSelection>(1,-1,topjet), "TopJetCut");
   //muonFactory->addSelection(make_unique<NJetSelection>(1,-1, btag_medium), "BTagMedium");
 
@@ -151,7 +152,7 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   dileptonFactory->addHists("JetHists","dileptonChannel_JetHists");
   dileptonFactory->addHists("TopJetHists","dileptonChannel_TopJetHists");
   dileptonFactory->addHists("VLQGenHists","dileptonChannel_VLQGenHists");
-
+  
   /*
   hadronicFactory.reset(new HistFactory(ctx,"hadronicEffis.txt"));	
   hadronicFactory->addSelection(make_unique<NMuonSelection>(0,0),"0_muonCut");
@@ -188,8 +189,9 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   topWMuonFactory->addSelection(make_unique<NElectronSelection>(0,0),"0_eleCut");
   topWMuonFactory->addSelection(make_unique<NMuonSelection>(1,1,muid_cut),"1_muonCut");
   topWMuonFactory->addSelection(make_unique<STSelection>(ctx,500),"500_ST");
+  topWMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,300),"300_HTLep");
   topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
-  topWMuonFactory->addSelection(make_unique<NJetSelection>(3,-1,twojet),"2_JetCut");
+  topWMuonFactory->addSelection(make_unique<NJetSelection>(5,-1,twojet),"5_JetCut");
   topWMuonFactory->addSelection(make_unique<NTopJetSelection>(1,-1,topjet), "TopJetCut");
   topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1, btag_medium), "BTagMedium");
 
@@ -208,8 +210,9 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   wMuonFactory->addSelection(make_unique<NElectronSelection>(0,0),"0_eleCut");
   wMuonFactory->addSelection(make_unique<NMuonSelection>(1,1,muid_cut),"1_muonCut");
   wMuonFactory->addSelection(make_unique<STSelection>(ctx,500),"500_ST");
+  wMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,300),"300_HTLep");
   wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
-  wMuonFactory->addSelection(make_unique<NJetSelection>(3,-1,twojet),"3_JetCut");
+  wMuonFactory->addSelection(make_unique<NJetSelection>(5,-1,twojet),"5_JetCut");
   wMuonFactory->addSelection(make_unique<NTopJetSelection>(2,-1,topjet), "TopJetCut");
   wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1, btag_medium), "BTagMedium");
 
@@ -228,18 +231,17 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
 
 bool GenTestModule::process(Event & event){
 
+
   jetCorr->process(event);
   jetcleaner->process(event);
   elecleaner->process(event);
   mucleaner->process(event);
-  
   ht->process(event);
   lepton->process(event);
-  
-
   bBprimeFactory->passAndFill(event);
+
   vlqGenHists->fill(event);    
-  
+  /*
   if(Version.find("BpJ_TW") != std::string::npos)
     if(!HiggsFilter->passes(event)||!ZFilter->passes(event)) return false;
 
@@ -247,7 +249,7 @@ bool GenTestModule::process(Event & event){
   //Reco->massReco(event);
 
   //channelSel.passes(event);
-
+  
   muonTrigger->passAndFill(event);
  
   wMuonFactory->passAndFill(event);
@@ -255,9 +257,12 @@ bool GenTestModule::process(Event & event){
 
   //hadronicFactory->passAndFill(event);
   //dileptonFactory->passAndFill(event);
+  
   bool muonChannel = muonFactory->passAndFill(event);
-
+  
   return muonChannel;
+  */
+  return false;
 }
 
 

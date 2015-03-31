@@ -3,6 +3,7 @@
 #include "UHH2/core/include/fwd.h"
 #include "UHH2/core/include/Selection.h"
 #include "UHH2/core/include/Event.h"
+#include "UHH2/core/include/Utils.h"
 
 #include "UHH2/common/include/ObjectIdUtils.h"
 #include "UHH2/core/include/AnalysisModule.h"
@@ -40,6 +41,28 @@ class STSelection: public uhh2::Selection{
   double STmin;
   uhh2::Event::Handle<double> ht;
   uhh2::Event::Handle<FlavorParticle> h_primlep;
-
 };
+
+class HTLepSelection: public uhh2::Selection{
+public:
+  //enum htType{HT, HtLep};
+  explicit HTLepSelection(uhh2::Context & ctx, double HTLepmin);
+  virtual bool passes(const uhh2::Event & event);
+  
+ private:
+  //htType type;
+  double HTLepmin;
+  uhh2::Event::Handle<FlavorParticle> h_primlep;
+};
+
+
+class TwoDCut: public uhh2::Selection {
+ public:
+  explicit TwoDCut(float min_deltaR, float min_pTrel): min_deltaR_(min_deltaR), min_pTrel_(min_pTrel) {}
+  virtual bool passes(const uhh2::Event & event) override;
+  
+ private:
+  float min_deltaR_, min_pTrel_;
+};
+  /////
 

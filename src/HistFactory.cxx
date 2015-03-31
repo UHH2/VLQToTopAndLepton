@@ -5,6 +5,7 @@
 #include "UHH2/common/include/JetHists.h"
 #include "UHH2/common/include/EventHists.h"
 
+#include "UHH2/VLQToTopAndLepton/include/BprimeRecoHists.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 
 
@@ -18,6 +19,8 @@ HistFactory::HistFactory(Context& ctx,
   sample = ctx.get("dataset_version");
   effiFileName=effiFileName_;
 
+  cutNames.push_back("");
+  count_cuts =0;
   if(!effiFileName.empty()){
     effiFile.open(sample+string("_")+effiFileName);
     effiprint = true;
@@ -55,14 +58,8 @@ void HistFactory::addSelection(unique_ptr<Selection> selection, const string& cu
   selectionClasses.push_back(move(selection)); 
   cutNames.push_back(cutName);
   if(effiprint)addCounter();
+  count_cuts++;
 }
-/*
-void HistFactory::addSelection(unique_ptr<Selection> selection, string cutName){
-  selectionClasses.push_back(move(selection)); 
-  cutNames.push_back(cutName);
-  if(effiprint)addCounter();
-}
-*/
 
 void HistFactory::addCounter(){
   
@@ -71,39 +68,13 @@ void HistFactory::addCounter(){
 }
 
 void HistFactory::addHists(const string& histClass, const  string& histName){
-  //no cut Histograms
-
   unique_ptr<Hists> histTemplate;
-  //histNames.push_back(histName);
-  //histClasses.push_back(histClass);
 
-  
-  if(histClass.compare("ElectronHists")==0) {
-    histTemplate.reset(new ElectronHists(m_ctx,histName.c_str()));
-  }
-  else if(histClass.compare("MuonHists")==0){
-    histTemplate.reset(new MuonHists(m_ctx,histName.c_str()));
-  }
-  else if(histClass.compare("JetHists")==0){
-    histTemplate.reset(new JetHists(m_ctx,histName.c_str()));
-  }
-  else if(histClass.compare("EventHists")==0){
-    histTemplate.reset(new EventHists(m_ctx,histName.c_str()));
-  }
-  else if(histClass.compare("TopJetHists")==0){
-    histTemplate.reset(new TopJetHists(m_ctx,histName.c_str()));
-  }
-  else if(histClass.compare("VLQGenHists")==0){
-    histTemplate.reset(new VLQGenHists(m_ctx,histName.c_str()));
-  }
-  
-  factoryHists.push_back(move(histTemplate));
-  //Histograms with cuts
   for(const auto & cutName : cutNames){
-
     stringstream ss;
-    ss<<cutName<<"_"<<histName;
-   
+    if(!cutName.empty()) ss<<cutName<<"_"<<histName;
+    else  ss<<histName;
+
     if(histClass.compare("ElectronHists")==0) {
       histTemplate.reset(new ElectronHists(m_ctx,ss.str().c_str()));
     }
@@ -118,20 +89,22 @@ void HistFactory::addHists(const string& histClass, const  string& histName){
     }
     else if(histClass.compare("TopJetHists")==0){
       histTemplate.reset(new TopJetHists(m_ctx,ss.str().c_str()));
-
     }
     else if(histClass.compare("VLQGenHists")==0){
       histTemplate.reset(new VLQGenHists(m_ctx,ss.str().c_str()));
     }
-
+    else if(histClass.compare("BprimeRecoHists")==0){
+      histTemplate.reset(new BprimeRecoHists(m_ctx,ss.str().c_str()));
+    }
+    else
+      cerr<<"You ask for a not supported hist class, please check spelling or add class";
     factoryHists.push_back(move(histTemplate));
-   
   }
-  
 }
 
 bool HistFactory::passAndFill(const Event & event, int passOption){
   bool passCuts =true;
+  if(count_cuts+1==cutNames.size())cutNames.erase(cutNames.begin());
   
   unsigned int hist_number = factoryHists.size()/(selectionClasses.size()+1);
   unsigned int cuti = 0; 

@@ -31,7 +31,7 @@ class HistFactory{
  private:
   void addCounter(); 
   void create_histos();
-
+  int count_cuts;
   vector<unique_ptr<Selection>> selectionClasses;
   vector<string> cutNames;
   vector<unique_ptr<Hists>> factoryHists;

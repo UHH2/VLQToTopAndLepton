@@ -241,8 +241,7 @@ bool TriggerTestModule::process(Event & event){
 
   if(genMuon->passes(event)) muonGenTriggerFactory->passAndFill(event,1);
   if(recoMuon->passes(event)) {
-    muonTriggerFactory->passAndFill(event,1);
-   
+    muonTriggerFactory->passAndFill(event,1);   
   }
   else return false;
 

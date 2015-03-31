@@ -22,21 +22,20 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-   <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Test/" PostFix="" TargetLumi="19700" >
-   <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="12" OutputDirectory="./Result_v3/" PostFix="" TargetLumi="19700" >-->
+   <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./TriggerTest_v1/" PostFix="" TargetLumi="1" >  
+   <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="12" OutputDirectory="./Result_v2/" PostFix="" TargetLumi="1" >-->
 
        <InputData Lumi="83604" NEventsMax="-1" Type="MC" Version="BpJ_TW_800" Cacheable="False">
           &BpJ_TW_800;
           <InputTree Name="AnalysisTree" /> 
         </InputData>
 
-
         <InputData Lumi="85611" NEventsMax="-1" Type="MC" Version="BpJ_TW_1200" Cacheable="False">
           &BpJ_TW_1200;
           <InputTree Name="AnalysisTree" /> 
         </InputData>
 <!--
-	<InputData Lumi="162.8" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
+	<InputData Lumi="162" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
           &WJets;
           <InputTree Name="AnalysisTree" /> 
         </InputData>
@@ -60,6 +59,8 @@
           <InputTree Name="AnalysisTree" /> 
         </InputData>
  -->
+	  
+
  
         <UserConfig>
             <!-- define which collections to read from the input. Only specify what you need to save I/O time -->
@@ -67,8 +68,8 @@
             <Item Name="ElectronCollection" Value="slimmedElectrons" />
             <Item Name="MuonCollection" Value="slimmedMuons" /> 
             <Item Name="TauCollection" Value="slimmedTaus" />
-            <Item Name="JetCollection" Value="patJetsAk4PFCHS" />
-	    <Item Name="TopJetCollection" Value="patJetsCmsTopTagCHSPacked" />
+            <Item Name="JetCollection" Value="slimmedJets" />
+	    <Item Name="TopJetCollection" Value="patJetsCMSTopTagCHSPacked" />
             <Item Name="METName" Value="slimmedMETs" />
             <Item Name="GenParticleCollection" Value="GenParticles" /> 
             
@@ -102,7 +103,7 @@
             
             <!-- the class name of the AnalysisModule subclasses to run: -->
             <!--<Item Name="AnalysisModule" Value="VLQToTopAndLeptonModule" /> -->
-            <Item Name="AnalysisModule" Value="GenTestModule" />
+            <Item Name="AnalysisModule" Value="TriggerTestModule" />
 
             <!-- set this to the name of an AndSelection to control what is written to the output. If not given, *all* events are written to the output tree. -->
             <Item Name="TestKey" Value="TestKeyValue" />
