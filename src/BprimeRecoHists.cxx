@@ -68,6 +68,14 @@ BprimeRecoHists::BprimeRecoHists(Context & ctx, const string & dirname): Hists(c
   topLep_res_eta  = book<TH1F>("topLep_res_eta","Top_{lep} Resolution #eta", 100, 0., 10); 
   topLep_res_deltaR  = book<TH1F>("topLep_res_deltaR","Top_{lep} Resolution #Delta R", 100, 0., 10); 
 
+  topReco_dR_pT_lep    = book<TH2F>("topReco_dR_pT_lep","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,0,800);  
+  topReco_dR_pTres_lep = book<TH2F>("topReco_dR_pTres_lep","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,-2,2);  
+  topReco_dR_pT_had    = book<TH2F>("topReco_dR_pT_had","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,0,800);  
+  topReco_dR_pTres_had = book<TH2F>("topReco_dR_pTres_had","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,-2,2);  
+  wReco_dR_pTres_lep   = book<TH2F>("wReco_dR_pTres_lep","Gen and Reco W #Delta R / pT", 100, 0, 2, 100,-2,2);  
+  wReco_dR_pT_lep      = book<TH2F>("wReco_dR_pT_lep","Gen and Reco W #Delta R / pT", 100, 0, 2, 100,0,800);  
+  wReco_dR_pTres_had   = book<TH2F>("wReco_dR_pTres_had","Gen and Reco W #delta R / pT", 100, 0, 2, 100,-2,2);  
+  wReco_dR_pT_had      = book<TH2F>("wReco_dR_pT_had","Gen and Reco W #Delta R / pT", 100, 0, 2, 100,0,800);  
 
   hyps = ctx.get_handle<std::vector<BprimeContainer>>("BprimeReco");
   gen = ctx.get_handle<BprimeGenContainer>("BprimeGen");
@@ -139,23 +147,31 @@ void BprimeRecoHists::fill(const uhh2::Event & event){
   wHad_res_phi->Fill(deltaPhi(GenInfo.get_wHad(),whad_best),weight);     
   wHad_res_eta->Fill(abs(GenInfo.get_wHad().eta()-whad_best.eta()),weight);     
   wHad_res_deltaR->Fill(deltaR(GenInfo.get_wHad(),whad_best),weight);
-  wLep_res_pt->Fill((GenInfo.get_wLep().pt()-wlep_best.pt())/GenInfo.get_wHad().pt(),weight);     
-  wLep_res_E->Fill((GenInfo.get_wLep().E()-wlep_best.E())/GenInfo.get_wHad().E(),weight);       
-  wLep_res_mass->Fill((GenInfo.get_wLep().M()-wlep_best.M())/GenInfo.get_wHad().M(),weight);    
+  wLep_res_pt->Fill((GenInfo.get_wLep().pt()-wlep_best.pt())/GenInfo.get_wLep().pt(),weight);     
+  wLep_res_E->Fill((GenInfo.get_wLep().E()-wlep_best.E())/GenInfo.get_wLep().E(),weight);       
+  wLep_res_mass->Fill((GenInfo.get_wLep().M()-wlep_best.M())/GenInfo.get_wLep().M(),weight);    
   wLep_res_phi->Fill(deltaPhi(GenInfo.get_wLep(),wlep_best),weight);     
   wLep_res_eta->Fill(abs(GenInfo.get_wLep().eta()-wlep_best.eta()),weight);     
   wLep_res_deltaR->Fill(deltaR(GenInfo.get_wLep(),wlep_best),weight);
 
+  wReco_dR_pTres_lep->Fill(deltaR(GenInfo.get_wLep(),wlep_best),(GenInfo.get_wLep().pt()-wlep_best.pt())/GenInfo.get_wLep().pt(),weight);  
+  wReco_dR_pT_lep->Fill(deltaR(GenInfo.get_wLep(),wlep_best),GenInfo.get_wLep().pt(),weight);       
+  wReco_dR_pTres_had->Fill(deltaR(GenInfo.get_wHad(),whad_best),(GenInfo.get_wHad().pt()-whad_best.pt())/GenInfo.get_wHad().pt(),weight);
+  wReco_dR_pT_had->Fill(deltaR(GenInfo.get_wHad(),whad_best),GenInfo.get_wHad().pt(),weight);     
 
   if(GenInfo.get_topLep().pt()>0){
-    topLep_res_pt->Fill((GenInfo.get_topLep().pt()-(wlep_best+topJets_best).pt())/GenInfo.get_topHad().pt(),weight);     
-    topLep_res_E->Fill((GenInfo.get_topLep().E()-(wlep_best+topJets_best).E())/GenInfo.get_topHad().E(),weight);       
-    topLep_res_mass->Fill((GenInfo.get_topLep().M()-(wlep_best+topJets_best).M())/GenInfo.get_topHad().M(),weight);    
+    topReco_dR_pT_lep->Fill(deltaR(GenInfo.get_topLep(),wlep_best+topJets_best),GenInfo.get_topLep().pt(),weight);   
+    topReco_dR_pTres_lep->Fill(deltaR(GenInfo.get_topLep(),wlep_best+topJets_best),(GenInfo.get_topLep().pt()-(wlep_best+topJets_best).pt())/GenInfo.get_topLep().pt(),weight);
+    topLep_res_pt->Fill((GenInfo.get_topLep().pt()-(wlep_best+topJets_best).pt())/GenInfo.get_topLep().pt(),weight);     
+    topLep_res_E->Fill((GenInfo.get_topLep().E()-(wlep_best+topJets_best).E())/GenInfo.get_topLep().E(),weight);       
+    topLep_res_mass->Fill((GenInfo.get_topLep().M()-(wlep_best+topJets_best).M())/GenInfo.get_topLep().M(),weight);    
     topLep_res_phi->Fill(deltaPhi(GenInfo.get_topLep(),wlep_best+topJets_best),weight);     
     topLep_res_eta->Fill(abs(GenInfo.get_topLep().eta()-(wlep_best+topJets_best).eta()),weight);     
     topLep_res_deltaR->Fill(deltaR(GenInfo.get_topLep(),wlep_best+topJets_best),weight);
   }
   if(GenInfo.get_topHad().pt()>0){
+    topReco_dR_pT_had->Fill(deltaR(GenInfo.get_topHad(),whad_best+topJets_best),GenInfo.get_topHad().pt(),weight);   
+    topReco_dR_pTres_had->Fill(deltaR(GenInfo.get_topHad(),whad_best+topJets_best),(GenInfo.get_topHad().pt()-(whad_best+topJets_best).pt())/GenInfo.get_topHad().pt(),weight);
     topHad_res_pt->Fill((GenInfo.get_topHad().pt()-(whad_best+topJets_best).pt())/GenInfo.get_topHad().pt(),weight);   
     topHad_res_E->Fill((GenInfo.get_topHad().E()-(whad_best+topJets_best).E())/GenInfo.get_topHad().E(),weight);       
     topHad_res_mass->Fill((GenInfo.get_topHad().M()-(whad_best+topJets_best).M())/GenInfo.get_topHad().M(),weight);    
