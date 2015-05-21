@@ -31,7 +31,7 @@ class HistFactory{
  private:
   void addCounter(); 
   void create_histos();
-  int count_cuts;
+  unsigned int count_cuts;
   vector<unique_ptr<Selection>> selectionClasses;
   vector<string> cutNames;
   vector<unique_ptr<Hists>> factoryHists;
@@ -40,7 +40,7 @@ class HistFactory{
   vector<double> count;
   Context& m_ctx;
 
-  TH1D * cutflow_raw, * cutflow_weighted; // owned by Context
+  TH1D *cutflow_raw, *cutflow_weighted; // owned by Context
   ofstream effiFile;
   bool effiprint;
   string sample, effiHistName, effiFileName;

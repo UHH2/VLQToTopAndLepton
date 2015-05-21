@@ -31,12 +31,9 @@ HistFactory::HistFactory(Context& ctx,
 }
 					
 HistFactory::~HistFactory(){
-
   if(effiprint){
     effiFile << sample << "\n" << "\n";
     //cout<<cutNames.size()<<" "<<count.size()<<endl;
-    
-    
     for(unsigned int i = 1; i<count.size(); i++ ){
       effiFile << cutNames[i-1] << "\n";
       effiFile << "Total\n"; 
@@ -44,15 +41,12 @@ HistFactory::~HistFactory(){
       effiFile << "Weighted\n";
       effiFile << "effi: "<< weighted_count[i]<<"/"<<weighted_count[0]<<" = "<<weighted_count[i]/weighted_count[0]<<" rel effi: "<<  weighted_count[i]<<"/"<<weighted_count[i-1]<<" = "<<weighted_count[i]/weighted_count[i-1]<<"\n";
       effiFile << "\n";
-    }
-    
+    } 
     effiFile << "---------------------------------\n";
     effiFile << "---------------------------------\n";
-    effiFile.close();
-  
+    effiFile.close();  
   }
 }
-
 
 void HistFactory::addSelection(unique_ptr<Selection> selection, const string& cutName){
   selectionClasses.push_back(move(selection)); 
@@ -62,19 +56,16 @@ void HistFactory::addSelection(unique_ptr<Selection> selection, const string& cu
 }
 
 void HistFactory::addCounter(){
-  
   weighted_count.push_back(0);
   count.push_back(0);
 }
 
 void HistFactory::addHists(const string& histClass, const  string& histName){
   unique_ptr<Hists> histTemplate;
-
   for(const auto & cutName : cutNames){
     stringstream ss;
     if(!cutName.empty()) ss<<cutName<<"_"<<histName;
     else  ss<<histName;
-
     if(histClass.compare("ElectronHists")==0) {
       histTemplate.reset(new ElectronHists(m_ctx,ss.str().c_str()));
     }
@@ -104,26 +95,20 @@ void HistFactory::addHists(const string& histClass, const  string& histName){
 
 bool HistFactory::passAndFill(const Event & event, int passOption){
   bool passCuts =true;
-  if(count_cuts+1==cutNames.size())cutNames.erase(cutNames.begin());
-  
+  if(abs(count_cuts+1)==cutNames.size())cutNames.erase(cutNames.begin());
   unsigned int hist_number = factoryHists.size()/(selectionClasses.size()+1);
   unsigned int cuti = 0; 
-
   if(!effiHistName.empty() && cutflow_raw==NULL ) create_histos();
-
   if(cutflow_raw){
     cutflow_raw->Fill(cuti);
     cutflow_weighted->Fill(cuti, event.weight);
   }
-
   if(effiprint){
     count[cuti] = count[cuti]+1;
     weighted_count[cuti] = weighted_count[cuti]+event.weight;
   }
-
   for(unsigned int i = 0;i<hist_number;++i)
     factoryHists[i*(selectionClasses.size()+1)]->fill(event);
-
   for(auto & selection : selectionClasses){
     cuti++;
     if(selection->passes(event)){
@@ -144,11 +129,9 @@ bool HistFactory::passAndFill(const Event & event, int passOption){
     }
   }
   return passCuts;
-
 }
 
 void HistFactory::create_histos(){
-
   cutflow_weighted = new TH1D(( effiHistName ).c_str(), ("Cutflow '" + effiHistName + "' using weights").c_str(), cutNames.size()+1, 0, cutNames.size()+1);
   cutflow_raw = new TH1D((effiHistName + "_raw").c_str(), ("Cutflow '" + effiHistName + "' unweighted").c_str(), cutNames.size()+1, 0, cutNames.size()+1);
   for(TAxis * ax : {cutflow_raw->GetXaxis(), cutflow_weighted->GetXaxis()}){
