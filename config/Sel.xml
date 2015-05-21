@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
+]>
+
+ <!-- uncomment to write tree of selected events, i.e. of those events for which the AnalysisModule::process method  returns true
+               If no OutputTree is given, no events will be written. Please do use "AnalysisTree" as Name. -->
+          <!-- <OutputTree Name="AnalysisTree" /> -->
+
+
+
+<!-- OutputLevel controls which messages are printed; set to VERBOSE or DEBUG for more verbosity, to WARNING or ERROR for less -->
+<JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
+    <Library Name="libSUHH2VLQToTopAndLepton"/>
+    <Package Name="SUHH2VLQToTopAndLepton.par" />
+
+   <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Selection_v2/" PostFix="" TargetLumi="19700">
+   <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="6" OutputDirectory="./Selection_v2/" PostFix="" TargetLumi="19700" >-->  
+
+       <InputData Lumi="83604" NEventsMax="-1" Type="MC" Version="BpJ_TW_800" Cacheable="False">
+	 <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.BpJ_TW_800.root" Lumi="0.0"/> 
+          <InputTree Name="AnalysisTree" /> 
+          <!--<OutputTree Name="AnalysisTree" />-->
+        </InputData>
+
+        <InputData Lumi="85611" NEventsMax="-1" Type="MC" Version="BpJ_TW_1200" Cacheable="False">
+          <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.BpJ_TW_1200.root" Lumi="0.0"/> 
+          <InputTree Name="AnalysisTree" /> 
+          <!--<OutputTree Name="AnalysisTree" />-->
+        </InputData>
+
+
+	<InputData Lumi="162.8" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
+          <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.WJets.root" Lumi="0.0"/> 
+          <InputTree Name="AnalysisTree" /> 
+        </InputData>
+
+	<InputData Lumi="31572" NEventsMax="-1" Type="MC" Version="TTJets" Cacheable="False">
+	  <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.TTJets.root" Lumi="0.0"/> 
+	  <InputTree Name="AnalysisTree" />
+	</InputData>
+
+	<InputData Lumi="1408" NEventsMax="-1" Type="MC" Version="ZJets" Cacheable="False">
+          <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.ZJets.root" Lumi="0.0"/> 
+          <InputTree Name="AnalysisTree" /> 
+          
+        </InputData>
+
+	<InputData Lumi="120.2" NEventsMax="-1" Type="MC" Version="QCD_HT500To1000Ext" Cacheable="False">
+	  <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.QCD_HT500To1000Ext.root" Lumi="0.0"/> 
+	  <InputTree Name="AnalysisTree" />
+	  
+	</InputData>
+
+	<InputData Lumi="1469.0" NEventsMax="-1" Type="MC" Version="QCD_HT1000ToInfExt" Cacheable="False">
+	  <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.QCD_HT1000ToInfExt.root" Lumi="0.0"/> 
+	  <InputTree Name="AnalysisTree" />
+	  
+	</InputData>
+
+	<InputData Lumi="2354.4" NEventsMax="-1" Type="MC" Version="WJetsHT100to200" Cacheable="False">
+	  <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.WJetsHT100to200.root" Lumi="0.0"/> 
+	  <InputTree Name="AnalysisTree" />
+	  
+	</InputData>
+	<InputData Lumi="8510.4" NEventsMax="-1" Type="MC" Version="WJetsHT200to400" Cacheable="False">
+	  <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.WJetsHT200to400.root" Lumi="0.0"/> 
+	  <InputTree Name="AnalysisTree" />
+	  
+	</InputData>
+	<InputData Lumi="67844.9" NEventsMax="-1" Type="MC" Version="WJetsHT400to600" Cacheable="False">
+	  <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.WJetsHT400to600.root" Lumi="0.0"/> 
+	  <InputTree Name="AnalysisTree" />
+	  
+	</InputData>
+	<InputData Lumi="196645.5" NEventsMax="-1" Type="MC" Version="WJetsHT600toInf" Cacheable="False">
+	  <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_0_pre4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v2/uhh2.AnalysisModuleRunner.MC.WJetsHT600toInf.root" Lumi="0.0"/> 
+	  <InputTree Name="AnalysisTree" />
+	  
+	</InputData>
+
+        <UserConfig>
+            <!-- define which collections to read from the input. Only specify what you need to save I/O time -->
+            <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices" /> 
+            <Item Name="ElectronCollection" Value="slimmedElectrons" />
+            <Item Name="MuonCollection" Value="slimmedMuons" /> 
+            <Item Name="TauCollection" Value="slimmedTaus" />
+            <Item Name="JetCollection" Value="slimmedJets" />
+	    <Item Name="TopJetCollection" Value="patJetsCMSTopTagCHSPacked" />
+            <Item Name="METName" Value="slimmedMETs" />
+            <Item Name="GenParticleCollection" Value="GenParticles" /> 
+            
+	    <Item Name="SelectionTriggerName" Value=""/>
+
+
+            <!-- The list of available collections to read in corresponds to the pointer members in event. The 'Name's to use here in the configuration are:
+            
+                 PrimaryVertexCollection
+                 ElectronCollection
+                 MuonCollection
+                 TauCollection
+                 PhotonCollection
+                 JetCollection
+                 TopJetCollection
+                 METName
+                 
+                 GenInfoName
+                 GenJetCollection
+                 GenTopJetCollection
+                 GenParticleCollection
+                 
+                 Note that the last four are only read in for MC (InputData Type="MC"), so it is save to specify
+                 them for real data, although those branches do not exist.
+                 
+                 As 'Value', always use the branch name (if in doubt, open the input file in ROOT).
+                 
+                 By default, triggers are read. To explicitly disable reading triggers, use:
+                 <Item Name="readTrigger" Value="false" />
+            -->
+            
+            <!-- the class name of the AnalysisModule subclasses to run: -->
+            <!--<Item Name="AnalysisModule" Value="VLQToTopAndLeptonModule" /> -->
+            <Item Name="AnalysisModule" Value="SelectionModule" />
+
+            <!-- set this to the name of an AndSelection to control what is written to the output. If not given, *all* events are written to the output tree. -->
+            <Item Name="TestKey" Value="TestKeyValue" />
+        </UserConfig>
+    </Cycle>
+</JobConfiguration>
