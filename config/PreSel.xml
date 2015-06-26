@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
 
-<!ENTITY TTbar SYSTEM "TTbar_usai.xml">
+<!ENTITY MC_TpJ_TH_M800_20x25 SYSTEM "../../common/datasets/MC_TpJ_TH_M800_20x25.xml">
+<!ENTITY MC_TpJ_TH_M1200_20x25 SYSTEM "../../common/datasets/MC_TpJ_TH_M1200_20x25.xml">
+
+<!ENTITY TTbar SYSTEM "../../common/datasets/MC_TTJets_20x25.xml">
 <!ENTITY BpJ_TW_800 SYSTEM "../../common/datasets/MC_BpJ_TW_M800_20x25.xml">
 <!ENTITY BpJ_TW_1200 SYSTEM "../../common/datasets/MC_BpJ_TW_M1200_20x25.xml">
 <!ENTITY WJets SYSTEM "../../common/datasets/MC_WJets_LNu_20x25.xml">
-<!ENTITY ZJets SYSTEM "../../common/datasets/MC_ZJets_LNu_20x25.xml">
-<!ENTITY QCD_HT500To1000Ext SYSTEM "../../common/datasets/MC_QCD_HT500To1000Ext_20x25.xml">
-<!ENTITY QCD_HT1000ToInfExt SYSTEM "../../common/datasets/MC_QCD_HT1000ToInfExt_20x25.xml">
-<!ENTITY WJetsHT100to200 SYSTEM "../../common/datasets/MC_WJets_HT100to200_20x25.xml">
-<!ENTITY WJetsHT200to400 SYSTEM "../../common/datasets/MC_WJets_HT200to400_20x25.xml">
-<!ENTITY WJetsHT400to600 SYSTEM "../../common/datasets/MC_WJets_HT400to600_20x25.xml">
-<!ENTITY WJetsHT600toInf SYSTEM "../../common/datasets/MC_WJets_HT600toInf_20x25.xml">
+<!ENTITY ZJets SYSTEM "../../common/datasets/MC_ZJets_LL_20x25.xml">
+<!ENTITY QCD_HT100To250 SYSTEM "../../common/datasets/MC_QCD_HT100To250_20x25.xml">
+<!ENTITY QCD_HT250To500Ext SYSTEM "../../common/datasets/MC_QCD_HT250To500_20x25_ext1.xml">
+<!ENTITY QCD_HT500To1000Ext SYSTEM "../../common/datasets/MC_QCD_HT500To1000_20x25_ext1.xml">
+<!ENTITY QCD_HT1000ToInfExt SYSTEM "../../common/datasets/MC_QCD_HT1000ToInf_20x25_ext1.xml">
+<!ENTITY WJetsHT100to200 SYSTEM "../../common/datasets/MC_WJets_LNu_HT100to200_20x25.xml">
+<!ENTITY WJetsHT200to400 SYSTEM "../../common/datasets/MC_WJets_LNu_HT200to400_20x25.xml">
+<!ENTITY WJetsHT400to600 SYSTEM "../../common/datasets/MC_WJets_LNu_HT400to600_20x25.xml">
+<!ENTITY WJetsHT600toInf SYSTEM "../../common/datasets/MC_WJets_LNu_HT600toInf_20x25.xml">
 ]>
 
 
@@ -26,15 +31,27 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-   <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v3/" PostFix="" TargetLumi="19700">-->
-   <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="" OutputDirectory="./PreSelection_v3/" PostFix="" TargetLumi="19700" > 
+    <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v8/" PostFix="" TargetLumi="19700">-->
+    <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="pod://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="" OutputDirectory="./PreSelection_v8/" PostFix="" TargetLumi="19700" >
+
+      <InputData Lumi="99900" NEventsMax="-1" Type="MC" Version="MC_TpJ_TH_M800_20x25" Cacheable="False">
+        &MC_TpJ_TH_M800_20x25;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+
+      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="MC_TpJ_TH_M1200_20x25" Cacheable="False">
+        &MC_TpJ_TH_M1200_20x25;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
 
        <InputData Lumi="83604" NEventsMax="-1" NEventsSkip="" Type="MC" Version="BpJ_TW_800" Cacheable="False">
           &BpJ_TW_800;
           <InputTree Name="AnalysisTree" /> 
           <OutputTree Name="AnalysisTree" />
         </InputData>
-<!--
+
         <InputData Lumi="85611" NEventsMax="-1" Type="MC" Version="BpJ_TW_1200" Cacheable="False">
           &BpJ_TW_1200;
           <InputTree Name="AnalysisTree" /> 
@@ -59,6 +76,18 @@
           <OutputTree Name="AnalysisTree" />
         </InputData>
 
+	<InputData Lumi="120.21" NEventsMax="-1" Type="MC" Version="QCD_HT100To250" Cacheable="False">
+	  &QCD_HT100To250;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+
+	<InputData Lumi="120.21" NEventsMax="-1" Type="MC" Version="QCD_HT100To250Ext" Cacheable="False">
+	  &QCD_HT250To500Ext;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+
 	<InputData Lumi="120.21" NEventsMax="-1" Type="MC" Version="QCD_HT500To1000Ext" Cacheable="False">
 	  &QCD_HT500To1000Ext;
 	  <InputTree Name="AnalysisTree" />
@@ -81,6 +110,7 @@
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
+
 	<InputData Lumi="67844.9" NEventsMax="-1" Type="MC" Version="WJetsHT400to600" Cacheable="False">
 	  &WJetsHT400to600;
 	  <InputTree Name="AnalysisTree" />
@@ -91,18 +121,18 @@
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
--->
+
         <UserConfig>
             <!-- define which collections to read from the input. Only specify what you need to save I/O time -->
             <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices" /> 
             <Item Name="ElectronCollection" Value="slimmedElectrons" />
             <Item Name="MuonCollection" Value="slimmedMuons" /> 
             <Item Name="TauCollection" Value="slimmedTaus" />
-            <Item Name="JetCollection" Value="slimmedJets" />
-	    <Item Name="TopJetCollection" Value="patJetsCMSTopTagCHSPacked" />
+            <Item Name="JetCollection" Value="patJetsAk4PFCHS" />
+	    <Item Name="TopJetCollection" Value="patJetsCmsTopTagCHSPacked" />
             <Item Name="METName" Value="slimmedMETs" />
             <Item Name="GenParticleCollection" Value="GenParticles" /> 
-            
+            <Item Name="additionalBranches" Value="cmsTopTagGen hepTopTagGen patJetsHepTopTagCHSPacked patJetsCa8CHSJetsPrunedPacked patJetsCa15CHSJetsFilteredPacked" />
 	    <Item Name="SelectionTriggerName" Value=""/>
 
 
