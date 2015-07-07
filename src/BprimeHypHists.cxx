@@ -21,10 +21,10 @@ void BprimeHypHists::fill_BaseHists(const T & particle, BaseHists & hists, doubl
 }
 
 BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const string & hyp_name): Hists(ctx, dirname){
-  wHad = book_BaseHists("wHad","W_{had} Hypothesis");
-  wLep = book_BaseHists("wLep","W_{lep} Hypothesis"); 
-  topLep = book_BaseHists("topLep","Top_{lep} Hypothesis");
-  topHad = book_BaseHists("topHad","Top_{had} Hypothesis");
+  wHad = book_BaseHists("wHad","W_{had}");
+  wLep = book_BaseHists("wLep","W_{lep}"); 
+  topLep = book_BaseHists("topLep","Top_{lep}");
+  topHad = book_BaseHists("topHad","Top_{had}");
   mass = book_BaseHists("hyp","Hypothesis",50,3000); 
   mass_lep = book_BaseHists("Mass_lep","lep. Hypothesis",50,3000); 
   mass_had = book_BaseHists("Mass_had","had. Hypothesis",50,3000); 
@@ -38,7 +38,7 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   pTratio_toptop = book<TH1F>("pTratio_toptop","ratio pT Top_{lep}/Top_{had}", 100, 0, 10); 
   pTratio_ww     = book<TH1F>("pTratio_ww","ratio pT W_{lep}/W_{had}", 100, 0, 10); 
 
-  recotype_h = book<TH1F>("recoType","0 hadronic Top, 1 leptonic Top",15, -0.5, 14.5);
+  recotype_h = book<TH1F>("recoType","reconstruction typ",15, -0.5, 14.5);
   chiDis = book<TH1F>("chiVal","#Chi^{2} Value",100, 0,60);
   chiDis_lep = book<TH1F>("chiVal_lep","#Chi^{2} Value lep. Top",100, 0,60);
   chiDis_had = book<TH1F>("chiVal_had","#Chi^{2} Value had. Top",100, 0,60);
@@ -68,6 +68,13 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   topLep_res_phi  = book<TH1F>("topLep_res_phi","Top_{lep} Resolution #phi", 100, 0, 3.14); 
   topLep_res_eta  = book<TH1F>("topLep_res_eta","Top_{lep} Resolution #eta", 100, 0., 4); 
   topLep_res_deltaR  = book<TH1F>("topLep_res_deltaR","Top_{lep} Resolution #Delta R", 100, 0., 4); 
+
+  Bprime_res_pt   = book<TH1F>("Bprime_res_pt","B Resolution p_{T}", 100, -3, 2);
+  Bprime_res_E    = book<TH1F>("Bprime_res_E","B Resolution E", 100, -3, 2); 
+  Bprime_res_mass = book<TH1F>("Bprime_res_mass","B Resolution Mass", 100, -3, 2); 
+  Bprime_res_phi  = book<TH1F>("Bprime_res_phi","B Resolution #phi", 100, 0, 3.14); 
+  Bprime_res_eta  = book<TH1F>(" Bprime_res_eta","B Resolution #eta", 100, 0, 4); 
+  Bprime_res_deltaR  = book<TH1F>(" Bprime_res_deltaR","B Resolution #Delta R", 100, 0, 4); 
  
   topReco_dR_pT_lep    = book<TH2F>("topReco_dR_pT_lep","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,0,800);  
   topReco_dR_pTres_lep = book<TH2F>("topReco_dR_pTres_lep","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,-2,2);  
@@ -101,6 +108,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   LorentzVector topJets = hyp.get_topJets();
   LorentzVector thad = hyp.get_topHad();
   LorentzVector tlep = hyp.get_topLep();
+  LorentzVector bprime;
   BprimeGenContainer GenInfo = event.get(gen);
   double chiVal = hyp.get_chiVal();
   int recotype = hyp.get_RecoTyp();
@@ -112,6 +120,12 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   }
   */
   //special treatment since topjets are not needed or filled for toptags
+
+  if(recotype==11)
+    bprime = tlep+whad;
+  else if(recotype==12 || recotype==2)
+    bprime = thad+wlep;
+
   if(recotype!=2)
     fill_BaseHists(topJets+whad+wlep, mass, weight);
   else if(recotype==2)
@@ -190,8 +204,15 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     topHad_res_eta->Fill(abs(GenInfo.get_topHad().eta()-(thad).eta()),weight);     
     topHad_res_deltaR->Fill(deltaR(GenInfo.get_topHad(),thad),weight);
   }
+  if(GenInfo.get_bprime().pt()>0){
+    Bprime_res_pt->Fill((GenInfo.get_bprime().pt()-bprime.pt())/GenInfo.get_bprime().pt(),weight);   
+    Bprime_res_E->Fill((GenInfo.get_bprime().E()-bprime.E())/GenInfo.get_bprime().E(),weight);   
+    Bprime_res_mass->Fill((GenInfo.get_bprime().M()-bprime.M())/GenInfo.get_bprime().M(),weight); 
+    Bprime_res_phi->Fill(deltaPhi(GenInfo.get_bprime(),bprime),weight);  
+    Bprime_res_eta->Fill(abs(GenInfo.get_bprime().eta()-bprime.eta()),weight);  
+    Bprime_res_deltaR->Fill(deltaR(GenInfo.get_bprime(),bprime),weight);  
+   }
 }
-
 
 //double calc_Chi(LorentzVector top, LorentzVector w){
 //}

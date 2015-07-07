@@ -73,12 +73,37 @@ bool TwoDCut::passes(const Event & event){
 }
 
 
-ChiSquareCut::ChiSquareCut(Context & ctx, float max_chi2,float min_chi2, const std::string & hyp_name):min_(min_chi2), max_(max_chi2){
+ChiSquareCut::ChiSquareCut(Context & ctx, float max_chi2,float min_chi2, const std::string & hyp_name, int recotyp):min_(min_chi2), max_(max_chi2),recotyp_(recotyp){
   recohyp = ctx.get_handle<BprimeContainer>(hyp_name);
 }
 
 bool ChiSquareCut::passes(const uhh2::Event & event){
   BprimeContainer hyp = event.get(recohyp);
-  if((max_>hyp.get_chiVal() && hyp.get_chiVal()>min_) || (max_>hyp.get_chiVal() && min_==-1))return true;
+  if(recotyp_==-1 || recotyp_ ==  hyp.get_RecoTyp()){
+    if((max_>hyp.get_chiVal() && hyp.get_chiVal()>min_) || (max_>hyp.get_chiVal() && min_==-1) || (min_<hyp.get_chiVal() && max_==-1)) return true;
+  }
+  else if(recotyp_!= hyp.get_RecoTyp()) return true;
   return false;
+}
+
+PtRatioWTCut::PtRatioWTCut(Context & ctx, float min, float max, const std::string & hyp_name):min_(min), max_(max){
+  recohyp = ctx.get_handle<BprimeContainer>(hyp_name);
+}
+
+bool PtRatioWTCut::passes(const uhh2::Event & event){
+  BprimeContainer hyp = event.get(recohyp);
+  float ratio =-1;
+  if(hyp.get_RecoTyp()==11){
+    ratio = hyp.get_wHad().pt()/hyp.get_topLep().pt();
+  }
+  else if(hyp.get_RecoTyp()==12 || hyp.get_RecoTyp()==2){
+    ratio = hyp.get_wLep().pt()/hyp.get_topHad().pt();
+  }
+  if(ratio==-1){
+    cout<<" pT ratio W/Top is -1. Have a look at the cut?"<<endl;
+    exit(EXIT_FAILURE);
+  }
+  if((ratio> min_ && ratio< max_) || (ratio>min_ && max_ ==-1) || (ratio<max_ && min_ ==-1)) return true;
+  return false;
+
 }

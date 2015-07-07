@@ -23,8 +23,9 @@ class HistFactory{
   //HistFactory clone(string addCutname);
 
   void addSelection(unique_ptr<Selection> selection, const string& cutName);
+  void addAndSelection(vector<unique_ptr<Selection>> selection, const string& cutName);
   //void addSelection(shared_ptr<Selection> selection, string cutName);
-  void addHists(const string& histClass, const string& histName);
+  void addHists(const string& histClass, const string& histName, const std::string & hyp_name = "BprimeReco");
   bool passAndFill(const Event& event, int passOption=0);
   void setEffiHistName(const string& name){effiHistName=name;}
 

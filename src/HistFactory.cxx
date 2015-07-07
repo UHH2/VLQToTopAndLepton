@@ -6,6 +6,7 @@
 #include "UHH2/common/include/EventHists.h"
 
 #include "UHH2/VLQToTopAndLepton/include/BprimeRecoHists.h"
+#include "UHH2/VLQToTopAndLepton/include/BprimeHypHists.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 
 
@@ -28,6 +29,7 @@ HistFactory::HistFactory(Context& ctx,
     count.push_back(0);
   }
   else effiprint = false;
+  
 }
 					
 HistFactory::~HistFactory(){
@@ -54,13 +56,20 @@ void HistFactory::addSelection(unique_ptr<Selection> selection, const string& cu
   if(effiprint)addCounter();
   count_cuts++;
 }
+void HistFactory::addAndSelection(vector<unique_ptr<Selection>> selection, const string& cutName){
+  unique_ptr<AndSelection> myAndSel;
+  myAndSel.reset(new AndSelection(m_ctx));
+  for(unsigned int i=0; i<selection.size(); i++)
+    myAndSel->add(to_string(i),move(selection.at(i)));
+  addSelection(move(myAndSel),cutName);
+}
 
 void HistFactory::addCounter(){
   weighted_count.push_back(0);
   count.push_back(0);
 }
 
-void HistFactory::addHists(const string& histClass, const  string& histName){
+void HistFactory::addHists(const string& histClass, const string& histName, const string & hyp_name){
   unique_ptr<Hists> histTemplate;
   for(const auto & cutName : cutNames){
     stringstream ss;
@@ -87,12 +96,15 @@ void HistFactory::addHists(const string& histClass, const  string& histName){
     else if(histClass.compare("BprimeRecoHists")==0){
       histTemplate.reset(new BprimeRecoHists(m_ctx,ss.str().c_str()));
     }
+    else if(histClass.compare("BprimeHypHists")==0){
+      histTemplate.reset(new BprimeHypHists(m_ctx,ss.str().c_str(),hyp_name));
+    }
     else
       cerr<<"You ask for a not supported hist class, please check spelling or add class";
     factoryHists.push_back(move(histTemplate));
   }
 }
-
+//passOption: 0 event has to pass all cuts, 1 event passe this cut
 bool HistFactory::passAndFill(const Event & event, int passOption){
   bool passCuts =true;
   if(abs(count_cuts+1)==cutNames.size())cutNames.erase(cutNames.begin());
@@ -125,7 +137,7 @@ bool HistFactory::passAndFill(const Event & event, int passOption){
     }
     else{
       if(passOption==0) return false;
-      else passCuts = false;
+      else if(passOption==1) passCuts = false;
     }
   }
   return passCuts;
@@ -142,16 +154,4 @@ void HistFactory::create_histos(){
   }
   m_ctx.put("cutflow", cutflow_raw);
   m_ctx.put("cutflow", cutflow_weighted);
-
 }
-
-/*
-HistFactory HistFactory::clone(string addCutname){
-  HistFactory clone(m_ctx,effiFileName);
-  for(unsigned int i = 0; i<selectionClasses.size(); ++i)
-    clone.addSelection(selectionClasses.at(i), cutNames.at(i)+name);      
-  for(unsigned int i = 0; i<histNames.size(); ++i)
-    clone.addHists(histClasses[i],histNames[i])
-  return clone;  
-}
-*/

@@ -68,8 +68,8 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
     LorentzVector topJets = hyp.get_topJets();
     double lepTop =999999999;
     double hadTop =999999999;
-    if(dis==1 || dis ==2)lepTop = ((topJets+wlep).M()-175)*((topJets+wlep).M()-175)/(14*14)+(whad.M()-82)*(whad.M()-82)/(20*20);
-    if(dis==1 || dis ==3)hadTop = ((topJets+whad).M()-178)*((topJets+whad).M()-178)/(14*14)+(whad.M()-82)*(whad.M()-82)/(20*20);
+    if(dis==1 || dis ==2)lepTop = ((topJets+wlep).M()-175)*((topJets+wlep).M()-175)/(14*14)+(whad.M()-82)*(whad.M()-82)/(14*14)+pow(deltaR(whad,wlep+topJets)-3.14,2)/0.15/0.15;
+    if(dis==1 || dis ==3)hadTop = ((topJets+whad).M()-178)*((topJets+whad).M()-178)/(14*14)+(whad.M()-82)*(whad.M()-82)/(14*14)+pow(deltaR(wlep,whad+topJets)-3.14,2)/0.15/0.15;
 
     if(dis==1){
       double combochi = lepTop > hadTop ? hadTop : lepTop;
@@ -110,7 +110,7 @@ BprimeContainer BprimeDiscriminator::cmsTopTag_dis(uhh2::Event & event){
   for(auto hyp :  event.get(hyps)){
     LorentzVector wlep = hyp.get_wLep();
     LorentzVector topHad = hyp.get_topHad();
-    double chi = pow(topHad.M()-175,2)+ pow(deltaR(wlep,topHad)-3,2);
+    double chi = pow(topHad.M()-180,2)/23/23+ pow(deltaR(wlep,topHad)-3.1,2)/0.15/0.15;
     if(chi<bprimechi || bprimechi==-1){
       bestHyp=hyp;
       bprimechi=chi;

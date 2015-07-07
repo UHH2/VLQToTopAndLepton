@@ -23,7 +23,9 @@ bool BprimeGen::process(uhh2::Event & event){
     else if(family(hadW, igenp, event))
       myDecay.set_wHad(igenp.v4());
     else if(family(lepWMu, igenp, event)||family(lepWEle, igenp, event))
-    myDecay.set_wLep(igenp.v4());
+      myDecay.set_wLep(igenp.v4());
+    else if(igenp.pdgId()>10000)
+      myDecay.set_bprime(igenp.v4());
   }
   event.set(BprimeGenLevel,move(myDecay)); 
   return true;

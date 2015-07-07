@@ -14,7 +14,7 @@
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
     <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Selection_v7/" PostFix="" TargetLumi="19700">-->
-    <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="6" OutputDirectory="./Selection_v7/" PostFix="" TargetLumi="19700" >
+    <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="6" OutputDirectory="./Selection_v8/" PostFix="" TargetLumi="19700" >
 
        <InputData Lumi="83604" NEventsMax="-1" Type="MC" Version="BpJ_TW_800" Cacheable="False">
 	 <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_2_1_patch4/src/UHH2/VLQToTopAndLepton/config/PreSelection_v8/uhh2.AnalysisModuleRunner.MC.BpJ_TW_800.root" Lumi="0.0"/> 
