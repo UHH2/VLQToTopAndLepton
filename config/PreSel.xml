@@ -7,6 +7,14 @@
 <!ENTITY TTbar SYSTEM "../../common/datasets/MC_TTJets_20x25.xml">
 <!ENTITY BpJ_TW_800 SYSTEM "../../common/datasets/MC_BpJ_TW_M800_20x25.xml">
 <!ENTITY BpJ_TW_1200 SYSTEM "../../common/datasets/MC_BpJ_TW_M1200_20x25.xml">
+
+<!ENTITY Bpb_TW_800_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-800_LH.xml">
+<!ENTITY Bpb_TW_1000_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1000_LH.xml">
+<!ENTITY Bpb_TW_1200_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1200_LH.xml">
+<!ENTITY Bpb_TW_800_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-800_RH.xml">
+<!ENTITY Bpb_TW_1000_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1000_RH.xml">
+<!ENTITY Bpb_TW_1200_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1200_RH.xml">
+
 <!ENTITY WJets SYSTEM "../../common/datasets/MC_WJets_LNu_20x25.xml">
 <!ENTITY ZJets SYSTEM "../../common/datasets/MC_ZJets_LL_20x25.xml">
 <!ENTITY QCD_HT100To250 SYSTEM "../../common/datasets/MC_QCD_HT100To250_20x25.xml">
@@ -33,7 +41,40 @@
 
     <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v8/" PostFix="" TargetLumi="19700">-->
     <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="pod://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="" OutputDirectory="./PreSelection_v8/" PostFix="" TargetLumi="19700" >
+      <InputData Lumi="98400" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_LH" Cacheable="False">
+        &Bpb_TW_800_LH;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1000_LH" Cacheable="False">
+        &Bpb_TW_1000_LH;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+      <InputData Lumi="99800" NEventsMax="-1" Type="MC" Version="Bpb_TW_1200_LH" Cacheable="False">
+        &Bpb_TW_1200_LH;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_RH" Cacheable="False">
+        &Bpb_TW_800_RH;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+      <InputData Lumi="99800" NEventsMax="-1" Type="MC" Version="Bpb_TW_1000_RH" Cacheable="False">
+        &Bpb_TW_1000_RH;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1200_RH" Cacheable="False">
+        &Bpb_TW_1200_RH;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
 
+
+
+<!--
       <InputData Lumi="99900" NEventsMax="-1" Type="MC" Version="MC_TpJ_TH_M800_20x25" Cacheable="False">
         &MC_TpJ_TH_M800_20x25;
         <InputTree Name="AnalysisTree" />
@@ -121,7 +162,7 @@
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-
+-->
         <UserConfig>
             <!-- define which collections to read from the input. Only specify what you need to save I/O time -->
             <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices" /> 
