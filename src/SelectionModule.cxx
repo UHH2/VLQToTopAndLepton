@@ -32,7 +32,7 @@
 #include "UHH2/common/include/JetIds.h"
 #include "UHH2/common/include/TopJetIds.h"
 #include "UHH2/common/include/TTbarReconstruction.h"
-
+#include "UHH2/common/include/JetHists.h"
 
 #include "UHH2/VLQToTopAndLepton/include/GenSelection.h"
 #include "UHH2/VLQToTopAndLepton/include/HistFactory.h"
@@ -42,7 +42,7 @@
 #include "UHH2/VLQToTopAndLepton/include/BprimeHypHists.h"
 #include "UHH2/VLQToTopAndLepton/include/BprimeReco.h"
 #include "UHH2/VLQToTopAndLepton/include/BprimeGen.h"
-//#include "UHH2/VLQToTopAndLepton/include/Utils.h"
+#include "UHH2/VLQToTopAndLepton/include/Utils.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonSelections.h"
 
 
@@ -78,7 +78,7 @@ private:
   std::unique_ptr<BprimeGen> Gen;
   std::unique_ptr<HistFactory> TagPlots;
   std::unique_ptr<HistFactory> Chi2Plots, CMSPlots, HEPPlots;
-
+  std::unique_ptr<Hists> jetHists_sortbyeta;
   //std::unique_ptr<HistFactory> TopTagBTag, TopTagNoBTag, NoTopTagBTag, NoTopTagNoBtag;
   std::unique_ptr<BprimeHypHists> chi2_Hists, ttbar_Hists, toptag_Hists, HEPtoptag_Hists;
   std::unique_ptr<Selection> topLep,topHad;
@@ -104,6 +104,8 @@ SelectionModule::SelectionModule(Context& ctx){
   Gen.reset(new BprimeGen(ctx)); 
   ht.reset(new HTCalc(ctx));
   lepton.reset(new PrimaryLepton(ctx));
+
+  jetHists_sortbyeta.reset(new JetHists(ctx,"jets_sortbyeta"));
 
   cmstoptagSel.reset(new NTopJetSelection(1,-1,topjetid));
 
@@ -212,11 +214,11 @@ SelectionModule::SelectionModule(Context& ctx){
 bool SelectionModule::process(Event & event){
   ht->process(event);
   lepton->process(event);
-
-  Gen->process(event);
-  
+  Gen->process(event);  
   TagPlots->passAndFill(event,1);
-  
+  sort_by_eta(*event.jets);
+  jetHists_sortbyeta->fill(event);
+  sort_by_pt(*event.jets);
   if(Reco->massReco(event)){
     if(ttbar->process(event))
       ttbar_Hists->fill(event);

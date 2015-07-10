@@ -16,7 +16,7 @@ inline void sort_by_eta(std::vector<P*> & particles){
 }
 
 
-
+/*
 //template<typename T>
 vector<unique_ptr<Selection>> make_uvec(std::initializer_list<unique_ptr<Selection>> list){
   vector<unique_ptr<Selection>> my_vec;
@@ -24,7 +24,7 @@ vector<unique_ptr<Selection>> make_uvec(std::initializer_list<unique_ptr<Selecti
     my_vec.push_back(move(list.at(i)));
   return my_vec;
 }
-
+*/
 
 
 /*
