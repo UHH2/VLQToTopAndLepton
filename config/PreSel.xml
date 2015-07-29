@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
-
-<!ENTITY MC_TpJ_TH_M800_20x25 SYSTEM "../../common/datasets/MC_TpJ_TH_M800_20x25.xml">
-<!ENTITY MC_TpJ_TH_M1200_20x25 SYSTEM "../../common/datasets/MC_TpJ_TH_M1200_20x25.xml">
-
-<!ENTITY TTbar SYSTEM "../../common/datasets/MC_TTJets_20x25.xml">
-<!ENTITY BpJ_TW_800 SYSTEM "../../common/datasets/MC_BpJ_TW_M800_20x25.xml">
-<!ENTITY BpJ_TW_1200 SYSTEM "../../common/datasets/MC_BpJ_TW_M1200_20x25.xml">
-
+<!ENTITY SingleMuDATA SYSTEM "../../common/datasets/DATA_SingleMu.xml">
 <!ENTITY Bpb_TW_800_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-800_LH.xml">
 <!ENTITY Bpb_TW_1000_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1000_LH.xml">
 <!ENTITY Bpb_TW_1200_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1200_LH.xml">
 <!ENTITY Bpb_TW_800_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-800_RH.xml">
 <!ENTITY Bpb_TW_1000_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1000_RH.xml">
 <!ENTITY Bpb_TW_1200_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1200_RH.xml">
+<!ENTITY WJets SYSTEM "../../common/datasets/MC_WJets_LNu_50ns.xml">
+<!ENTITY TTbar SYSTEM "../../common/datasets/MC_TTbar.xml">
+<!ENTITY ZJetsM10to50 SYSTEM "../../common/datasets/MC_DYJetsToLL_M-10to50.xml">
+<!ENTITY ZJetsM50toInf SYSTEM "../../common/datasets/MC_DYJetsToLL_M-50.xml">
+<!ENTITY TtChannel SYSTEM "../../common/datasets/ST_t-channel.xml">
+<!ENTITY TWAntitop SYSTEM "../../common/datasets/ST_tW_antitop.xml">
+<!ENTITY TWTop SYSTEM "../../common/datasets/ST_tW_top.xml">
 
-<!ENTITY WJets SYSTEM "../../common/datasets/MC_WJets_LNu_20x25.xml">
-<!ENTITY ZJets SYSTEM "../../common/datasets/MC_ZJets_LL_20x25.xml">
 <!ENTITY QCD_HT100To250 SYSTEM "../../common/datasets/MC_QCD_HT100To250_20x25.xml">
 <!ENTITY QCD_HT250To500Ext SYSTEM "../../common/datasets/MC_QCD_HT250To500_20x25_ext1.xml">
 <!ENTITY QCD_HT500To1000Ext SYSTEM "../../common/datasets/MC_QCD_HT500To1000_20x25_ext1.xml">
@@ -39,8 +37,14 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-    <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v8/" PostFix="" TargetLumi="19700">-->
-    <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="pod://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="" OutputDirectory="./PreSelection_v8/" PostFix="" TargetLumi="19700" >
+    <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v9/" PostFix="" TargetLumi="40.028">-->
+    <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="16" OutputDirectory="./PreSelection_v9/" PostFix="" TargetLumi="40.028" >
+<!--
+      <InputData Lumi="1" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">
+        &SingleMuDATA;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
       <InputData Lumi="98400" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_LH" Cacheable="False">
         &Bpb_TW_800_LH;
         <InputTree Name="AnalysisTree" />
@@ -71,10 +75,47 @@
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
+      <InputData Lumi="1174.6" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
+        &WJets;
+        <InputTree Name="AnalysisTree" /> 
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+-->
+      <InputData Lumi="23642.87" NEventsMax="-1" Type="MC" Version="TTJets" Cacheable="False">
+	&TTbar;
+	<InputTree Name="AnalysisTree" />
+	<OutputTree Name="AnalysisTree" />
+      </InputData>
+<!--
+	<InputData Lumi="18433.6" NEventsMax="-1" Type="MC" Version="TtChannel" Cacheable="False">
+	  &TtChannel;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="28089.89" NEventsMax="-1" Type="MC" Version="TWAntitop" Cacheable="False">
+	  &TWAntitop;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="28044.9" NEventsMax="-1" Type="MC" Version="TWTop" Cacheable="False">
+	  &TWTop;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
 
-
+	<InputData Lumi="9921" NEventsMax="-1" Type="MC" Version="ZJetsM50toInf" Cacheable="False">
+          &ZJetsM50toInf;
+          <InputTree Name="AnalysisTree" /> 
+          <OutputTree Name="AnalysisTree" />
+        </InputData>
+-->
 
 <!--
+	<InputData Lumi="" NEventsMax="-1" Type="MC" Version="ZJetsM10to50" Cacheable="False">
+          &ZJetsM10to50;
+          <InputTree Name="AnalysisTree" /> 
+          <OutputTree Name="AnalysisTree" />
+          </InputData>
       <InputData Lumi="99900" NEventsMax="-1" Type="MC" Version="MC_TpJ_TH_M800_20x25" Cacheable="False">
         &MC_TpJ_TH_M800_20x25;
         <InputTree Name="AnalysisTree" />
@@ -95,12 +136,6 @@
 
         <InputData Lumi="85611" NEventsMax="-1" Type="MC" Version="BpJ_TW_1200" Cacheable="False">
           &BpJ_TW_1200;
-          <InputTree Name="AnalysisTree" /> 
-          <OutputTree Name="AnalysisTree" />
-        </InputData>
-
-	<InputData Lumi="162.8" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
-          &WJets;
           <InputTree Name="AnalysisTree" /> 
           <OutputTree Name="AnalysisTree" />
         </InputData>
@@ -166,16 +201,20 @@
         <UserConfig>
             <!-- define which collections to read from the input. Only specify what you need to save I/O time -->
             <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices" /> 
-            <Item Name="ElectronCollection" Value="slimmedElectrons" />
-            <Item Name="MuonCollection" Value="slimmedMuons" /> 
+            <Item Name="ElectronCollection" Value="slimmedElectronsUSER" />
+            <Item Name="MuonCollection" Value="slimmedMuonsUSER" /> 
             <Item Name="TauCollection" Value="slimmedTaus" />
-            <Item Name="JetCollection" Value="patJetsAk4PFCHS" />
-	    <Item Name="TopJetCollection" Value="patJetsCmsTopTagCHSPacked" />
+            <Item Name="JetCollection" Value="slimmedJets" />
+	    <Item Name="GenJetCollection" Value="slimmedGenJets" />
+	    <Item Name="TopJetCollection" Value="slimmedJetsAK8_CMSTopTag" />
             <Item Name="METName" Value="slimmedMETs" />
             <Item Name="GenParticleCollection" Value="GenParticles" /> 
-            <Item Name="additionalBranches" Value="cmsTopTagGen hepTopTagGen patJetsHepTopTagCHSPacked patJetsCa8CHSJetsPrunedPacked patJetsCa15CHSJetsFilteredPacked" />
+            <Item Name="additionalBranches" Value="slimmedJetsPuppi" />
 	    <Item Name="SelectionTriggerName" Value=""/>
 
+	    <Item Name="lumi_file" Value="/nfs/dust/cms/user/peiffer/NtupleWriter/Ntuples/RunII_v1/Lumifile.root" />
+            <Item Name="lumihists_lumi_per_bin" Value="0.2"/>
+	    <Item Name="pileup_directory" Value=""/>
 
             <!-- The list of available collections to read in corresponds to the pointer members in event. The 'Name's to use here in the configuration are:
             
