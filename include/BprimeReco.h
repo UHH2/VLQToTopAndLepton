@@ -15,8 +15,8 @@ class BprimeReco :public uhh2::AnalysisModule {
   virtual bool process(uhh2::Event & event) override;
   bool massReco(uhh2::Event & event);
   bool TopJetReco(uhh2::Event & event, double dRmin = 0);
-  void set_jetRecoId(boost::optional<JetId> my_jetId){jetId= my_jetId;}
-  void set_topjetRecoId(boost::optional<TopJetId> my_topjetId){topjetId =my_topjetId;}
+  void set_jetRecoId(const JetId & my_jetId){jetId= my_jetId;}
+  void set_topjetRecoId(const TopJetId & my_topjetId){topjetId =my_topjetId;}
   bool set_topjetCollection(uhh2::Context & ctx, const std::string & topjetCollectionName);
   bool set_jetCollection(uhh2::Context & ctx, const std::string & jetCollectionName);  
  private:
