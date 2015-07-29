@@ -46,7 +46,7 @@ bool HTLepSelection::passes(const Event & event){
   return HTLepmin < event.met->pt()+event.get(h_primlep).pt();
 }
 
-METSelection::METSelection(Context & ctx, double METmin_): METmin(METmin_){}
+METSelection::METSelection(double METmin_): METmin(METmin_){}
 
 bool METSelection::passes(const Event & event){
   return METmin < event.met->pt();
@@ -106,4 +106,24 @@ bool PtRatioWTCut::passes(const uhh2::Event & event){
   if((ratio> min_ && ratio< max_) || (ratio>min_ && max_ ==-1) || (ratio<max_ && min_ ==-1)) return true;
   return false;
 
+}
+
+PTWhadCut::PTWhadCut(Context & ctx, float min, float max, const std::string & hyp_name):min_(min), max_(max){
+ recohyp = ctx.get_handle<BprimeContainer>(hyp_name);
+}
+
+bool PTWhadCut::passes(const uhh2::Event & event){
+  BprimeContainer hyp = event.get(recohyp);
+  if(hyp.get_wHad().pt()>min_ && (hyp.get_wHad().pt() <max_ || max_==-1))return true;
+  return false;
+}
+
+ForwardJetPtEtaCut::ForwardJetPtEtaCut(float minEta, float minPt):minEta_(minEta),minPt_(minPt){}
+
+bool ForwardJetPtEtaCut::passes(const uhh2::Event & event){
+  vector<Jet> jets = *event.jets;
+  Jet maxEtaJet = jets.at(0);
+  for(auto jet : jets)
+    if(fabs(jet.eta())> fabs(maxEtaJet.eta())) maxEtaJet = jet;
+  return fabs(maxEtaJet.eta())>minEta_ && maxEtaJet.pt()>minPt_;
 }

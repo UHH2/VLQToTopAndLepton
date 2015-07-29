@@ -34,7 +34,7 @@ GenParticleHists VLQGenHists::histoBooker(const string& HistName, double minMass
     single.eta = book<TH1F>(HistName+"_eta"+suffix,"#eta_{"+HistName+" "+axisSuffix+"}", 100, -4, 4);
     single.phi = book<TH1F>(HistName+"_phi"+suffix,"#phi_{"+HistName+" "+axisSuffix+"}", 100, -3.2, 3.2);
     single.mass = book<TH1F>(HistName+"_mass"+suffix,"mass_{"+HistName+" "+axisSuffix+"}", 100, minMass, maxMass);
-    single.charge = book<TH1F>(HistName+"_charge"+suffix,"charge_{"+HistName+" "+axisSuffix+"}", 100, -1, 1);
+    single.charge = book<TH1F>(HistName+"_charge"+suffix,"charge_{"+HistName+" "+axisSuffix+"}", 100, -5, 5);
     single.pt_eta = book<TH2F>(HistName+"_pT_eta"+suffix,"pT & eta "+HistName+" "+axisSuffix, 150, 0, 800, 100, -4, 4);
 
     hists.stdHists.push_back(single);
@@ -59,6 +59,7 @@ void VLQGenHists::histoFiller(vector<GenParticle> & particles,  int partNumber, 
       if(count==it || it==0 ) m_Hists.at(partNumber).stdHists.at(it).phi->Fill(part.phi(),weight);
       if(count==it || it==0 ) m_Hists.at(partNumber).stdHists.at(it).mass->Fill(part.v4().M(),weight);
       if(count==it || it ==0) m_Hists.at(partNumber).stdHists.at(it).charge->Fill(part.charge(),weight);
+      //if(partNumber==6)cout<<" num "<<it<<" "<<part.charge()<<endl;
       if(count==it || it ==0) m_Hists.at(partNumber).stdHists.at(it).pt_eta->Fill(part.pt(),part.eta(),weight);
 
     }
@@ -133,6 +134,8 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
 
 
 void VLQGenHists::fill(const Event & event){
+
+  if(event.isRealData) return;
   // fill the histograms. Don't forget to always use the weight when filling:
   //     double weight = event.weight;
   double weight = event.weight;

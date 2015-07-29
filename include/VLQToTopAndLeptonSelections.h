@@ -58,7 +58,7 @@ public:
 class METSelection: public uhh2::Selection{
 public:
   //enum htType{HT, HtLep};
-  explicit METSelection(uhh2::Context & ctx, double METmin);
+  explicit METSelection(double METmin);
   virtual bool passes(const uhh2::Event & event);
   
  private:
@@ -96,3 +96,20 @@ class PtRatioWTCut: public uhh2::Selection{
    uhh2::Event::Handle<BprimeContainer> recohyp;
 };
 
+class PTWhadCut: public uhh2::Selection{
+ public:
+  explicit PTWhadCut(uhh2::Context & ctx, float min, float max=-1, const std::string & hyp_name="BprimeReco");
+  virtual bool passes(const uhh2::Event & event) override;
+ private:
+   float min_, max_;
+   uhh2::Event::Handle<BprimeContainer> recohyp;
+};
+
+class ForwardJetPtEtaCut: public uhh2::Selection{
+ public:
+  explicit ForwardJetPtEtaCut(float minEta, float minPt);
+  virtual bool passes(const uhh2::Event & event) override;
+ private:
+  float minEta_;
+  float minPt_;
+};
