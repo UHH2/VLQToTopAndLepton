@@ -39,9 +39,9 @@ BprimeContainer BprimeDiscriminator::ttbar_dis(uhh2::Event & event){
   double ttbarchi =-1;
   double recoType =-1;
   for(auto hyp :  event.get(hyps)){
-    LorentzVector whad = hyp.get_wHad();
-    LorentzVector wlep = hyp.get_wLep();
-    LorentzVector topJets = hyp.get_topJets();
+    const LorentzVector & whad    = hyp.get_wHad();
+    const LorentzVector & wlep    = hyp.get_wLep();
+    const LorentzVector & topJets = hyp.get_topJets();
     double ttbar = ((topJets+wlep).M()-174.7)*((topJets+wlep).M()-174.7)/(14*14)+(whad.M()-172.1)*(whad.M()-172.1)/(21.8*21.8);
     if(ttbar < ttbarchi || ttbarchi == -1){
       ttbarchi=ttbar;
@@ -63,9 +63,9 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
   double bprimechi =-1;
   int recoType = -1;
   for(auto hyp :  event.get(hyps)){
-    LorentzVector whad = hyp.get_wHad();
-    LorentzVector wlep = hyp.get_wLep();
-    LorentzVector topJets = hyp.get_topJets();
+    const LorentzVector & whad    = hyp.get_wHad();
+    const LorentzVector & wlep    = hyp.get_wLep();
+    const LorentzVector & topJets = hyp.get_topJets();
     double lepTop =999999999;
     double hadTop =999999999;
     if(dis==1 || dis ==2)lepTop = ((topJets+wlep).M()-175)*((topJets+wlep).M()-175)/(14*14)+(whad.M()-82)*(whad.M()-82)/(14*14)+pow(deltaR(whad,wlep+topJets)-3.14,2)/0.15/0.15;
@@ -108,8 +108,8 @@ BprimeContainer BprimeDiscriminator::cmsTopTag_dis(uhh2::Event & event){
   double bprimechi =-1;
   int recoType = -1;
   for(auto hyp :  event.get(hyps)){
-    LorentzVector wlep = hyp.get_wLep();
-    LorentzVector topHad = hyp.get_topHad();
+    const LorentzVector & wlep = hyp.get_wLep();
+    const LorentzVector & topHad = hyp.get_topHad();
     double chi = pow(topHad.M()-180,2)/23/23+ pow(deltaR(wlep,topHad)-3.1,2)/0.15/0.15;
     if(chi<bprimechi || bprimechi==-1){
       bestHyp=hyp;

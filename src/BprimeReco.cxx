@@ -62,10 +62,10 @@ bool BprimeReco::massReco(uhh2::Event & event){
       LorentzVector whad(0,0,0,0);
       for (unsigned int i = 0; i < N; ++i){ // [0..N-1] integers
 	if(bitmask[i]) whad = whad+jets.at(i).v4();
-	if(whad.M()>600) break;
+	if(whad.M()>500) break;
       }
       for(auto & neutrino:neutrinos){
-	if(whad.M()<400 && whad.M()>40){
+	if(whad.M()<400 && whad.M()>50){
 	  tmp_hyp.set_wJets(bitmask);
 	  tmp_hyp.set_wHad(whad);
 	  tmp_hyp.set_wLep(neutrino+lep);
@@ -78,13 +78,19 @@ bool BprimeReco::massReco(uhh2::Event & event){
 
   //permutation of top jets
   for(auto & hyp : recoWHyps){
-    recoHyps.emplace_back(hyp);//hypothersis without any jets!
+    string jet_string = hyp.get_wJets();
+    hyp.set_unusedJets(jet_string);//setting unused Jets to wJets for hyp with no Jets!
+    recoHyps.emplace_back(hyp);//hypothersis without any additional jets!
     vector<Jet> unusedJets;
-    //cout<<hyp.get_wJets().size()<<endl;
+    vector<double> unusedjetsMap;
     for(unsigned int i=0; i<jets.size();++i){
-      if(!hyp.get_wJets()[i]) unusedJets.emplace_back(jets.at(i));
-    }
+      if(!jet_string[i]){
+	unusedJets.emplace_back(jets.at(i));
+	unusedjetsMap.emplace_back(i);
+      }
+    }  
     for(unsigned int K=1; K<unusedJets.size(); ++K){
+      string hyp_jet_string =  jet_string;
       unsigned int N = unusedJets.size();
       string bitmask(K, 1); // K leading 1's
       bitmask.resize(N, 0); // N-K trailing 0's 
@@ -97,7 +103,16 @@ bool BprimeReco::massReco(uhh2::Event & event){
 	}
 	if((top+hyp.get_wHad()).M()>400 && (top+hyp.get_wLep()).M()>400) continue;
 	hyp.set_topJets(top);
-	//hyp.set_topJets(bitmask); //intendet for a string to see which jets where associated
+	for(unsigned int it = 0; it<bitmask.size(); it++){
+	  if(bitmask[it]){
+	    hyp_jet_string[unusedjetsMap[it]]=1;
+	  }
+	}
+	//cout<<"wJets allJets size "<< jets.size()<<endl;
+	//for(unsigned int ip =0; ip< hyp.get_wJets().size(); ip++)
+	//  cout<<bool(hyp.get_wJets()[ip])<<" "<<bool(hyp_jet_string[ip])<<endl;
+	//cout<<"==================="<<endl;
+	hyp.set_unusedJets(hyp_jet_string);
   	recoHyps.emplace_back(hyp);
       } while(std::prev_permutation(bitmask.begin(), bitmask.end()));   
     }
@@ -107,7 +122,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
   return true;
 }
 
-void BprimeReco::comb(int N, int K)
+void BprimeReco::comb(int N, int K)//prototyp of the permutation algorithem
 {
     std::string bitmask(K, 1); // K leading 1's
     bitmask.resize(N, 0); // N-K trailing 0's
@@ -128,18 +143,15 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
   if(topjetId){
     vector<TopJet> selected_topjets;
     for(unsigned int i =0; i<topjets.size(); i++){
-	if(passes_id(topjets.at(i),event,topjetId)) selected_topjets.push_back(topjets.at(i));
-      }
+      if(passes_id(topjets.at(i),event,topjetId)) selected_topjets.push_back(topjets.at(i));
+    }
     selected_topjets.swap(topjets);
-  }
-  	  
+  }	  
   LorentzVector lep = event.get(primlep).v4();  
   vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
-  //vector<Jet>* jets = event.jets;
   vector<BprimeContainer> recoHyps;
   BprimeContainer tmp_hyp;
-
-  if(topjets.size()<1 || neutrinos.size()<1)return false;
+  if(topjets.size()<1||neutrinos.size()<1) return false;
   for(auto & topjet : topjets){
     tmp_hyp.set_topHad(topjet.v4());
     for(auto & neutrino : neutrinos){
