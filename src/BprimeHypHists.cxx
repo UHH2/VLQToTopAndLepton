@@ -29,6 +29,11 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   mass_lep = book_BaseHists("Mass_lep","lep. Hypothesis",50,3000); 
   mass_had = book_BaseHists("Mass_had","had. Hypothesis",50,3000); 
 
+  forward = book_BaseHists("forward_jet","forward Jet",0,100,20,400);
+  balance = book_BaseHists("balance_jet","balance Jet",0,100,20,400); 
+  combination = book_BaseHists("combination","forward + balance Jet",20,400,20,400); 
+  no_forwardJet= book_BaseHists("no_forward_Jet","no forward Jet",50,3000); 
+
   deltaR_w    = book<TH1F>("deltaR_w","#Delta R (W_{lep},W_{had})", 100, 0, 8);
   deltaPhi_w  = book<TH1F>("deltaPhi_w","#Delta #phi (W_{lep},W_{had})", 100, 0, 4);
   deltaR_top  = book<TH1F>("deltaR_top","#Delta R (t_{lep},t_{had})", 100, 0, 4);
@@ -76,6 +81,7 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   Bprime_res_eta  = book<TH1F>(" Bprime_res_eta","B Resolution #eta", 100, 0, 4); 
   Bprime_res_deltaR  = book<TH1F>(" Bprime_res_deltaR","B Resolution #Delta R", 100, 0, 4); 
  
+
   topReco_dR_pT_lep    = book<TH2F>("topReco_dR_pT_lep","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,0,800);  
   topReco_dR_pTres_lep = book<TH2F>("topReco_dR_pTres_lep","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,-2,2);  
   topReco_dR_pT_had    = book<TH2F>("topReco_dR_pT_had","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,0,800);  
@@ -90,6 +96,10 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   chi_whad_pT      = book<TH2F>("chi_whad_pT","#Chi^{2} - W_{had} p_{T}", 100, 0, 80, 100, 0,1500);  
   //chi_ST           = book<TH2F>("chi_ST","", 100, 0, 2, 100,0,800);  
   chi_deltaR_w_top = book<TH2F>("chi_deltaR_w_top","#Chi^{2} - #Delta R (t,W)", 100, 0, 80, 100,0,6);  
+  
+  //forward Jet TH1F/TH2F
+  deltaR_forward_B = book<TH1F>("deltaR_forward_B","#Delta R (Jet_{forward},whad)", 100, 0,8); 
+  forward_pt_eta = book<TH2F>("forward_pt_eta","Jet_{forward} pT #eta", 100, 0, 250, 100,-8,8);  
   
 
 
@@ -109,9 +119,10 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   LorentzVector thad = hyp.get_topHad();
   LorentzVector tlep = hyp.get_topLep();
   LorentzVector bprime;
-  BprimeGenContainer GenInfo = event.get(gen);
   double chiVal = hyp.get_chiVal();
   int recotype = hyp.get_RecoTyp();
+  vector<Jet>* jets = event.jets;
+  string unusedJets = hyp.get_unusedJets();
 
   //cout<<recotype<<endl;
   /*
@@ -164,6 +175,46 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     chi_top_pT->Fill(chiVal,tlep.pt(),weight);
     if(recotype==11) chiDis_lep->Fill(chiVal,weight);
   }
+  //forward Jet
+  /*
+  LorentzVector forwardJet (0,0,0,0);
+  LorentzVector balanceJet (0,0,0,0);
+  if(recotype==11 || recotype==12||recotype==0){
+    //cout<<unusedJets.size()<<" "<<jets->size()<<endl;
+    for(unsigned int i =0; i<jets->size();i++){ 
+      if(!unusedJets[i]){
+	if(fabs(forwardJet.eta())<fabs(jets->at(i).eta())){
+	  balanceJet = forwardJet;
+	  forwardJet = jets->at(i).v4();
+	}
+      }
+    }
+    //cout<<"forwardJet eta "<< forwardJet.eta()<<" balanceJet eta "<<balanceJet.eta()<<endl;
+  }
+  else if (recotype==2){
+    for(unsigned int i =0; i<jets->size();i++){ 
+      if(deltaR(jets->at(i).v4(),thad)>2)
+	if(fabs(forwardJet.eta())<fabs(jets->at(i).eta())){
+	  balanceJet = forwardJet;
+	  forwardJet = jets->at(i).v4();
+	}
+    }
+  }
+  if(forwardJet.pt()>0){
+    fill_BaseHists(forwardJet,forward,weight);
+    fill_BaseHists(forwardJet+balanceJet+whad+wlep+topJets,combination,weight);
+    deltaR_forward_B->Fill(deltaR(forwardJet,whad),weight);
+    forward_pt_eta->Fill(forwardJet.pt(),forwardJet.eta(),weight);
+  }
+  else
+    fill_BaseHists(whad+wlep+topJets,no_forwardJet,weight);
+
+
+  if(balanceJet.pt()>0)fill_BaseHists(balanceJet,balance,weight);
+  */
+
+  if(event.isRealData) return;
+  BprimeGenContainer GenInfo = event.get(gen);
   if(GenInfo.get_wHad().pt()>0){
     wHad_res_pt->Fill((GenInfo.get_wHad().pt()-whad.pt())/GenInfo.get_wHad().pt(),weight);   
     wHad_res_E->Fill((GenInfo.get_wHad().E()-whad.E())/GenInfo.get_wHad().E(),weight);       
