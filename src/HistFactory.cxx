@@ -4,6 +4,7 @@
 #include "UHH2/common/include/ElectronHists.h"
 #include "UHH2/common/include/JetHists.h"
 #include "UHH2/common/include/EventHists.h"
+#include "UHH2/common/include/LuminosityHists.h"
 
 #include "UHH2/VLQToTopAndLepton/include/BprimeRecoHists.h"
 #include "UHH2/VLQToTopAndLepton/include/BprimeHypHists.h"
@@ -63,7 +64,13 @@ void HistFactory::addAndSelection(vector<unique_ptr<Selection>> selection, const
     myAndSel->add(to_string(i),move(selection.at(i)));
   addSelection(move(myAndSel),cutName);
 }
-
+void HistFactory::addOrSelection(vector<unique_ptr<Selection>> selection, const string& cutName){
+  unique_ptr<OrSelection> myOrSel;
+  myOrSel.reset(new OrSelection());
+  for(unsigned int i=0; i<selection.size(); i++)
+    myOrSel->add(move(selection.at(i)));
+  addSelection(move(myOrSel),cutName);
+}
 void HistFactory::addCounter(){
   weighted_count.push_back(0);
   count.push_back(0);
@@ -99,11 +106,37 @@ void HistFactory::addHists(const string& histClass, const string& histName, cons
     else if(histClass.compare("BprimeHypHists")==0){
       histTemplate.reset(new BprimeHypHists(m_ctx,ss.str().c_str(),hyp_name));
     }
+    else if(histClass.compare("LuminosityHists")==0){
+      histTemplate.reset(new LuminosityHists(m_ctx,ss.str().c_str()));
+    }
     else
       cerr<<"You ask for a not supported hist class, please check spelling or add class";
     factoryHists.push_back(move(histTemplate));
   }
 }
+void HistFactory::addHists(const string& histName, JetId jetid){
+  unique_ptr<JetHists> histTemplate;
+  for(const auto & cutName : cutNames){
+    stringstream ss;
+    if(!cutName.empty()) ss<<cutName<<"_"<<histName;
+    else  ss<<histName;
+    histTemplate.reset(new JetHists(m_ctx,ss.str().c_str()));
+    histTemplate->set_JetId(jetid);
+    factoryHists.push_back(move(histTemplate));
+  }
+}
+void HistFactory::addHists(const string& histName, TopJetId topjetid){
+  unique_ptr<TopJetHists> histTemplate;
+  for(const auto & cutName : cutNames){
+    stringstream ss;
+    if(!cutName.empty()) ss<<cutName<<"_"<<histName;
+    else  ss<<histName;
+    histTemplate.reset(new TopJetHists(m_ctx,ss.str().c_str()));
+    histTemplate->set_TopJetId(topjetid);
+    factoryHists.push_back(move(histTemplate));
+  }
+}
+
 //passOption: 0 event has to pass all cuts, 1 event passe this cut
 bool HistFactory::passAndFill(const Event & event, int passOption){
   bool passCuts =true;

@@ -1,7 +1,13 @@
 #pragma once
 
 #include "UHH2/core/include/Selection.h"
+#include "UHH2/common/include/AdditionalSelections.h"
+
 #include "UHH2/core/include/AnalysisModule.h"
+
+#include "UHH2/common/include/JetIds.h"
+#include "UHH2/common/include/TopJetIds.h"
+
 
 //#include <boost/ptr_container/ptr_vector.hpp>
 #include <iostream>
@@ -24,8 +30,11 @@ class HistFactory{
 
   void addSelection(unique_ptr<Selection> selection, const string& cutName);
   void addAndSelection(vector<unique_ptr<Selection>> selection, const string& cutName);
+  void addOrSelection(vector<unique_ptr<Selection>> selection, const string& cutName);
   //void addSelection(shared_ptr<Selection> selection, string cutName);
   void addHists(const string& histClass, const string& histName, const std::string & hyp_name = "BprimeReco");
+  void addHists(const string& histName, JetId jetid);
+  void addHists(const string& histName, TopJetId topjetid);
   bool passAndFill(const Event& event, int passOption=0);
   void setEffiHistName(const string& name){effiHistName=name;}
 
