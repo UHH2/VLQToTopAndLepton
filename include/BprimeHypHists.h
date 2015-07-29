@@ -31,6 +31,7 @@ class BprimeHypHists: public uhh2::Hists {
   BaseHists wHad, wLep, topLep, topHad;
   BaseHists mass, mass_lep, mass_had;
   BaseHists ttbar;
+  BaseHists forward, balance, combination, no_forwardJet;
   //DeltaR & DeltaPhi. top referece to top -> w
   TH1F* deltaR_w, *deltaPhi_w, *deltaR_top, *deltaR_wtop;
   TH1F* pTratio_wtop, *pTratio_toptop, *pTratio_ww;
@@ -46,7 +47,9 @@ class BprimeHypHists: public uhh2::Hists {
 
   TH2F* chi_top_pT, *chi_wlep_pT, *chi_whad_pT, chi_ST;
   TH2F* chi_deltaR_w_top;
-
+  TH1F* deltaR_forward_B; 
+  TH2F* forward_pt_eta;
+  
   uhh2::Event::Handle<BprimeContainer> recohyp;
   uhh2::Event::Handle<BprimeGenContainer> gen;
 };
