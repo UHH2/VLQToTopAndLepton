@@ -37,14 +37,15 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-    <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v9/" PostFix="" TargetLumi="40.028">-->
-    <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="16" OutputDirectory="./PreSelection_v9/" PostFix="" TargetLumi="40.028" >
-<!--
+    <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_TEST/" PostFix="" TargetLumi="40.028">-->
+    <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="25" OutputDirectory="./PreSelection_v2/" PostFix="" TargetLumi="40.028" >
+
       <InputData Lumi="1" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">
         &SingleMuDATA;
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
+
       <InputData Lumi="98400" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_LH" Cacheable="False">
         &Bpb_TW_800_LH;
         <InputTree Name="AnalysisTree" />
@@ -75,40 +76,40 @@
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
-      <InputData Lumi="1174.6" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
+
+<!--
+      <InputData Lumi="60492481.7" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
         &WJets;
         <InputTree Name="AnalysisTree" /> 
         <OutputTree Name="AnalysisTree" />
       </InputData>
 -->
-      <InputData Lumi="23642.87" NEventsMax="-1" Type="MC" Version="TTJets" Cacheable="False">
+      <InputData Lumi="24100.7" NEventsMax="-1" Type="MC" Version="TTJets" Cacheable="False">
 	&TTbar;
 	<InputTree Name="AnalysisTree" />
 	<OutputTree Name="AnalysisTree" />
       </InputData>
-<!--
-	<InputData Lumi="18433.6" NEventsMax="-1" Type="MC" Version="TtChannel" Cacheable="False">
+      <InputData Lumi="51947416.4" NEventsMax="-1" Type="MC" Version="ZJetsM50toInf" Cacheable="False">
+        &ZJetsM50toInf;
+        <InputTree Name="AnalysisTree" /> 
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+
+	<InputData Lumi="1237718.3" NEventsMax="-1" Type="MC" Version="SingleTtChannel" Cacheable="False">
 	  &TtChannel;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="28089.89" NEventsMax="-1" Type="MC" Version="TWAntitop" Cacheable="False">
+	<InputData Lumi="28089.89" NEventsMax="-1" Type="MC" Version="SingleTWAntitop" Cacheable="False">
 	  &TWAntitop;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="28044.9" NEventsMax="-1" Type="MC" Version="TWTop" Cacheable="False">
+	<InputData Lumi="28044.9" NEventsMax="-1" Type="MC" Version="SingleTWTop" Cacheable="False">
 	  &TWTop;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-
-	<InputData Lumi="9921" NEventsMax="-1" Type="MC" Version="ZJetsM50toInf" Cacheable="False">
-          &ZJetsM50toInf;
-          <InputTree Name="AnalysisTree" /> 
-          <OutputTree Name="AnalysisTree" />
-        </InputData>
--->
 
 <!--
 	<InputData Lumi="" NEventsMax="-1" Type="MC" Version="ZJetsM10to50" Cacheable="False">
@@ -214,8 +215,10 @@
 
 	    <Item Name="lumi_file" Value="/nfs/dust/cms/user/peiffer/NtupleWriter/Ntuples/RunII_v1/Lumifile.root" />
             <Item Name="lumihists_lumi_per_bin" Value="0.2"/>
-	    <Item Name="pileup_directory" Value=""/>
-
+	    <!--<Item Name="pileup_directory" Value=""/>-->
+	    <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/mameyer/TTDMDM/preselection_RunII/uhh2.AnalysisModuleRunner.Data.Data.root"/>
+	    <Item Name="pileup_directory_50ns" Value="/nfs/dust/cms/user/mameyer/TTDMDM/preselection_RunII/uhh2.AnalysisModuleRunner.MC.TTbar.root"/>
+	    <Item Name="pileup_directory_25ns" Value="/nfs/dust/cms/user/mameyer/TTDMDM/preselection_RunII/uhh2.AnalysisModuleRunner.MC.TTbarDMJets_pseudoscalar_Mchi-50_Mphi-300.root"/>
             <!-- The list of available collections to read in corresponds to the pointer members in event. The 'Name's to use here in the configuration are:
             
                  PrimaryVertexCollection
