@@ -13,13 +13,14 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-    <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Selection5000_v1/" PostFix="" TargetLumi="5000">-->
+    <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Selection_v1/" PostFix="" TargetLumi="40.028">-->
     <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="2" OutputDirectory="./Selection_v1/" PostFix="" TargetLumi="40.028">
-
+<!--
       <InputData Lumi="98400" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">
 	<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/VLQToTopAndLepton/config/PreSelection_v1/uhh2.AnalysisModuleRunner.DATA.SingleMuDATA.root" Lumi="0.0"/> 
 	<InputTree Name="AnalysisTree" />
       </InputData>
+-->
       <InputData Lumi="98400" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_LH" Cacheable="False">
 	<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/VLQToTopAndLepton/config/PreSelection_v1/uhh2.AnalysisModuleRunner.MC.Bpb_TW_800_LH.root" Lumi="0.0"/> 
 	<InputTree Name="AnalysisTree" />
@@ -61,7 +62,7 @@
         <InputTree Name="AnalysisTree" /> 
       </InputData>
 
-      <InputData Lumi="1237718.3" NEventsMax="-1" Type="MC" Version="SingleTtChannel" Cacheable="False">
+      <InputData Lumi="3799299.8" NEventsMax="-1" Type="MC" Version="SingleTtChannel" Cacheable="False">
 	<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/VLQToTopAndLepton/config/PreSelection_v1/uhh2.AnalysisModuleRunner.MC.TtChannel.root" Lumi="0.0"/> 
 	<InputTree Name="AnalysisTree" />
 	</InputData>
@@ -137,8 +138,8 @@
 	    <Item Name="additionalBranches" Value="slimmedJetsPuppi" />
             
 	    <Item Name="SelectionTriggerName" Value=""/>
-
-	    <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/mameyer/TTDMDM/preselection_RunII/uhh2.AnalysisModuleRunner.Data.Data.root"/>
+	    <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/reimersa/LQToTopMu/Run2/MCPUReweight/uhh2.AnalysisModuleRunner.DATA.DATA.root" />
+	    
 	    <Item Name="pileup_directory_50ns" Value="/nfs/dust/cms/user/mameyer/TTDMDM/preselection_RunII/uhh2.AnalysisModuleRunner.MC.TTbar.root"/>
 	    <Item Name="pileup_directory_25ns" Value="/nfs/dust/cms/user/mameyer/TTDMDM/preselection_RunII/uhh2.AnalysisModuleRunner.MC.TTbarDMJets_pseudoscalar_Mchi-50_Mphi-300.root"/>
 
