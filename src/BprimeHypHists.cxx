@@ -121,7 +121,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   LorentzVector bprime;
   double chiVal = hyp.get_chiVal();
   int recotype = hyp.get_RecoTyp();
-  vector<Jet>* jets = event.jets;
+  //vector<Jet>* jets = event.jets;
   string unusedJets = hyp.get_unusedJets();
 
   //cout<<recotype<<endl;
