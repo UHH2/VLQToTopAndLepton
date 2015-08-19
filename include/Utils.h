@@ -1,9 +1,13 @@
 #pragma once
 
-#include "UHH2/core/include/Selection.h"
-
 #include <initializer_list>
+#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
+
 #include "UHH2/core/include/Event.h"
+#include "UHH2/core/include/Selection.h"
+#include "UHH2/core/include/Utils.h" 
+
 
 template<typename P>
 inline void sort_by_eta(std::vector<P> & particles){
@@ -15,6 +19,17 @@ inline void sort_by_eta(std::vector<P*> & particles){
   std::sort(particles.begin(), particles.end(), [](const P* p1, const P* p2){return fabs(p1->eta()) > fabs(p2->eta());});
 }
 
+inline std::vector<std::unique_ptr<Selection>> make_uvec(std::unique_ptr<Selection> a, std::unique_ptr<Selection> b){
+  std::vector<std::unique_ptr<Selection>> my_vec;
+  my_vec.push_back(move(a)); my_vec.push_back(move(b));
+  return my_vec;
+}
+
+inline std::vector<std::unique_ptr<Selection>> make_uvec(std::unique_ptr<Selection> a, std::unique_ptr<Selection> b, std::unique_ptr<Selection> c){
+  std::vector<std::unique_ptr<Selection>> my_vec;
+  my_vec.push_back(move(a)); my_vec.push_back(move(b)); my_vec.push_back(move(c));
+  return my_vec;
+}
 
 /*
 //template<typename T>
