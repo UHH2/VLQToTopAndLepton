@@ -1,33 +1,22 @@
 #include <iostream>
 #include <memory>
 
-/*
-#include "boost/fusion/include/sequence.hpp"
-#include "boost/fusion/include/make_vector.hpp"
-#include "boost/fusion/include/insert.hpp"
-#include "boost/fusion/include/invoke_procedure.hpp"
-#include "boost/fusion/include/make_vector.hpp"
-*/
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/include/make_vector.hpp>
-
 #include "UHH2/core/include/AnalysisModule.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/core/include/Utils.h" 
 #include "UHH2/core/include/GenParticle.h"
 #include "UHH2/core/include/Selection.h"
 
-#include "UHH2/common/include/CleaningModules.h"
 #include "UHH2/common/include/EventVariables.h"
 #include "UHH2/common/include/ElectronIds.h"
 #include "UHH2/common/include/MuonIds.h"
 #include "UHH2/common/include/TriggerSelection.h" 
 #include "UHH2/common/include/NSelections.h"
-#include "UHH2/common/include/JetCorrections.h" 
 #include "UHH2/common/include/JetIds.h"
 #include "UHH2/common/include/TopJetIds.h"
 #include "UHH2/common/include/TTbarReconstruction.h"
 #include "UHH2/common/include/JetHists.h"
+#include "UHH2/common/include/MCWeight.h"
 
 #include "UHH2/VLQToTopAndLepton/include/GenSelection.h"
 #include "UHH2/VLQToTopAndLepton/include/HistFactory.h"
@@ -41,19 +30,10 @@
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonSelections.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonHists.h"
 
+
+
 using namespace std;
 using namespace uhh2;
-
-vector<unique_ptr<Selection>> make_uvec(unique_ptr<Selection> a, unique_ptr<Selection> b){
-  vector<unique_ptr<Selection>> my_vec;
-  my_vec.push_back(move(a)); my_vec.push_back(move(b));
-  return my_vec;
-}
-vector<unique_ptr<Selection>> make_uvec(unique_ptr<Selection> a, unique_ptr<Selection> b, unique_ptr<Selection> c){
-  vector<unique_ptr<Selection>> my_vec;
-  my_vec.push_back(move(a)); my_vec.push_back(move(b)); my_vec.push_back(move(c));
-  return my_vec;
-}
 
 
 
@@ -81,13 +61,17 @@ private:
   std::unique_ptr<JetHists> btag_jetHists;
   std::unique_ptr<Hists> jetHists_sortbyeta;
   std::unique_ptr<Hists> twoDjetHists_sortbyeta;
+  std::unique_ptr<MCPileupReweight> pileup_weights;
   //std::unique_ptr<TopJetCleaner> topjetcleaner;
   JetId btag_medium;
   TopJetId topjetid;
   TopJetId heptopjetid;
+  uhh2::Event::Handle<double> MCPileupWeight;
 };
 
 SelectionModule::SelectionModule(Context& ctx){
+  pileup_weights.reset(new MCPileupReweight(ctx));
+  //MCPileupWeight = ctx.declare_event_input<double>("MCPileupWeight", "MCPileupWeight"); //declare_in_out<float>("MCPileupWeight", "MCPileupWeight", ctx);
   topjetid = AndId<TopJet>(CMSTopTag(),Tau32());
   //heptopjetid = HEPTopTag();
   btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
@@ -221,9 +205,14 @@ SelectionModule::SelectionModule(Context& ctx){
 }
 
 bool SelectionModule::process(Event & event){
+  pileup_weights->process(event);
+  //if(!event.isRealData)event.weight *= event.get(MCPileupWeight);
   ht->process(event);
   lepton->process(event);
-  if(!event.isRealData)Gen->process(event);  
+  if(!event.isRealData){
+    Gen->process(event);  
+    //lumi_weights->process(event);  
+  }
   TagPlots->passAndFill(event,1);
   sort_by_eta(*event.jets);
   jetHists_sortbyeta->fill(event);

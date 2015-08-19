@@ -31,6 +31,7 @@
 #include "UHH2/VLQToTopAndLepton/include/HistFactory.h"
 #include "UHH2/VLQToTopAndLepton/include/HTCalc.h"
 #include "UHH2/VLQToTopAndLepton/include/BprimeReco.h"
+#include "UHH2/VLQToTopAndLepton/include/Utils.h"
 
 using namespace std;
 using namespace uhh2;
@@ -63,29 +64,33 @@ private:
 TriggerModule::TriggerModule(Context& ctx){
   //Reco.reset(new BprimeReco(ctx)); 
   //Version  = ctx.get("dataset_version", "<not set>");
+  
   common.reset(new CommonModules());
-  common->set_jet_id(PtEtaCut(30.0,5));
-  common->set_electron_id(AndId<Electron>(ElectronID_PHYS14_25ns_tight_noIso, PtEtaCut(15.0, 2.1)));
-  common->set_muon_id(AndId<Muon>(MuonIDTight(),PtEtaCut(15.0, 2.1)));
+  common->set_jet_id(PtEtaCut(40.0,2.7));
+  common->set_electron_id(AndId<Electron>(ElectronID_PHYS14_25ns_tight_noIso, PtEtaCut(20.0, 2.1)));
+  common->set_muon_id(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 2.1)));
   common->switch_jetlepcleaner();
   common->switch_jetPtSorter();
+  common->disable_mclumiweight();
+  common->disable_mcpileupreweight();
   common->init(ctx);
-  btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
   lepton.reset(new PrimaryLepton(ctx));
   vlqGenHists.reset(new VLQGenHists(ctx,"GenHists"));
 
-  muid_cut = AndId<Muon>(MuonIDTight(), PtEtaCut(50.0, 2.4));
-  onejet = PtEtaCut(200.0, 2.4); twojet = PtEtaCut(50.0, 2.4);
-  topjet = PtEtaCut(250.0,2.4); 
-  lowjet = PtEtaCut(50.0,2.4); 
 
+  dataTrigger.reset(new HistFactory(ctx));
+  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"HLT_Mu45_eta2p1");					     
+  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu50_v*"),"HLT_Mu50");						     
+  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_IsoMu24_eta2p1_v*"),"HLT_IsoMu24_eta2p1");			     
+  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu40_eta2p1_PFJet200_PFJet50_v*"),"HLT_Mu40_eta2p1_PFJet200_PFJet50");
+ 
   muonTrigger.reset(new HistFactory(ctx));
   //muonTrigger.reset(new HistFactory(ctx));
-  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"Mu45_eta2p1");
-  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu50_v*"),"HLT_Mu50");
-  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_IsoMu24_eta2p1_v*"),"HLT_IsoMu24_eta2p1");
+  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"HLT_Mu45_eta2p1");					     
+  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu50_v*"),"HLT_Mu50");						     
+  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_IsoMu24_eta2p1_v*"),"HLT_IsoMu24_eta2p1");			     
   muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu40_eta2p1_PFJet200_PFJet50_v*"),"HLT_Mu40_eta2p1_PFJet200_PFJet50");
-
+  muonTrigger->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),make_unique<TriggerSelection>("HLT_IsoMu24_eta2p1_v*")),"HLT_OR_Mu45_IsoMu24");
   muonTrigger->addHists("MuonHists","trigger_MuonHists");
   muonTrigger->addHists("JetHists","trigger_JetHists");
 
@@ -108,13 +113,15 @@ bool TriggerModule::process(Event & event){
   if(!common->process(event)) return false;
   lepton->process(event);
   if(!event.isRealData){
-    //cout<<"Hi I was here "<<endl;
-    if(topHadSel->passes(event) || topLepSel->passes(event))
+    //if(topHadSel->passes(event) || topLepSel->passes(event))
     vlqGenHists->fill(event);
     muonTrigger->passAndFill(event);
   }
+  else{
+    dataTrigger->passAndFill(event);
+  }
+
   return true;
- 
 }
 
 

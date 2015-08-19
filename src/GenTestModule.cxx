@@ -53,11 +53,6 @@ private:
   std::unique_ptr<HistFactory> muonFactory, dileptonFactory;//, hadronicFactory;
   std::unique_ptr<HistFactory> topWMuonFactory, wMuonFactory;
   std::unique_ptr<HistFactory> muonTrigger;
-  std::unique_ptr<AnalysisModule>  jetCorr; 
-  std::unique_ptr<ElectronCleaner> elecleaner;
-  std::unique_ptr<MuonCleaner> mucleaner;  
-  std::unique_ptr<JetCleaner> jetcleaner;
-  std::unique_ptr<AnalysisModule> jetlepclean; 
   std::unique_ptr<Selection> HiggsFilter, ZFilter;
   AndSelection  channelSel;
   JetId btag_medium;
@@ -73,9 +68,12 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   //Reco.reset(new BprimeReco(ctx)); 
   //Version  = ctx.get("dataset_version", "<not set>");
   common.reset(new CommonModules());
-  common->set_jet_id(PtEtaCut(40.0,5));
-  common->set_electron_id(AndId<Electron>(ElectronID_PHYS14_25ns_tight_noIso, PtEtaCut(35.0, 2.4)));
-  common->set_muon_id(AndId<Muon>(MuonIDTight(),PtEtaCut(40.0, 2.4)));
+  common->set_jet_id(PtEtaCut(40.0,3));
+  //common->store_mcpileupreweight(false);
+  common->set_electron_id(AndId<Electron>(ElectronID_PHYS14_25ns_tight_noIso, PtEtaCut(40.0, 2.1)));
+  common->set_muon_id(AndId<Muon>(MuonIDTight(),PtEtaCut(40.0, 2.1)));
+  //common->disable_mcpileupreweight();
+  common->disable_metfilters();
   common->switch_jetlepcleaner();
   common->switch_jetPtSorter();
   common->init(ctx);
@@ -83,19 +81,13 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   ht.reset(new HTCalc(ctx));
   lepton.reset(new PrimaryLepton(ctx));
 
-  jetcleaner.reset(new JetCleaner(30.0, 5));
-  jetlepclean.reset(new JetLeptonCleaner(JERFiles::PHYS14_L123_MC));
-  jetCorr.reset(new JetCorrector(JERFiles::PHYS14_L123_MC));
-  elecleaner.reset(new ElectronCleaner(AndId<Electron>(ElectronID_PHYS14_25ns_tight_noIso, PtEtaCut(35.0, 2.4))));
-  mucleaner.reset(new MuonCleaner(AndId<Muon>(MuonIDTight(),PtEtaCut(40.0, 2.4))));
-
   vlqGenHists.reset(new VLQGenHists(ctx,"GenHists"));
 
-  muonTrigger.reset(new HistFactory(ctx,"triggerEffis.txt"));
+  //muonTrigger.reset(new HistFactory(ctx,"triggerEffis.txt"));
   //muonTrigger.reset(new HistFactory(ctx));
-  muonTrigger->addSelection(make_unique<GenNSelection>(13,1,1,30,-1),"1_GenSel");
-  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu40_v*"),"muonTrigger");
-  muonTrigger->addHists("MuonHists","triggerChannel_MuonHists");
+  //muonTrigger->addSelection(make_unique<GenNSelection>(13,1,1,30,-1),"1_GenSel");
+  //muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu40_v*"),"muonTrigger");
+  //muonTrigger->addHists("MuonHists","triggerChannel_MuonHists");
 
   muid_cut = AndId<Muon>(MuonIDTight(), PtEtaCut(50.0, 2.4));
   onejet = PtEtaCut(200.0, 2.4); twojet = PtEtaCut(50.0, 2.4);
@@ -184,22 +176,13 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
 }
 
 bool GenTestModule::process(Event & event){
-  //elecleaner->process(event);
-  //mucleaner->process(event);
-  //jetlepclean->process(event);
-  //jetCorr->process(event);
-  //jetcleaner->process(event);
   if(!common->process(event)) return false;
-  //sort_by_pt(*event.jets);
-  //ht->process(event);
   lepton->process(event);
-  
-
   if(!event.isRealData){
     bBprimeFactory->passAndFill(event);
     vlqGenHists->fill(event);  
-    if(Version.find("BpJ_TW") != std::string::npos)
-      if(!HiggsFilter->passes(event)||!ZFilter->passes(event)) return false;
+    //if(Version.find("BpJ_TW") != std::string::npos)
+    //  if(!HiggsFilter->passes(event)||!ZFilter->passes(event)) return false;
     wMuonFactory->passAndFill(event);
     topWMuonFactory->passAndFill(event);
   }
