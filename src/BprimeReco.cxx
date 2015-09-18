@@ -153,7 +153,9 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
   BprimeContainer tmp_hyp;
   if(topjets.size()<1||neutrinos.size()<1) return false;
   for(auto & topjet : topjets){
-    tmp_hyp.set_topHad(topjet.v4());
+    const vector<Jet> & Top_subjets = topjet.subjets();
+    LorentzVector TopCand = Top_subjets[0].v4()+Top_subjets[1].v4()+Top_subjets[2].v4();
+    tmp_hyp.set_topHad(TopCand);
     for(auto & neutrino : neutrinos){
       if(deltaR(topjet.v4(),neutrino+lep)>dRmin){
 	tmp_hyp.set_wLep(neutrino+lep);
@@ -166,6 +168,63 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
   return true;
 }
 
+bool BprimeReco::BTagReco(Event & event){
+  if(!jetId){
+    cerr<<"You have to set a jet Id which to veto"<<endl;
+    assert(0==1);
+  }
+  vector<Jet>* jets = jetCollBool ? &event.get(jet_collection) : event.jets;
+  vector<Jet> selected_jets; 
+  vector<Jet> bjets; 
+  for(unsigned int i =0; i<jets->size(); i++){
+    if(!passes_id(jets->at(i),event,jetId)) selected_jets.push_back(jets->at(i));
+    else bjets.push_back(jets->at(i));
+  }
+  LorentzVector lep = event.get(primlep).v4();  
+  vector<LorentzVector> wleps = NeutrinoReconstruction(lep, event.met->v4());
+  for(unsigned int i=0; i<wleps.size();++i) wleps[i] +=  lep;
+  vector<BprimeContainer> recoWHyps = reconstruct_WHyps(selected_jets,wleps);
+  /*
+  BprimeContainer tmp_hyp;
+  //reconstruct leptonic W
+  LorentzVector lep(0,0,0,0);
+  lep = event.get(primlep).v4();  
+  //cout<<"lep pt "<<lep.pt()<<endl;
+  vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
+  //reconstruct hadronic W and add leptonic W
+  for(unsigned int K=1; K<selected_jets.size(); ++K){
+    unsigned int N = selected_jets.size();
+    string bitmask(K, 1); // K leading 1's
+    bitmask.resize(N, 0); // N-K trailing 0's 
+    //permute bitmask
+    do {
+      LorentzVector whad(0,0,0,0);
+      for (unsigned int i = 0; i < N; ++i){ // [0..N-1] integers
+	if(bitmask[i]) whad = whad+selected_jets.at(i).v4();
+	if(whad.M()>500) break;
+      }
+      for(auto & neutrino:neutrinos){
+	if(whad.M()<400 && whad.M()>50){
+	  tmp_hyp.set_wJets(bitmask);
+	  tmp_hyp.set_wHad(whad);
+	  tmp_hyp.set_wLep(neutrino+lep);
+	  recoWHyps.emplace_back(tmp_hyp);
+	}
+      }
+    } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
+  }
+  */
+  vector<BprimeContainer> recoHyps;
+  for(auto & hyp : recoWHyps){
+    for(auto & bjet :  bjets){
+      hyp.set_topJets(bjet.v4());
+      recoHyps.push_back(hyp);
+    }
+  }
+  if(recoHyps.size()==0) return false;
+  event.set(hypothesis, move(recoHyps));
+  return true;
+}
 
 template<typename T>
   bool BprimeReco::passes_id(const T & object, const Event & event, const boost::optional<std::function<bool (const T &, const Event & )>> & object_id){
@@ -173,3 +232,33 @@ template<typename T>
     return true;
   return false;
 }
+
+vector<BprimeContainer> BprimeReco::reconstruct_WHyps(const std::vector<Jet> & jets, const std::vector<LorentzVector> & Wleps, double cutoff_WHad_min, double cutoff_WHad_max){
+
+  vector<BprimeContainer> recoWHyps;
+  BprimeContainer tmp_hyp;
+  //reconstruct hadronic W and add leptonic W
+  for(unsigned int K=1; K<jets.size(); ++K){
+    unsigned int N = jets.size();
+    string bitmask(K, 1); // K leading 1's
+    bitmask.resize(N, 0); // N-K trailing 0's 
+    //permute bitmask
+    do {
+      LorentzVector whad(0,0,0,0);
+      for (unsigned int i = 0; i < N; ++i){ // [0..N-1] integers
+	if(bitmask[i]) whad = whad+jets.at(i).v4();
+	if(whad.M()>cutoff_WHad_max*1.25) break;
+      }
+      for(auto & wlep:Wleps){
+	if(whad.M()<cutoff_WHad_max && whad.M()>cutoff_WHad_min){
+	  tmp_hyp.set_wJets(bitmask);
+	  tmp_hyp.set_wHad(whad);
+	  tmp_hyp.set_wLep(wlep);
+	  recoWHyps.emplace_back(tmp_hyp);
+	}
+      }
+    } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
+  }
+  return recoWHyps;
+}
+

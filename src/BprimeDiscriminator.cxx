@@ -5,14 +5,15 @@ using namespace std;
 using namespace uhh2;
 
 
-BprimeDiscriminator::BprimeDiscriminator(uhh2::Context & ctx, discriminatorType dis_, const std::string& RecoLabel,const std::string& GenLabel){
+BprimeDiscriminator::BprimeDiscriminator(uhh2::Context & ctx, discriminatorType dis_, const std::string& RecoLabel,const std::string Outputname, const std::string& GenLabel){
   if(RecoLabel.empty())hyps = ctx.get_handle<std::vector<BprimeContainer>>("BprimeReco");
   else  hyps = ctx.get_handle<std::vector<BprimeContainer>>(RecoLabel);
   if(GenLabel.empty())  gen = ctx.get_handle<BprimeGenContainer>("BprimeGen");
   else gen = ctx.get_handle<BprimeGenContainer>(GenLabel);
   dis=dis_;
   string disName= "DiscriminatorType_"+to_string(dis);
-  //cout <<disName<<endl;
+  if(!Outputname.empty())
+    disName = Outputname;
   resultHyp = ctx.declare_event_output<BprimeContainer>(disName);
 }
 
@@ -27,7 +28,9 @@ bool BprimeDiscriminator::process(uhh2::Event & event){
   else if(dis == 5)
     result  = cmsTopTag_dis(event);
 
-  if(result.get_RecoTyp()==-1) return false;
+  if(result.get_RecoTyp()==-1){
+    return false;
+  }
   //if(dis >0 && dis <4 && result.get_chiVal()>15) return false;
   //if(dis ==0 && result.get_chiVal()<44) return false;
   event.set(resultHyp,move(result));
@@ -55,7 +58,6 @@ BprimeContainer BprimeDiscriminator::ttbar_dis(uhh2::Event & event){
   bestHyp.set_topHad(bestHyp.get_wHad());
   bestHyp.set_topLep(bestHyp.get_wLep()+bestHyp.get_topJets());
   return bestHyp;
-
 }
 
 BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
@@ -121,4 +123,6 @@ BprimeContainer BprimeDiscriminator::cmsTopTag_dis(uhh2::Event & event){
   bestHyp.set_RecoTyp(recoType);
   return bestHyp;
 }
+
+
 

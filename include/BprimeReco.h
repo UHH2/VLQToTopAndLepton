@@ -15,13 +15,14 @@ class BprimeReco :public uhh2::AnalysisModule {
   virtual bool process(uhh2::Event & event) override;
   bool massReco(uhh2::Event & event);
   bool TopJetReco(uhh2::Event & event, double dRmin = 0);
+  bool BTagReco(uhh2::Event & event);
   void set_jetRecoId(const JetId & my_jetId){jetId= my_jetId;}
   void set_topjetRecoId(const TopJetId & my_topjetId){topjetId =my_topjetId;}
   bool set_topjetCollection(uhh2::Context & ctx, const std::string & topjetCollectionName);
   bool set_jetCollection(uhh2::Context & ctx, const std::string & jetCollectionName);  
  private:
   void comb(int N, int K);
-
+  std::vector<BprimeContainer> reconstruct_WHyps(const std::vector<Jet> & jets, const std::vector<LorentzVector> & Wleps, double cutoff_WHad_min=50, double cutoff_WHad_max=400);
   template<typename T>
     bool passes_id(const T & object, const uhh2::Event & event, const boost::optional<std::function<bool (const T &, const uhh2::Event & )>> & object_id);
   uhh2::Event::Handle<std::vector<BprimeContainer>> hypothesis;
