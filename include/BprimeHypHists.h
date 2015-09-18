@@ -49,6 +49,11 @@ class BprimeHypHists: public uhh2::Hists {
   TH2F* chi_deltaR_w_top;
   TH1F* deltaR_forward_B; 
   TH2F* forward_pt_eta;
+
+
+  BaseHists matched_top_lep, matched_top_had, matched_W_lep, matched_W_had;
+  BaseHists matched_tops, matched_top_matched_W, matched_W_matched_top, matched_top_unmatched_W, matched_W_unmatched_top;
+  BaseHists semi_matched_tops; 
   
   uhh2::Event::Handle<BprimeContainer> recohyp;
   uhh2::Event::Handle<BprimeGenContainer> gen;

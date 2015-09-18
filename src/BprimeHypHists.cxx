@@ -8,7 +8,7 @@ BprimeHypHists::BaseHists BprimeHypHists::book_BaseHists(const std::string & nam
   hists.pt   = book<TH1F>("pt_"+name,"p_{T} "+label,100,minPt,maxPt);
   hists.eta  = book<TH1F>("eta_"+name,"#eta "+label,100,-4,4);
   hists.phi  = book<TH1F>("phi_"+name,"#phi "+label,100,-3.2,3.2);
-  hists.mass = book<TH1F>("mass_"+name,"Mass "+label,50,minMass,maxMass);
+  hists.mass = book<TH1F>("mass_"+name,"Mass "+label,25,minMass,maxMass);
   return hists;
 }
 
@@ -91,6 +91,9 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   wReco_dR_pTres_had   = book<TH2F>("wReco_dR_pTres_had","Gen and Reco W #delta R / pT", 100, 0, 2, 100,-2,2);  
   wReco_dR_pT_had      = book<TH2F>("wReco_dR_pT_had","Gen and Reco W #Delta R / pT", 100, 0, 2, 100,0,800);  
 
+  
+
+
   chi_top_pT       = book<TH2F>("chi_top_pT","#Chi^{2} - Top p_{T}", 100, 0, 80, 100,0,1500);  
   chi_wlep_pT      = book<TH2F>("chi_wlep_pT","#Chi^{2} - W_{lep} p_{T}", 100, 0, 80, 100, 0,1500);  
   chi_whad_pT      = book<TH2F>("chi_whad_pT","#Chi^{2} - W_{had} p_{T}", 100, 0, 80, 100, 0,1500);  
@@ -98,9 +101,22 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   chi_deltaR_w_top = book<TH2F>("chi_deltaR_w_top","#Chi^{2} - #Delta R (t,W)", 100, 0, 80, 100,0,6);  
   
   //forward Jet TH1F/TH2F
-  deltaR_forward_B = book<TH1F>("deltaR_forward_B","#Delta R (Jet_{forward},whad)", 100, 0,8); 
-  forward_pt_eta = book<TH2F>("forward_pt_eta","Jet_{forward} pT #eta", 100, 0, 250, 100,-8,8);  
+  //deltaR_forward_B = book<TH1F>("deltaR_forward_B","#Delta R (Jet_{forward},whad)", 100, 0,8); 
+  //forward_pt_eta = book<TH2F>("forward_pt_eta","Jet_{forward} pT #eta", 100, 0, 250, 100,-8,8);  
   
+
+
+  //matching studies
+  matched_top_lep          = book_BaseHists("matched_top_lep","Top_{lep,match}");
+  matched_top_had          = book_BaseHists("matched_top_had","Top_{had,match}");
+  matched_W_lep            = book_BaseHists("matched_W_lep","W_{lep,match}");
+  matched_W_had            = book_BaseHists("matched_W_had","W_{had,match}");
+  matched_tops             = book_BaseHists("matched_tops","matched Tops");
+  semi_matched_tops        = book_BaseHists("semi_matched_tops","semi matched Tops");
+  matched_top_matched_W    = book_BaseHists("matched_top_matched_W","Top_{match} with W_{match}");
+  matched_W_matched_top    = book_BaseHists("matched_W_matched_top","W_{match} with Top{match}");
+  matched_top_unmatched_W  = book_BaseHists("matched_top_unmatched_W","Top_{match} with W_{unmatch}");
+  matched_W_unmatched_top  = book_BaseHists("matched_W_unmatched_top","W_{match} with Top_{unmatch}");
 
 
   recohyp = ctx.get_handle<BprimeContainer>(hyp_name);
@@ -123,6 +139,8 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   int recotype = hyp.get_RecoTyp();
   //vector<Jet>* jets = event.jets;
   string unusedJets = hyp.get_unusedJets();
+
+  double matching_distance = 0.4;
 
   //cout<<recotype<<endl;
   /*
@@ -223,7 +241,13 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     wHad_res_eta->Fill(abs(GenInfo.get_wHad().eta()-whad.eta()),weight);     
     wHad_res_deltaR->Fill(deltaR(GenInfo.get_wHad(),whad),weight);
     wReco_dR_pTres_had->Fill(deltaR(GenInfo.get_wHad(),whad),(GenInfo.get_wHad().pt()-whad.pt())/GenInfo.get_wHad().pt(),weight);
-    wReco_dR_pT_had->Fill(deltaR(GenInfo.get_wHad(),whad),GenInfo.get_wHad().pt(),weight);     
+    wReco_dR_pT_had->Fill(deltaR(GenInfo.get_wHad(),whad),GenInfo.get_wHad().pt(),weight); 
+
+    if(deltaR(GenInfo.get_wHad(), whad)<matching_distance && whad.pt()>0 && GenInfo.get_wHad().pt()>0){
+      fill_BaseHists(whad,matched_W_had, weight);
+      if(tlep.pt()>0 && deltaR(tlep,GenInfo.get_topLep())>= 0.4 && GenInfo.get_topLep().pt()>0)
+	fill_BaseHists(whad,matched_W_unmatched_top,weight);
+    }  
   }  
   if(GenInfo.get_wLep().pt()>0){
     wLep_res_pt->Fill((GenInfo.get_wLep().pt()-wlep.pt())/GenInfo.get_wLep().pt(),weight);     
@@ -234,6 +258,13 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     wLep_res_deltaR->Fill(deltaR(GenInfo.get_wLep(),wlep),weight);
     wReco_dR_pTres_lep->Fill(deltaR(GenInfo.get_wLep(),wlep),(GenInfo.get_wLep().pt()-wlep.pt())/GenInfo.get_wLep().pt(),weight);  
     wReco_dR_pT_lep->Fill(deltaR(GenInfo.get_wLep(),wlep),GenInfo.get_wLep().pt(),weight);       
+
+    if(deltaR(GenInfo.get_wLep(), wlep)<matching_distance && wlep.pt()>0 && GenInfo.get_wLep().pt()>0){
+      fill_BaseHists(wlep,matched_W_lep, weight);
+      if(thad.pt()>0 && deltaR(thad,GenInfo.get_topHad())>= 0.4 && GenInfo.get_topHad().pt()>0)
+	fill_BaseHists(wlep,matched_W_unmatched_top,weight);
+    }
+
   }
   if(GenInfo.get_topLep().pt()>0 && (recotype==11 || recotype==0)){
     topReco_dR_pT_lep->Fill(deltaR(GenInfo.get_topLep(),wlep+topJets),GenInfo.get_topLep().pt(),weight);   
@@ -244,6 +275,25 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     topLep_res_phi->Fill(deltaPhi(GenInfo.get_topLep(),wlep+topJets),weight);     
     topLep_res_eta->Fill(abs(GenInfo.get_topLep().eta()-(wlep+topJets).eta()),weight);     
     topLep_res_deltaR->Fill(deltaR(GenInfo.get_topLep(),wlep+topJets),weight);
+
+    if(deltaR(GenInfo.get_topLep(),tlep)<matching_distance && tlep.pt()>0){
+      fill_BaseHists(tlep,matched_top_lep, weight);
+      if(GenInfo.get_topHad().pt()>0 && deltaR(GenInfo.get_topHad(),thad)<matching_distance && thad.pt()>0){
+	fill_BaseHists(tlep,matched_tops, weight);
+	fill_BaseHists(thad,matched_tops, weight);
+      }
+      else if(GenInfo.get_topHad().pt()>0 && thad.pt()>0 )
+	fill_BaseHists(tlep,semi_matched_tops,weight);
+      if(GenInfo.get_wHad().pt()>0 && whad.pt()>0){
+	if(deltaR(GenInfo.get_wHad(),whad)<matching_distance){
+	  fill_BaseHists(thad,matched_top_matched_W, weight);
+	  fill_BaseHists(whad,matched_W_matched_top, weight);
+	}
+	else{
+	  fill_BaseHists(thad,matched_top_unmatched_W,weight); 
+	}
+      }
+    }
   }
   if(GenInfo.get_topHad().pt()>0 && (recotype==12 || recotype==0 || recotype==2)){
     topReco_dR_pT_had->Fill(deltaR(GenInfo.get_topHad(),thad),GenInfo.get_topHad().pt(),weight);   
@@ -254,6 +304,21 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     topHad_res_phi->Fill(deltaPhi(GenInfo.get_topHad(),thad),weight);     
     topHad_res_eta->Fill(abs(GenInfo.get_topHad().eta()-(thad).eta()),weight);     
     topHad_res_deltaR->Fill(deltaR(GenInfo.get_topHad(),thad),weight);
+
+    if(deltaR(GenInfo.get_topHad(), thad)<matching_distance){
+      fill_BaseHists(thad,matched_top_had, weight);
+      if(GenInfo.get_topLep().pt()>0 && deltaR(GenInfo.get_topLep(),thad)>=matching_distance && tlep.pt()>0)
+	 fill_BaseHists(thad,semi_matched_tops,weight);
+      if(GenInfo.get_wLep().pt()>0 && wlep.pt()>0){
+	if(deltaR(GenInfo.get_wLep(),wlep)<matching_distance){
+	  fill_BaseHists(thad,matched_top_matched_W, weight);
+	  fill_BaseHists(wlep,matched_W_matched_top, weight);
+	}
+	else{
+	  fill_BaseHists(thad,matched_top_unmatched_W,weight); 
+	}
+      }
+    }
   }
   if(GenInfo.get_bprime().pt()>0){
     Bprime_res_pt->Fill((GenInfo.get_bprime().pt()-bprime.pt())/GenInfo.get_bprime().pt(),weight);   
