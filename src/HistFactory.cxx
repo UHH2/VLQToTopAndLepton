@@ -137,14 +137,9 @@ void HistFactory::addHists(const string& histName, TopJetId topjetid){
   }
 }
 
-//passOption: 0 event has to pass all cuts, 1 event passe this cut
+//passOption: 0 event has to pass all cuts, 1 event passes this cut
 bool HistFactory::passAndFill(const Event & event, int passOption){
   bool passCuts =true;
-  //if(abs(count_cuts+1)==cutNames.size())cutNames.erase(cutNames.begin());
-  //if(fmod(factoryHists.size()/(selectionClasses.size()+1),1)!=0){
-  //  cout<<"number of histograms is not an integer something wrong"<<endl;
-  //  assert(0==1);
-  //}
   unsigned int hist_number = factoryHists.size()/(selectionClasses.size()+1);
   unsigned int cuti = 0; 
   if(!effiHistName.empty() && cutflow_raw==NULL ) create_histos();
@@ -185,7 +180,7 @@ void HistFactory::create_histos(){
   cutflow_raw = new TH1D((effiHistName + "_raw").c_str(), ("Cutflow '" + effiHistName + "' unweighted").c_str(), cutNames.size(), 0, cutNames.size());
   for(TAxis * ax : {cutflow_raw->GetXaxis(), cutflow_weighted->GetXaxis()}){
     ax->SetBinLabel(1, "all");
-    for(size_t i=1; i<cutNames.size()-1; ++i){
+    for(size_t i=1; i<cutNames.size(); ++i){
       ax->SetBinLabel(i+1, cutNames.at(i).c_str());
     }
   }
