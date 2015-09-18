@@ -22,7 +22,7 @@ namespace {
 
 
 HTCalc::HTCalc(Context & ctx, const boost::optional<JetId> & jetid, const jetTyp jetColl, const std::string & collection){
-  ht_handle = ctx.get_handle<double>("HT");
+  ht_handle = ctx.declare_event_output<double>("HT");
 
   m_collection = collection;
     
