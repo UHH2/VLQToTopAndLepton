@@ -11,22 +11,17 @@
 
 class HTCalc: public uhh2::AnalysisModule {
  public: 
-
   enum jetTyp {jet, topjet};
   explicit HTCalc( uhh2::Context & ctx, 
 		   const boost::optional<JetId> & jetid = boost::none, 
 		   const jetTyp jetColl = jet,
 		   const std::string & collection = "");
-
   virtual bool process( uhh2::Event & event);
 
  private:
- 
   std::string m_collection;
-  
   jetTyp m_jetTyp;
   boost::optional<JetId> m_jetid;
-
   uhh2::Event::Handle<double> ht_handle;
   uhh2::Event::Handle<std::vector<Jet> > h_jets;
   uhh2::Event::Handle<std::vector<TopJet> > h_topjets;

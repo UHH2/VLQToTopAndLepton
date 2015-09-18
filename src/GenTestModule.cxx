@@ -70,7 +70,7 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   common.reset(new CommonModules());
   common->set_jet_id(PtEtaCut(40.0,3));
   //common->store_mcpileupreweight(false);
-  common->set_electron_id(AndId<Electron>(ElectronID_PHYS14_25ns_tight_noIso, PtEtaCut(40.0, 2.1)));
+  common->set_electron_id(AndId<Electron>(ElectronID_Spring15_25ns_tight_noIso, PtEtaCut(40.0, 2.1)));
   common->set_muon_id(AndId<Muon>(MuonIDTight(),PtEtaCut(40.0, 2.1)));
   //common->disable_mcpileupreweight();
   common->disable_metfilters();
@@ -99,7 +99,7 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
 
   muonFactory.reset(new HistFactory(ctx));
   muonFactory->setEffiHistName("muonEffis");
-  //muonFactory->addSelection(make_unique<TriggerSelection>("HLT_Mu40_v*"),"muonTrigger");
+  muonFactory->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"muonTrigger");
   muonFactory->addSelection(make_unique<NElectronSelection>(0,0),"0_eleCut");
   muonFactory->addSelection(make_unique<NMuonSelection>(1,-1,muid_cut),"1_muonCut");
   muonFactory->addSelection(make_unique<NJetSelection>(1,-1,lowjet),"50GeV_JetCut");
