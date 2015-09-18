@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
 <!ENTITY SingleMuDATA SYSTEM "../../common/datasets/DATA_SingleMu.xml">
-<!ENTITY Bpb_TW_800_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-800_LH.xml">
+<!ENTITY Bpb_TW_800_LH SYSTEM "../../common/datasets/RunII_50ns_v2/MC_BprimeBToTW_M-800_LH.xml">
 <!ENTITY Bpb_TW_1000_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1000_LH.xml">
 <!ENTITY Bpb_TW_1200_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1200_LH.xml">
-<!ENTITY Bpb_TW_800_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-800_RH.xml">
+<!ENTITY Bpb_TW_800_RH SYSTEM "../../common/datasets/RunII_50ns_v2/MC_BprimeBToTW_M-800_RH.xml">
 <!ENTITY Bpb_TW_1000_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1000_RH.xml">
 <!ENTITY Bpb_TW_1200_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/common/datasets/BprimeBToTW_M-1200_RH.xml">
 <!ENTITY WJets SYSTEM "../../common/datasets/MC_WJets_LNu_50ns.xml">
@@ -37,7 +37,7 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-     <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Trigger_v2/" PostFix="" TargetLumi="40.028">
+     <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Trigger_v3/" PostFix="" TargetLumi="42.477">
      <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="5" OutputDirectory="./Trigger_v2/" PostFix="" TargetLumi="40.028" >-->
 <!--
       <InputData Lumi="1" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">

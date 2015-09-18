@@ -67,7 +67,7 @@ TriggerModule::TriggerModule(Context& ctx){
   
   common.reset(new CommonModules());
   common->set_jet_id(PtEtaCut(40.0,2.7));
-  common->set_electron_id(AndId<Electron>(ElectronID_PHYS14_25ns_tight_noIso, PtEtaCut(20.0, 2.1)));
+  common->set_electron_id(AndId<Electron>(ElectronID_Spring15_25ns_tight_noIso, PtEtaCut(20.0, 2.1)));
   common->set_muon_id(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 2.1)));
   common->switch_jetlepcleaner();
   common->switch_jetPtSorter();
@@ -115,10 +115,10 @@ bool TriggerModule::process(Event & event){
   if(!event.isRealData){
     //if(topHadSel->passes(event) || topLepSel->passes(event))
     vlqGenHists->fill(event);
-    muonTrigger->passAndFill(event);
+    muonTrigger->passAndFill(event,1);
   }
   else{
-    dataTrigger->passAndFill(event);
+    dataTrigger->passAndFill(event,1);
   }
 
   return true;

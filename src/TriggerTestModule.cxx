@@ -82,7 +82,7 @@ TriggerTestModule::TriggerTestModule(Context& ctx){
 
   jetcleaner.reset(new JetCleaner(30.0, 2.4));
   jetCorr.reset(new JetCorrector(JERFiles::PHYS14_L123_MC));
-  elecleaner.reset(new ElectronCleaner(AndId<Electron>(ElectronID_CSA14_50ns_medium, PtEtaCut(30.0, 2.4))));
+  elecleaner.reset(new ElectronCleaner(AndId<Electron>(ElectronID_Spring15_50ns_medium, PtEtaCut(30.0, 2.4))));
   mucleaner.reset(new MuonCleaner(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 3.0))));
 
   muIsoCleaner.reset(new MuonCleaner(MuonIso()));
