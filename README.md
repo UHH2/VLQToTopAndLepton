@@ -1,4 +1,6 @@
 VLQToTopAndLepton
 =================
-This should be the repository for an analysis which has a Top and a Lepton in the final state
-Since some code will be shared with the other VLQ searches in uhh part of the code will move to uhh2/common
+This should be the repository for an analysis which has a Top and a Lepton in the final state.
+The physics is happening for a vector like quark B' -> tW, which can be produced in association with
+a b or a top. 
+
