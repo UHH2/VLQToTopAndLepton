@@ -17,6 +17,7 @@ class BprimeContainer{
     whad_jets="";
     unused_jets="";
     chi =-1;
+    mass =-1;
     recoTyp=-1;
   }
   
@@ -28,6 +29,7 @@ class BprimeContainer{
   std::string get_wJets(){return whad_jets;}
   std::string get_unusedJets(){return unused_jets;}
   double get_chiVal(){return chi;}
+  double get_Mass(){return mass;}
   int get_RecoTyp(){return recoTyp;}
   
   void set_topJets(LorentzVector topJets_){topJets = topJets_;}
@@ -40,6 +42,7 @@ class BprimeContainer{
   void set_wJets(std::string jets){whad_jets = jets;}
   void set_unusedJets(std::string jets){unused_jets = jets;}
   void set_chiVal(double chi_){chi=chi_;}
+  void set_Mass(double mass_){mass=mass_;}
   void set_RecoTyp(int i_){recoTyp= i_;}
   
  private:  
@@ -48,5 +51,5 @@ class BprimeContainer{
   std::string whad_jets;
   std::string unused_jets;//additional jets for the top
   Particle m_lepton;
-  double chi;
+  double chi,mass;
 };

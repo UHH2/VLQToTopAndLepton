@@ -5,10 +5,10 @@ using namespace uhh2;
 
 BprimeHypHists::BaseHists BprimeHypHists::book_BaseHists(const std::string & name, const std::string & label, double minMass, double maxMass, double minPt, double maxPt){
   BaseHists hists;
-  hists.pt   = book<TH1F>("pt_"+name,"p_{T} "+label,100,minPt,maxPt);
+  hists.pt   = book<TH1F>("pt_"+name,"p_{T} "+ label+" [GeV]",100,minPt,maxPt);
   hists.eta  = book<TH1F>("eta_"+name,"#eta "+label,100,-4,4);
   hists.phi  = book<TH1F>("phi_"+name,"#phi "+label,100,-3.2,3.2);
-  hists.mass = book<TH1F>("mass_"+name,"Mass "+label,25,minMass,maxMass);
+  hists.mass = book<TH1F>("mass_"+name,"Mass "+label+" [GeV]",25,minMass,maxMass);
   return hists;
 }
 
@@ -25,7 +25,7 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   wLep = book_BaseHists("wLep","W_{lep}"); 
   topLep = book_BaseHists("topLep","Top_{lep}");
   topHad = book_BaseHists("topHad","Top_{had}");
-  mass = book_BaseHists("hyp","Hypothesis",50,3000); 
+  mass = book_BaseHists("hyp","B",50,3000); 
   mass_lep = book_BaseHists("Mass_lep","lep. Hypothesis",50,3000); 
   mass_had = book_BaseHists("Mass_had","had. Hypothesis",50,3000); 
 
@@ -91,9 +91,6 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   wReco_dR_pTres_had   = book<TH2F>("wReco_dR_pTres_had","Gen and Reco W #delta R / pT", 100, 0, 2, 100,-2,2);  
   wReco_dR_pT_had      = book<TH2F>("wReco_dR_pT_had","Gen and Reco W #Delta R / pT", 100, 0, 2, 100,0,800);  
 
-  
-
-
   chi_top_pT       = book<TH2F>("chi_top_pT","#Chi^{2} - Top p_{T}", 100, 0, 80, 100,0,1500);  
   chi_wlep_pT      = book<TH2F>("chi_wlep_pT","#Chi^{2} - W_{lep} p_{T}", 100, 0, 80, 100, 0,1500);  
   chi_whad_pT      = book<TH2F>("chi_whad_pT","#Chi^{2} - W_{had} p_{T}", 100, 0, 80, 100, 0,1500);  
@@ -104,8 +101,6 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   //deltaR_forward_B = book<TH1F>("deltaR_forward_B","#Delta R (Jet_{forward},whad)", 100, 0,8); 
   //forward_pt_eta = book<TH2F>("forward_pt_eta","Jet_{forward} pT #eta", 100, 0, 250, 100,-8,8);  
   
-
-
   //matching studies
   matched_top_lep          = book_BaseHists("matched_top_lep","Top_{lep,match}");
   matched_top_had          = book_BaseHists("matched_top_had","Top_{had,match}");
@@ -125,11 +120,10 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
 
 BprimeHypHists::~BprimeHypHists(){}
 
-
 void BprimeHypHists::fill(const uhh2::Event & event){
   double weight = event.weight;
   BprimeContainer hyp = event.get(recohyp);
-  LorentzVector whad = hyp.get_wHad() ;
+  LorentzVector whad = hyp.get_wHad();
   LorentzVector wlep = hyp.get_wLep();
   LorentzVector topJets = hyp.get_topJets();
   LorentzVector thad = hyp.get_topHad();

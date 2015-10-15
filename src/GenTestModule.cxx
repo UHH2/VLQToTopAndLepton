@@ -62,8 +62,6 @@ private:
   //std::unique_ptr<BprimeReco> Reco;
 };
 
-
-
 GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   //Reco.reset(new BprimeReco(ctx)); 
   //Version  = ctx.get("dataset_version", "<not set>");
@@ -73,7 +71,7 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   common->set_electron_id(AndId<Electron>(ElectronID_Spring15_25ns_tight_noIso, PtEtaCut(40.0, 2.1)));
   common->set_muon_id(AndId<Muon>(MuonIDTight(),PtEtaCut(40.0, 2.1)));
   //common->disable_mcpileupreweight();
-  common->disable_metfilters();
+  //common->disable_metfilters();
   common->switch_jetlepcleaner();
   common->switch_jetPtSorter();
   common->init(ctx);
@@ -181,8 +179,6 @@ bool GenTestModule::process(Event & event){
   if(!event.isRealData){
     bBprimeFactory->passAndFill(event);
     vlqGenHists->fill(event);  
-    //if(Version.find("BpJ_TW") != std::string::npos)
-    //  if(!HiggsFilter->passes(event)||!ZFilter->passes(event)) return false;
     wMuonFactory->passAndFill(event);
     topWMuonFactory->passAndFill(event);
   }

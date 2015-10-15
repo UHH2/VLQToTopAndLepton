@@ -15,7 +15,9 @@ class BprimeDiscriminator :public uhh2::AnalysisModule {
   enum discriminatorType{ttbar, chi2_combo, lepTop, hadTop, cmsTopTag,hepTopTag};
   explicit BprimeDiscriminator(uhh2::Context & ctx, discriminatorType dis_, const std::string& RecoLabel="", const std::string Outputname="" ,const std::string& GenLabel="");
   virtual bool process(uhh2::Event & event) override;
+  void set_emptyHyp(bool empty){emptyHyp=empty;}
  private:
+  bool emptyHyp;
   discriminatorType dis;
   uhh2::Event::Handle<std::vector<BprimeContainer>> hyps;
   uhh2::Event::Handle<BprimeGenContainer> gen;

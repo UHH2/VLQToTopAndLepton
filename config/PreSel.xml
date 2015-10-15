@@ -59,10 +59,9 @@
 
     <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_TEST/" PostFix="" TargetLumi="40.028">-->
     <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="18" OutputDirectory="./PreSelection_v1/" PostFix="" TargetLumi="42.477" >
-
+<!--
       <InputData Lumi="1" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">
         &SingleMuDATA;
-	<!--&DATA_SingleM_Run254833;-->
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
@@ -110,17 +109,17 @@
         <OutputTree Name="AnalysisTree" />
       </InputData>
 
-      <InputData Lumi="299347" NEventsMax="-1" Type="MC" Version="Bpt_TW_1000_LH" Cacheable="False">
+      <InputData Lumi="299347" NEventsMax="-1" Type="MC" Version="Bpt_TW_1000_LH_25ns" Cacheable="False">
         &Bpt_TW_1000_LH;
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>    
-      <InputData Lumi="289396" NEventsMax="-1" Type="MC" Version="Bpt_TW_1000_RH" Cacheable="False">
+      <InputData Lumi="289396" NEventsMax="-1" Type="MC" Version="Bpt_TW_1000_RH_25ns" Cacheable="False">
         &Bpt_TW_1000_RH;
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
-
+-->
 
 
 <!--
@@ -136,7 +135,7 @@
       </InputData>
  
 -->
-
+<!--
      <InputData Lumi="60492481.7" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
         &WJets;
         <InputTree Name="AnalysisTree" /> 
@@ -158,7 +157,7 @@
 	<OutputTree Name="AnalysisTree" />
       </InputData>
 
-
+-->
 
 
       <InputData Lumi="51947416.4" NEventsMax="-1" Type="MC" Version="ZJetsM50toInf" Cacheable="False">

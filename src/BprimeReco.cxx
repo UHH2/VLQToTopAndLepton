@@ -44,38 +44,12 @@ bool BprimeReco::massReco(uhh2::Event & event){
     }
     selected_jets.swap(jets);
   }
-  vector<BprimeContainer> recoWHyps;
+  //vector<BprimeContainer> recoWHyps;
   vector<BprimeContainer> recoHyps;
-  BprimeContainer tmp_hyp;
-  //reconstruct leptonic W
-  LorentzVector lep(0,0,0,0);
-  lep = event.get(primlep).v4();  
-  //cout<<"lep pt "<<lep.pt()<<endl;
-  vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
-  //reconstruct hadronic W and add leptonic W
-  for(unsigned int K=1; K<jets.size(); ++K){
-    unsigned int N = jets.size();
-    string bitmask(K, 1); // K leading 1's
-    bitmask.resize(N, 0); // N-K trailing 0's 
-    //permute bitmask
-    do {
-      LorentzVector whad(0,0,0,0);
-      for (unsigned int i = 0; i < N; ++i){ // [0..N-1] integers
-	if(bitmask[i]) whad = whad+jets.at(i).v4();
-	if(whad.M()>500) break;
-      }
-      for(auto & neutrino:neutrinos){
-	if(whad.M()<400 && whad.M()>50){
-	  tmp_hyp.set_wJets(bitmask);
-	  tmp_hyp.set_wHad(whad);
-	  tmp_hyp.set_wLep(neutrino+lep);
-	  recoWHyps.emplace_back(tmp_hyp);
-	}
-      }
-    } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-  }
-  //cout<<"Size of reco hyps "<<recoWHyps.size()<<endl;
-
+  LorentzVector lep = event.get(primlep).v4();  
+  vector<LorentzVector> wleps = NeutrinoReconstruction(lep, event.met->v4());
+  for(unsigned int i=0; i<wleps.size();++i) wleps[i] +=  lep;
+  vector<BprimeContainer> recoWHyps = reconstruct_WHyps(jets,wleps);
   //permutation of top jets
   for(auto & hyp : recoWHyps){
     string jet_string = hyp.get_wJets();
@@ -101,7 +75,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
 	  if (bitmask[i]) top = top+unusedJets.at(i).v4();
 	  //if (bitmask[i]) cout <<i<<endl;
 	}
-	if((top+hyp.get_wHad()).M()>400 && (top+hyp.get_wLep()).M()>400) continue;
+	if((top+hyp.get_wHad()).M()>500 && (top+hyp.get_wLep()).M()>500) continue;
 	hyp.set_topJets(top);
 	for(unsigned int it = 0; it<bitmask.size(); it++){
 	  if(bitmask[it]){
@@ -117,9 +91,9 @@ bool BprimeReco::massReco(uhh2::Event & event){
       } while(std::prev_permutation(bitmask.begin(), bitmask.end()));   
     }
   }
-  if(recoHyps.size()==0) return false;
+  int size_recoHyps = recoHyps.size();
   event.set(hypothesis, move(recoHyps));
-  return true;
+  return size_recoHyps > 0 ? true : false;
 }
 
 void BprimeReco::comb(int N, int K)//prototyp of the permutation algorithem
@@ -151,11 +125,12 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
   vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
   vector<BprimeContainer> recoHyps;
   BprimeContainer tmp_hyp;
-  if(topjets.size()<1||neutrinos.size()<1) return false;
+  //if(topjets.size()==0||neutrinos.size()==0) return false;
   for(auto & topjet : topjets){
     const vector<Jet> & Top_subjets = topjet.subjets();
     LorentzVector TopCand = Top_subjets[0].v4()+Top_subjets[1].v4()+Top_subjets[2].v4();
     tmp_hyp.set_topHad(TopCand);
+    //tmp_hyp.set_topJets(TopCand);
     for(auto & neutrino : neutrinos){
       if(deltaR(topjet.v4(),neutrino+lep)>dRmin){
 	tmp_hyp.set_wLep(neutrino+lep);
@@ -163,9 +138,9 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
       }
     }
   }
-  if(recoHyps.size()<1)return false;
-  event.set(hypothesis, move(recoHyps));
-  return true;
+  int size_recoHyps = recoHyps.size();
+  event.set(hypothesis,move(recoHyps));
+  return size_recoHyps > 0 ? true : false;
 }
 
 bool BprimeReco::BTagReco(Event & event){
@@ -184,36 +159,6 @@ bool BprimeReco::BTagReco(Event & event){
   vector<LorentzVector> wleps = NeutrinoReconstruction(lep, event.met->v4());
   for(unsigned int i=0; i<wleps.size();++i) wleps[i] +=  lep;
   vector<BprimeContainer> recoWHyps = reconstruct_WHyps(selected_jets,wleps);
-  /*
-  BprimeContainer tmp_hyp;
-  //reconstruct leptonic W
-  LorentzVector lep(0,0,0,0);
-  lep = event.get(primlep).v4();  
-  //cout<<"lep pt "<<lep.pt()<<endl;
-  vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
-  //reconstruct hadronic W and add leptonic W
-  for(unsigned int K=1; K<selected_jets.size(); ++K){
-    unsigned int N = selected_jets.size();
-    string bitmask(K, 1); // K leading 1's
-    bitmask.resize(N, 0); // N-K trailing 0's 
-    //permute bitmask
-    do {
-      LorentzVector whad(0,0,0,0);
-      for (unsigned int i = 0; i < N; ++i){ // [0..N-1] integers
-	if(bitmask[i]) whad = whad+selected_jets.at(i).v4();
-	if(whad.M()>500) break;
-      }
-      for(auto & neutrino:neutrinos){
-	if(whad.M()<400 && whad.M()>50){
-	  tmp_hyp.set_wJets(bitmask);
-	  tmp_hyp.set_wHad(whad);
-	  tmp_hyp.set_wLep(neutrino+lep);
-	  recoWHyps.emplace_back(tmp_hyp);
-	}
-      }
-    } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-  }
-  */
   vector<BprimeContainer> recoHyps;
   for(auto & hyp : recoWHyps){
     for(auto & bjet :  bjets){
@@ -221,9 +166,9 @@ bool BprimeReco::BTagReco(Event & event){
       recoHyps.push_back(hyp);
     }
   }
-  if(recoHyps.size()==0) return false;
+  int size_recoHyps = recoHyps.size();
   event.set(hypothesis, move(recoHyps));
-  return true;
+  return size_recoHyps > 0 ? true : false;
 }
 
 template<typename T>

@@ -29,7 +29,7 @@
 #include "UHH2/VLQToTopAndLepton/include/Utils.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonSelections.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonHists.h"
-#include "UHH2/VLQToTopAndLepton/include/OptTreeModule.h"
+//#include "UHH2/VLQToTopAndLepton/include/OptTreeModule.h"
 
 
 using namespace std;
@@ -46,8 +46,8 @@ public:
 private:
   string Version;
   std::unique_ptr<BprimeRecoHists> RecoHists;
-  std::unique_ptr<BprimeDiscriminator> chi2_combo, chi2_tlep, chi2_thad, ttbar, toptagDis, heptoptagDis, chi2_btag;
-  std::unique_ptr<AnalysisModule> ht, lepton, OptTree;
+  std::unique_ptr<BprimeDiscriminator> chi2_combo, chi2_tlep, chi2_thad, ttbar, cmstoptagDis, heptoptagDis, chi2_btag;
+  std::unique_ptr<AnalysisModule> ht, lepton;//, OptTree
   std::unique_ptr<BprimeReco> Reco, CMSTopTagReco, HEPTopTagReco, BTagReco;
   std::unique_ptr<BprimeRecoHists> Reco_wHad, Reco_wLep;
   std::unique_ptr<BprimeGen> Gen;
@@ -68,13 +68,11 @@ private:
   JetId eta_cut;
   TopJetId topjetid;
   TopJetId heptopjetid;
-
   std::unique_ptr<Selection> hepselection;
 };
 
 SelectionModule::SelectionModule(Context& ctx){
-
-  OptTree.reset(new OptTreeModule(ctx));
+  //OptTree.reset(new OptTreeModule(ctx));
   pileup_weights.reset(new MCPileupReweight(ctx));
   topjetid = AndId<TopJet>(CMSTopTag(),Tau32());
   heptopjetid = HEPTopTagV2();
@@ -103,13 +101,13 @@ SelectionModule::SelectionModule(Context& ctx){
   btag_jetHists->set_JetId(btag_medium);
   btagSel.reset(new NJetSelection(1,-1,btag_medium));
 
-  chi2_combo.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::chi2_combo));
-  chi2_tlep.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::lepTop));
-  chi2_thad.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::hadTop));
+  chi2_combo.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::chi2_combo,"BprimeReco","Chi2Dis"));
+  chi2_tlep.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::lepTop,"BprimeReco"));
+  chi2_thad.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::hadTop,"BprimeReco"));
   ttbar.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::ttbar,"BprimeReco","TTbarDis"));
   chi2_btag.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::chi2_combo,"BTagReco","BTagDis"));
-  toptagDis.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::cmsTopTag,"CMSTopTagReco"));
-  heptoptagDis.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::hepTopTag,"HEPTopTagReco"));
+  cmstoptagDis.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::cmsTopTag,"CMSTopTagReco","CMSTopTagDis"));
+  heptoptagDis.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::hepTopTag,"HEPTopTagReco","HEPTopTagDis"));
   ttbar_Hists.reset(new BprimeHypHists(ctx,"TTbarHists","TTbarDis"));
   ttbar_chi2.reset(new ChiSquareCut(ctx,35,0,"TTbarDis"));
 
@@ -170,7 +168,7 @@ SelectionModule::SelectionModule(Context& ctx){
   Chi2Plots->addHists("TopJetHists","Chi2_TopJetHists");
   Chi2Plots->addHists("Chi2_CMSTopTagJetHists",topjetid);
   Chi2Plots->addHists("VLQGenHists","Chi2_VLQGenHists");
-  Chi2Plots->addHists("BprimeHypHists","Chi2_BprimeHypHists","DiscriminatorType_1");
+  Chi2Plots->addHists("BprimeHypHists","Chi2_BprimeHypHists","Chi2Dis");
 
   CMSPlots.reset(new HistFactory(ctx));
   CMSPlots->setEffiHistName("CMSReco");
@@ -189,7 +187,7 @@ SelectionModule::SelectionModule(Context& ctx){
   CMSPlots->addHists("TopJetHists","CMSReco_TopJetHists");
   CMSPlots->addHists("CMSReco_CMSTopTagJetHists",topjetid);
   CMSPlots->addHists("VLQGenHists","CMSReco_VLQGenHists");
-  CMSPlots->addHists("BprimeHypHists","CMSReco_BprimeHypHists","DiscriminatorType_4");
+  CMSPlots->addHists("BprimeHypHists","CMSReco_BprimeHypHists","CMSTopTagDis");
 
   
   HEPPlots.reset(new HistFactory(ctx));
@@ -207,7 +205,7 @@ SelectionModule::SelectionModule(Context& ctx){
   HEPPlots->addHists("JetHists","HEPReco_JetHists");
   HEPPlots->addHists("TopJetHists","HEPReco_TopJetHists");
   HEPPlots->addHists("VLQGenHists","HEPReco_VLQGenHists");
-  HEPPlots->addHists("BprimeHypHists","HEPReco_BprimeHypHists","DiscriminatorType_5");
+  HEPPlots->addHists("BprimeHypHists","HEPReco_BprimeHypHists","HEPTopTagDis");
 
   BTagRecoPlots.reset(new HistFactory(ctx));
   BTagRecoPlots->setEffiHistName("BTagRecoReco");
@@ -268,15 +266,12 @@ bool SelectionModule::process(Event & event){
     }
   }
   if(CMSTopTagReco->TopJetReco(event,2)){
-    if(toptagDis->process(event)){
+    if(cmstoptagDis->process(event)){
       CMSPlots->passAndFill(event,1);
     }
   }
-
-  OptTree->process(event);
+  //OptTree->process(event);
   return true;
 }
-
-
 // make sure the class is found by class name. This is ensured by this macro:
 UHH2_REGISTER_ANALYSIS_MODULE(SelectionModule)

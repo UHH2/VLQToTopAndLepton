@@ -13,15 +13,14 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Selection_TEST/" PostFix="" TargetLumi="42.477">
-    <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="4" OutputDirectory="./Selection_v1/" PostFix="" TargetLumi="42.477">-->
+    <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Selection5000_v1/" PostFix="" TargetLumi="42.477">-->
+    <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="4" OutputDirectory="./Selection5000_v1/" PostFix="" TargetLumi="5000">
 
       <InputData Lumi="98400" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">
 	<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/VLQToTopAndLepton/config/PreSelection_v1/uhh2.AnalysisModuleRunner.DATA.SingleMuDATA.root" Lumi="0.0"/> 
 	<InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
-
       <InputData Lumi="98400" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_LH_25ns" Cacheable="False">
 	<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/VLQToTopAndLepton/config/PreSelection_v1/uhh2.AnalysisModuleRunner.MC.Bpb_TW_800_LH_25ns.root" Lumi="0.0"/> 
 	<InputTree Name="AnalysisTree" />
@@ -68,13 +67,13 @@
         <InputTree Name="AnalysisTree" />
       </InputData>
 
-      <InputData Lumi="299347" NEventsMax="-1" Type="MC" Version="Bpt_TW_1000_LH" Cacheable="False">
-	<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/VLQToTopAndLepton/config/PreSelection_v1/uhh2.AnalysisModuleRunner.MC.Bpt_TW_1000_LH.root" Lumi="0.0"/> 
+      <InputData Lumi="299347" NEventsMax="-1" Type="MC" Version="Bpt_TW_1000_LH_25ns" Cacheable="False">
+	<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/VLQToTopAndLepton/config/PreSelection_v1/uhh2.AnalysisModuleRunner.MC.Bpt_TW_1000_LH_25ns.root" Lumi="0.0"/> 
         <InputTree Name="AnalysisTree" />
       </InputData>
 
-      <InputData Lumi="289396" NEventsMax="-1" Type="MC" Version="Bpt_TW_1000_RH" Cacheable="False">
-	<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/VLQToTopAndLepton/config/PreSelection_v1/uhh2.AnalysisModuleRunner.MC.Bpt_TW_1000_RH.root" Lumi="0.0"/> 
+      <InputData Lumi="289396" NEventsMax="-1" Type="MC" Version="Bpt_TW_1000_RH_25ns" Cacheable="False">
+	<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_3/src/UHH2/VLQToTopAndLepton/config/PreSelection_v1/uhh2.AnalysisModuleRunner.MC.Bpt_TW_1000_RH_25ns.root" Lumi="0.0"/> 
         <InputTree Name="AnalysisTree" />
       </InputData>    
 
