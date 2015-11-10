@@ -26,6 +26,16 @@ class HTCalc: public uhh2::AnalysisModule {
   uhh2::Event::Handle<std::vector<Jet> > h_jets;
   uhh2::Event::Handle<std::vector<TopJet> > h_topjets;
 };
+/*
+class METSelection: public uhh2::Selection {
+public:
+    explicit METSelection(double met_);
+    virtual bool passes(const uhh2::Event & event);
+private:
+    double met;
+};
+
+*/
 
 /*
 class HTSelection: public uhh2::Selection{

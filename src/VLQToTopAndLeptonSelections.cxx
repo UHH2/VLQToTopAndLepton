@@ -118,12 +118,12 @@ bool PTWhadCut::passes(const uhh2::Event & event){
   return false;
 }
 
-ForwardJetPtEtaCut::ForwardJetPtEtaCut(float minEta, float minPt):minEta_(minEta),minPt_(minPt){}
+ForwardJetPtEtaCut::ForwardJetPtEtaCut(float minEta, float maxEta, float minPt, float maxPt):minEta_(minEta),maxEta_(maxEta),minPt_(minPt),maxPt_(maxPt){}
 
 bool ForwardJetPtEtaCut::passes(const uhh2::Event & event){
   vector<Jet> jets = *event.jets;
   Jet maxEtaJet = jets.at(0);
   for(auto jet : jets)
     if(fabs(jet.eta())> fabs(maxEtaJet.eta())) maxEtaJet = jet;
-  return fabs(maxEtaJet.eta())>minEta_ && maxEtaJet.pt()>minPt_;
+  return fabs(maxEtaJet.eta())>minEta_ && maxEtaJet.pt()>minPt_ && (maxEtaJet.eta() < maxEta_ || maxEta_==-1) && (maxEtaJet.pt()<maxPt_ || maxPt_==-1);
 }

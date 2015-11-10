@@ -107,9 +107,11 @@ class PTWhadCut: public uhh2::Selection{
 
 class ForwardJetPtEtaCut: public uhh2::Selection{
  public:
-  explicit ForwardJetPtEtaCut(float minEta, float minPt);
+  explicit ForwardJetPtEtaCut(float minEta, float maxEta=-1, float minPt=0, float maxPt=-1);
   virtual bool passes(const uhh2::Event & event) override;
  private:
   float minEta_;
+  float maxEta_;
   float minPt_;
+  float maxPt_;
 };
