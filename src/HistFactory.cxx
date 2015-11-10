@@ -9,7 +9,7 @@
 #include "UHH2/VLQToTopAndLepton/include/BprimeRecoHists.h"
 #include "UHH2/VLQToTopAndLepton/include/BprimeHypHists.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
-
+#include "UHH2/VLQToTopAndLepton/include/EventKinematicHists.h"
 
 #include "TH1D.h"
 #include <math.h> 
@@ -76,6 +76,12 @@ void HistFactory::addCounter(){
   count.push_back(0);
 }
 
+void HistFactory::addAnalysisModule(unique_ptr<uhh2::AnalysisModule> module){
+  AnalysisModules.push_back(move(module));
+  orderAnalysisModules.push_back(selectionClasses.size());
+}
+
+
 void HistFactory::addHists(const string& histClass, const string& histName, const string & hyp_name){
   unique_ptr<Hists> histTemplate;
   for(const auto & cutName : cutNames){
@@ -109,6 +115,9 @@ void HistFactory::addHists(const string& histClass, const string& histName, cons
     else if(histClass.compare("LuminosityHists")==0){
       histTemplate.reset(new LuminosityHists(m_ctx,ss.str().c_str()));
     }
+    else if(histClass.compare("EventKinematicHists")==0){
+      histTemplate.reset(new EventKinematicHists(m_ctx,ss.str().c_str()));
+    }
     else
       cerr<<"You ask for a not supported hist class, please check spelling or add class";
     factoryHists.push_back(move(histTemplate));
@@ -138,7 +147,7 @@ void HistFactory::addHists(const string& histName, TopJetId topjetid){
 }
 
 //passOption: 0 event has to pass all cuts, 1 event passes this cut
-bool HistFactory::passAndFill(const Event & event, int passOption){
+bool HistFactory::passAndFill(Event & event, int passOption){
   bool passCuts =true;
   unsigned int hist_number = factoryHists.size()/(selectionClasses.size()+1);
   unsigned int cuti = 0; 
@@ -154,6 +163,8 @@ bool HistFactory::passAndFill(const Event & event, int passOption){
   for(unsigned int i = 0;i<hist_number;++i)
     factoryHists[i*(selectionClasses.size()+1)]->fill(event);
   for(auto & selection : selectionClasses){
+    for(auto & module : orderAnalysisModules)
+      if(module == cuti)  AnalysisModules.at(&module-&orderAnalysisModules[0])->process(event);
     cuti++;
     if(selection->passes(event)){
       if(cutflow_raw){
@@ -172,6 +183,8 @@ bool HistFactory::passAndFill(const Event & event, int passOption){
       else if(passOption==1) passCuts = false;
     }
   }
+  for(auto & module : orderAnalysisModules)
+    if(module == cuti)  AnalysisModules[&module-&orderAnalysisModules[0]]->process(event);
   return passCuts;
 }
 

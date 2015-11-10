@@ -27,7 +27,7 @@ class HistFactory{
   ~HistFactory();
 
   //HistFactory clone(string addCutname);
-
+  void addAnalysisModule(unique_ptr<uhh2::AnalysisModule> module);
   void addSelection(unique_ptr<Selection> selection, const string& cutName);
   void addAndSelection(vector<unique_ptr<Selection>> selection, const string& cutName);
   void addOrSelection(vector<unique_ptr<Selection>> selection, const string& cutName);
@@ -35,16 +35,18 @@ class HistFactory{
   void addHists(const string& histClass, const string& histName, const std::string & hyp_name = "BprimeReco");
   void addHists(const string& histName, JetId jetid);
   void addHists(const string& histName, TopJetId topjetid);
-  bool passAndFill(const Event& event, int passOption=0);
+  bool passAndFill(Event& event, int passOption=0);
   void setEffiHistName(const string& name){effiHistName=name;}
 
  private:
   void addCounter(); 
   void create_histos();
   unsigned int count_cuts;
-  vector<unique_ptr<Selection>> selectionClasses;
-  vector<string> cutNames;
-  vector<unique_ptr<Hists>> factoryHists;
+  std::vector<unique_ptr<Selection>> selectionClasses;
+  std::vector<string> cutNames;
+  std::vector<unique_ptr<Hists>> factoryHists;
+  std::vector<unique_ptr<uhh2::AnalysisModule>> AnalysisModules;
+  std::vector<unsigned int> orderAnalysisModules;
   //vector<string> histNames,histClasses;
   vector<double> weighted_count;
   vector<double> count;
