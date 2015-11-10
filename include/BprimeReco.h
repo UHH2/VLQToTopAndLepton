@@ -16,8 +16,10 @@ class BprimeReco :public uhh2::AnalysisModule {
   bool massReco(uhh2::Event & event);
   bool TopJetReco(uhh2::Event & event, double dRmin = 0);
   bool BTagReco(uhh2::Event & event);
+  bool hadronicW(uhh2::Event & event, double dRmin = 0);
   void set_jetRecoId(const JetId & my_jetId){jetId= my_jetId;}
   void set_topjetRecoId(const TopJetId & my_topjetId){topjetId =my_topjetId;}
+  void set_wjetRecoId(const TopJetId & my_wjetId){wjetId =my_wjetId;}
   bool set_topjetCollection(uhh2::Context & ctx, const std::string & topjetCollectionName);
   bool set_jetCollection(uhh2::Context & ctx, const std::string & jetCollectionName);  
  private:
@@ -32,6 +34,9 @@ class BprimeReco :public uhh2::AnalysisModule {
   bool topjetCollBool, jetCollBool;
   boost::optional<JetId> jetId;
   boost::optional<TopJetId> topjetId;
+  boost::optional<TopJetId> wjetId;
+
 };
+
 
 //more classes for TopTag and WTag Reconstruction should follow
