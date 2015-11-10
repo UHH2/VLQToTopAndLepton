@@ -31,7 +31,7 @@
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonSelections.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonHists.h"
 #include "UHH2/VLQToTopAndLepton/include/OptTreeModule.h"
-
+#include "UHH2/VLQToTopAndLepton/include/WTopJet.h"
 
 using namespace std;
 using namespace uhh2;
@@ -47,20 +47,20 @@ public:
 private:
   string Version;
   std::unique_ptr<CommonModules> common;
-  std::unique_ptr<BprimeDiscriminator> chi2_combo, ttbar, cmstoptagDis, heptoptagDis;
+  std::unique_ptr<BprimeDiscriminator> chi2_combo, ttbar, cmstoptagDis, heptoptagDis,chi2_wtag;
   std::unique_ptr<AnalysisModule> ht, lepton, OptTree;
-  std::unique_ptr<BprimeReco> Reco, CMSTopTagReco, HEPTopTagReco;
+  std::unique_ptr<BprimeReco> Reco, CMSTopTagReco, HEPTopTagReco, WTagReco;
   std::unique_ptr<HistFactory> CutPlots;
   std::unique_ptr<MCPileupReweight> pileup_weights;
-  JetId btag_medium, eta_cut, twojet, onejet, lowjet;
+  JetId btag_medium, eta_cut, twojet, onejet, lowjet, wjetId;
   MuonId muid_cut;
   TopJetId cmstopjetid, heptopjetid;
 };
 
 OptSelModule::OptSelModule(Context& ctx){
   common.reset(new CommonModules());
-  common->set_jet_id(PtEtaCut(40.0,3));
-  common->set_electron_id(AndId<Electron>(ElectronID_Spring15_25ns_tight_noIso, PtEtaCut(40.0, 2.1)));
+  common->set_jet_id(PtEtaCut(30.0,3));
+  common->set_electron_id(AndId<Electron>(ElectronID_Spring15_25ns_tight_noIso, PtEtaCut(50.0, 2.1)));
   common->set_muon_id(AndId<Muon>(MuonIDTight(),PtEtaCut(40.0, 2.1)));
   common->switch_jetlepcleaner();
   common->switch_jetPtSorter();
@@ -69,6 +69,7 @@ OptSelModule::OptSelModule(Context& ctx){
   cmstopjetid = AndId<TopJet>(CMSTopTag(),Tau32());
   heptopjetid = HEPTopTagV2();
   btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
+  wjetId = AndId<TopJet>(WMass(),Tau21(0.5));
   //btag_medium = CSVBTag(CSVBTag::WP_TIGHT);
   Reco.reset(new BprimeReco(ctx));
   CMSTopTagReco.reset(new BprimeReco(ctx,"CMSTopTagReco"));
@@ -76,6 +77,9 @@ OptSelModule::OptSelModule(Context& ctx){
   HEPTopTagReco.reset(new BprimeReco(ctx,"HEPTopTagReco"));
   HEPTopTagReco->set_topjetRecoId(heptopjetid);
   HEPTopTagReco->set_topjetCollection(ctx,"patJetsHepTopTagCHSPacked_daughters");
+  WTagReco.reset(new BprimeReco(ctx,"WTagReco"));
+  WTagReco->set_wjetRecoId(wjetId);
+
   //Event::Handle<std::vector<TopJet>> heptopjets_handle = ctx.get_handle<std::vector<TopJet>>("patJetsHepTopTagCHSPacked_daughters");
   eta_cut = PtEtaCut(20.0,2.6);
   ht.reset(new HTCalc(ctx,eta_cut));
@@ -88,11 +92,11 @@ OptSelModule::OptSelModule(Context& ctx){
   cmstoptagDis->set_emptyHyp(true);
   heptoptagDis.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::hepTopTag,"HEPTopTagReco","HEPTopTagDis"));
   heptoptagDis->set_emptyHyp(true);
+  chi2_wtag.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::wTag,"WTagReco","WTagDis"));
 
   lowjet = PtEtaCut(50.0,2.4); 
   onejet = PtEtaCut(100.0, 2.4); twojet = PtEtaCut(50.0, 2.4);
   muid_cut = AndId<Muon>(MuonIDTight(), PtEtaCut(50.0, 2.4));
-
   CutPlots.reset(new HistFactory(ctx));
   CutPlots->setEffiHistName("CutsOpt");
   CutPlots->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"muonTrigger");
@@ -103,7 +107,6 @@ OptSelModule::OptSelModule(Context& ctx){
   //CutPlots->addSelection(make_unique<ForwardJetPtEtaCut>(1.5,40),"ForwardJetCut");
   CutPlots->addSelection(make_unique<HTLepSelection>(ctx,100),"100_HTLep");
   CutPlots->addSelection(make_unique<NJetSelection>(1,-1,onejet),"100GeV_JetCut");
-  
   CutPlots->addHists("ElectronHists","ElectronHists");
   CutPlots->addHists("MuonHists","MuonHists");
   CutPlots->addHists("EventHists","EventHists");
@@ -126,6 +129,8 @@ bool OptSelModule::process(Event & event){
   heptoptagDis->process(event);
   CMSTopTagReco->TopJetReco(event,2);
   cmstoptagDis->process(event);
+  WTagReco->hadronicW(event,2);
+  chi2_wtag->process(event);
   OptTree->process(event);
   return true;
 }

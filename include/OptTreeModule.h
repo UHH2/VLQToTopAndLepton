@@ -14,10 +14,11 @@ explicit OptTreeModule(uhh2::Context & ctx);
   uhh2::Event::Handle<BprimeContainer> chi2HypHandle;
   uhh2::Event::Handle<BprimeContainer> cmsTopTagHypHandle;
   uhh2::Event::Handle<BprimeContainer> ttbarHandle;
-
+  uhh2::Event::Handle<BprimeContainer> wTagHypHandle;
   //Output
   uhh2::Event::Handle<double> leadingLepPt;
   uhh2::Event::Handle<double> leadingJetPt;
+  uhh2::Event::Handle<double> mostForwardJetEta;
   uhh2::Event::Handle<double> numberJet;
   uhh2::Event::Handle<double> chi2Mass;	
   uhh2::Event::Handle<double> chi2Val;
@@ -25,6 +26,7 @@ explicit OptTreeModule(uhh2::Context & ctx);
   uhh2::Event::Handle<double> cmsTopTagChi2;
   uhh2::Event::Handle<double> ttbarMass;
   uhh2::Event::Handle<double> ttbarChi2;
+  uhh2::Event::Handle<double> wTagMass;
   uhh2::Event::Handle<double> weight;
   uhh2::Event::Handle<double> pTW;	
   uhh2::Event::Handle<double> pTT;     
