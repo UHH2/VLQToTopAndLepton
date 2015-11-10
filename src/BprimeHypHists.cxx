@@ -8,7 +8,7 @@ BprimeHypHists::BaseHists BprimeHypHists::book_BaseHists(const std::string & nam
   hists.pt   = book<TH1F>("pt_"+name,"p_{T} "+ label+" [GeV]",100,minPt,maxPt);
   hists.eta  = book<TH1F>("eta_"+name,"#eta "+label,100,-4,4);
   hists.phi  = book<TH1F>("phi_"+name,"#phi "+label,100,-3.2,3.2);
-  hists.mass = book<TH1F>("mass_"+name,"Mass "+label+" [GeV]",25,minMass,maxMass);
+  hists.mass = book<TH1F>("mass_"+name,"Mass "+label+" [GeV]",30,minMass,maxMass);
   return hists;
 }
 
@@ -21,10 +21,10 @@ void BprimeHypHists::fill_BaseHists(const T & particle, BaseHists & hists, doubl
 }
 
 BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const string & hyp_name): Hists(ctx, dirname){
-  wHad = book_BaseHists("wHad","W_{had}");
-  wLep = book_BaseHists("wLep","W_{lep}"); 
-  topLep = book_BaseHists("topLep","Top_{lep}");
-  topHad = book_BaseHists("topHad","Top_{had}");
+  wHad = book_BaseHists("wHad","W_{had}",0,300);
+  wLep = book_BaseHists("wLep","W_{lep}",0,300); 
+  topLep = book_BaseHists("topLep","Top_{lep}",0,400);
+  topHad = book_BaseHists("topHad","Top_{had}",0,400);
   mass = book_BaseHists("hyp","B",50,3000); 
   mass_lep = book_BaseHists("Mass_lep","lep. Hypothesis",50,3000); 
   mass_had = book_BaseHists("Mass_had","had. Hypothesis",50,3000); 
@@ -80,7 +80,6 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   Bprime_res_phi  = book<TH1F>("Bprime_res_phi","B Resolution #phi", 100, 0, 3.14); 
   Bprime_res_eta  = book<TH1F>(" Bprime_res_eta","B Resolution #eta", 100, 0, 4); 
   Bprime_res_deltaR  = book<TH1F>(" Bprime_res_deltaR","B Resolution #Delta R", 100, 0, 4); 
- 
 
   topReco_dR_pT_lep    = book<TH2F>("topReco_dR_pT_lep","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,0,800);  
   topReco_dR_pTres_lep = book<TH2F>("topReco_dR_pTres_lep","Gen and Reco Top #Delta R pT", 100, 0, 2, 100,-2,2);  
@@ -144,7 +143,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   */
   //special treatment since topjets are not needed or filled for toptags
 
-  if(recotype==11)
+  if(recotype==11||recotype==6)
     bprime = tlep+whad;
   else if(recotype==12 || recotype==2)
     bprime = thad+wlep;
@@ -178,7 +177,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     if(recotype==12) chiDis_had->Fill(chiVal,weight);
   }
   //leptonic tops
-  if(recotype==11 || recotype==0){
+  if(recotype==11 || recotype==0 || recotype==6){
     fill_BaseHists(tlep,topLep,weight);
     fill_BaseHists(tlep+whad,mass_lep,weight);
     deltaR_wtop->Fill(deltaR(tlep,whad),weight);
@@ -260,7 +259,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     }
 
   }
-  if(GenInfo.get_topLep().pt()>0 && (recotype==11 || recotype==0)){
+  if(GenInfo.get_topLep().pt()>0 && (recotype==11 || recotype==0 || recotype==6)){
     topReco_dR_pT_lep->Fill(deltaR(GenInfo.get_topLep(),wlep+topJets),GenInfo.get_topLep().pt(),weight);   
     topReco_dR_pTres_lep->Fill(deltaR(GenInfo.get_topLep(),wlep+topJets),(GenInfo.get_topLep().pt()-(wlep+topJets).pt())/GenInfo.get_topLep().pt(),weight);
     topLep_res_pt->Fill((GenInfo.get_topLep().pt()-(wlep+topJets).pt())/GenInfo.get_topLep().pt(),weight);     

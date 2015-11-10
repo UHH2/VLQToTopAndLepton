@@ -26,6 +26,8 @@ bool BprimeDiscriminator::process(uhh2::Event & event){
     result  = cmsTopTag_dis(event);
   else if(dis == 5)
     result  = cmsTopTag_dis(event);
+  else if (dis ==6)
+    result = wTag_dis(event);
 
   if(result.get_RecoTyp()==-1){
     if(emptyHyp)event.set(resultHyp,move(result));
@@ -125,6 +127,29 @@ BprimeContainer BprimeDiscriminator::cmsTopTag_dis(uhh2::Event & event){
       bestHyp=hyp;
       bprimechi=chi;
       recoType=2;
+    }
+  }
+  if(bprimechi==-1) return bestHyp;
+  bestHyp.set_chiVal(bprimechi);
+  bestHyp.set_RecoTyp(recoType);
+  bestHyp.set_Mass(mass);
+  return bestHyp;
+}
+
+BprimeContainer BprimeDiscriminator::wTag_dis(uhh2::Event & event){
+  BprimeContainer bestHyp;
+  double bprimechi =-1;
+  int recoType = -1;
+  double mass =-1;
+  for(auto hyp :  event.get(hyps)){
+    const LorentzVector & toplep = hyp.get_topLep();
+    const LorentzVector & wHad = hyp.get_wHad();
+    mass = sqrt((wHad+toplep).M2());
+    double chi = pow(wHad.M()-80,2)/23/23+ pow(deltaR(wHad,toplep)-3.1,2)/0.15/0.15;
+    if(chi<bprimechi || bprimechi==-1){
+      bestHyp=hyp;
+      bprimechi=chi;
+      recoType=3;
     }
   }
   if(bprimechi==-1) return bestHyp;

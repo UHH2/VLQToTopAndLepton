@@ -128,7 +128,9 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
   //if(topjets.size()==0||neutrinos.size()==0) return false;
   for(auto & topjet : topjets){
     const vector<Jet> & Top_subjets = topjet.subjets();
-    LorentzVector TopCand = Top_subjets[0].v4()+Top_subjets[1].v4()+Top_subjets[2].v4();
+    LorentzVector TopCand(0,0,0,0);
+    for(auto &subjet :Top_subjets)
+      TopCand += subjet.v4();
     tmp_hyp.set_topHad(TopCand);
     //tmp_hyp.set_topJets(TopCand);
     for(auto & neutrino : neutrinos){
@@ -179,7 +181,6 @@ template<typename T>
 }
 
 vector<BprimeContainer> BprimeReco::reconstruct_WHyps(const std::vector<Jet> & jets, const std::vector<LorentzVector> & Wleps, double cutoff_WHad_min, double cutoff_WHad_max){
-
   vector<BprimeContainer> recoWHyps;
   BprimeContainer tmp_hyp;
   //reconstruct hadronic W and add leptonic W
@@ -207,3 +208,41 @@ vector<BprimeContainer> BprimeReco::reconstruct_WHyps(const std::vector<Jet> & j
   return recoWHyps;
 }
 
+bool BprimeReco::hadronicW(uhh2::Event & event, double dRmin){
+  vector<TopJet> wjets = topjetCollBool ?  event.get(topjet_collection) : *event.topjets;
+  vector<Jet> jets = jetCollBool ? event.get(jet_collection) : *event.jets;
+  if(wjetId){
+    vector<TopJet> selected_wjets;
+    for(unsigned int i =0; i<wjets.size(); i++){
+      if(passes_id(wjets.at(i),event,wjetId)) selected_wjets.push_back(wjets.at(i));
+    }
+    selected_wjets.swap(wjets);
+  }	  
+  LorentzVector lep = event.get(primlep).v4();  
+  vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
+  vector<BprimeContainer> recoHyps;
+  BprimeContainer tmp_hyp;
+  for(auto & wjet : wjets){
+    const vector<Jet> & w_subjets = wjet.subjets();
+    LorentzVector WCand(0,0,0,0);
+    for(auto &subjet : w_subjets)
+      WCand += subjet.v4();
+    tmp_hyp.set_wHad(WCand);
+    //tmp_hyp.set_topJets(TopCand);
+    for(auto & neutrino : neutrinos){
+      if(deltaR(wjet.v4(),neutrino+lep)>dRmin){
+	tmp_hyp.set_wLep(neutrino+lep);
+	for(auto & jet :jets){
+	  if(deltaR(jet.v4(),WCand)>dRmin){
+	    tmp_hyp.set_topJets(jet.v4());
+	    tmp_hyp.set_topLep(jet.v4()+neutrino+lep);
+	    recoHyps.push_back(tmp_hyp);
+	  }
+	}
+      }
+    }
+  }
+  int size_recoHyps = recoHyps.size();
+  event.set(hypothesis,move(recoHyps));
+  return size_recoHyps > 0 ? true : false;
+}
