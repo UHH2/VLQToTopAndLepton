@@ -51,6 +51,14 @@ bool HTCalc::process(Event & event){
 
   return true;
 }
+/*
+METSelection::METSelection(double met_): met(met_){}
+
+bool METSelection::passes(const Event & event){
+    return event.met>met;
+}
+*/
+
 
 /*
 HTSelection::HTSelection(Context & ctx, double HTmin_): HTmin(HTmin_){
