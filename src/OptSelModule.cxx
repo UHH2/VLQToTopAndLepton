@@ -52,9 +52,9 @@ private:
   std::unique_ptr<BprimeReco> Reco, CMSTopTagReco, HEPTopTagReco, WTagReco;
   std::unique_ptr<HistFactory> CutPlots;
   std::unique_ptr<MCPileupReweight> pileup_weights;
-  JetId btag_medium, eta_cut, twojet, onejet, lowjet, wjetId;
+  JetId btag_medium, eta_cut, twojet, onejet, lowjet;
   MuonId muid_cut;
-  TopJetId cmstopjetid, heptopjetid;
+  TopJetId cmstopjetid, heptopjetid,wjetId;
 };
 
 OptSelModule::OptSelModule(Context& ctx){
