@@ -59,7 +59,7 @@ private:
   JetId btag_medium;
   ElectronId softElectron;
   MuonId muid_cut, softMuon;
-  JetId secondjet, onejet, softjet;
+  JetId secondjet, onejet, softjet, ak4ForwardId, ak4CentralId;;
   TopJetId topjet;
   //std::unique_ptr<BprimeReco> Reco;
 };
@@ -82,6 +82,9 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   onejet = PtEtaCut(130.0, 2.4); secondjet = PtEtaCut(50.0, 2.4); 
   softjet = PtEtaCut(30.0, 5.0);
   topjet = PtEtaCut(250.0, 2.4); 
+  
+  ak4ForwardId = PtEtaCut(30.0,5,-1,2);
+  ak4CentralId = PtEtaCut(30.0,2,-1,-1);
 
   common.reset(new CommonModules());
   common->set_jet_id(softjet);
@@ -100,15 +103,16 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   muonFactory->addSelection(make_unique<NElectronSelection>(0,0,softElectron),"0_eleCut");
   muonFactory->addSelection(make_unique<NMuonSelection>(1,-1,softMuon),"1_softMuonCut");
   muonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
-  muonFactory->addSelection(make_unique<TwoDCut>(0.4,40),"2DCut");
+  muonFactory->addSelection(make_unique<TwoDCut>(0.4,50),"2DCut");
   //muonFactory->addAnalysisModule(make_unique<JetCleaner>(secondjet));
   muonFactory->addSelection(make_unique<NMuonSelection>(1,-1,muid_cut),"1_muonCut");
-  muonFactory->addSelection(make_unique<METSelection>(100),"100GeV_METCut");
+  muonFactory->addSelection(make_unique<METSelection>(50),"50GeV_METCut");
   muonFactory->addSelection(make_unique<NJetSelection>(1,-1,secondjet),"50GeV_JetCut");
   //muonFactory->addSelection(make_unique<ForwardJetPtEtaCut>(1.5,40),"ForwardJetCut");
-  muonFactory->addSelection(make_unique<HTLepSelection>(ctx,200),"200_HTLep");
+  muonFactory->addSelection(make_unique<STSelection>(ctx,400),"400GeV_ST");
+  //muonFactory->addSelection(make_unique<HTLepSelection>(ctx,200),"200_HTLep");
   muonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"130GeV_JetCut");
-  muonFactory->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"3_JetCut");
+  muonFactory->addSelection(make_unique<NJetSelection>(4,-1,secondjet),"3_JetCut");
 
   muonFactory->addHists("ElectronHists","muonChannel_ElectronHists");
   muonFactory->addHists("MuonHists","muonChannel_MuonHists");
@@ -117,6 +121,9 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   muonFactory->addHists("TopJetHists","muonChannel_TopJetHists");
   muonFactory->addHists("VLQGenHists","muonChannel_VLQGenHists");
   muonFactory->addHists("LuminosityHists","muonChannel_LumiHists");
+  muonFactory->addHists("Central_muonChannel_JetHists",ak4CentralId);
+  muonFactory->addHists("Forward_muonChannel_JetHists",ak4ForwardId);
+  muonFactory->addHists("50GeV_muonChannel_JetHists",secondjet);
 
   vector<int> bBprimeDecay {5, 6000007};
 
@@ -138,10 +145,11 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   topWMuonFactory->addSelection(make_unique<TwoDCut>(0.4,40),"2DCut");
   //topWMuonFactory->addAnalysisModule(make_unique<JetCleaner>(secondjet));
   topWMuonFactory->addSelection(make_unique<NMuonSelection>(1,-1,muid_cut),"1_muonCut");
-  topWMuonFactory->addSelection(make_unique<METSelection>(100),"100GeV_METCut");
+  topWMuonFactory->addSelection(make_unique<METSelection>(50),"50GeV_METCut");
   topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,secondjet),"50GeV_JetCut");
   //topWMuonFactory->addSelection(make_unique<ForwardJetPtEtaCut>(1.5,40),"ForwardJetCut");
-  topWMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,150),"200_HTLep");
+  topWMuonFactory->addSelection(make_unique<STSelection>(ctx,400),"400GeV_ST");
+  //topWMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,150),"200_HTLep");
   topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"130GeV_JetCut");
   topWMuonFactory->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"3_JetCut");
   topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1, btag_medium), "BTagMedium");
@@ -152,6 +160,9 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   topWMuonFactory->addHists("JetHists","topLep_JetHists");
   topWMuonFactory->addHists("TopJetHists","topLep_TopJetHists");
   topWMuonFactory->addHists("VLQGenHists","topLep_VLQGenHists");
+  topWMuonFactory->addHists("Central_topLep_JetHists",ak4CentralId);
+  topWMuonFactory->addHists("Forward_topLep_JetHists",ak4ForwardId);
+  topWMuonFactory->addHists("50GeV_topLep_JetHists",secondjet);
 
   wMuonFactory.reset(new HistFactory(ctx));
   wMuonFactory->setEffiHistName("topHad");	
@@ -163,10 +174,11 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   wMuonFactory->addSelection(make_unique<TwoDCut>(0.4,40),"2DCut");
   //wMuonFactory->addAnalysisModule(make_unique<JetCleaner>(secondjet));
   wMuonFactory->addSelection(make_unique<NMuonSelection>(1,-1,muid_cut),"1_muonCut");
-  wMuonFactory->addSelection(make_unique<METSelection>(100),"100GeV_METCut");
+  wMuonFactory->addSelection(make_unique<METSelection>(50),"50GeV_METCut");
   wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,secondjet),"50GeV_JetCut");
   //wMuonFactory->addSelection(make_unique<ForwardJetPtEtaCut>(1.5,40),"ForwardJetCut");
-  wMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,200),"200_HTLep");
+  wMuonFactory->addSelection(make_unique<STSelection>(ctx,400),"400GeV_ST");
+  //wMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,200),"200_HTLep");
   wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"130GeV_JetCut");
   wMuonFactory->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"3_JetCut");
   wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1, btag_medium), "BTagMedium");
@@ -177,7 +189,9 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   wMuonFactory->addHists("JetHists","topHad_JetHists");
   wMuonFactory->addHists("TopJetHists","topHad_TopJetHists");
   wMuonFactory->addHists("VLQGenHists","topHad_VLQGenHists");
-
+  wMuonFactory->addHists("Central_topHad_JetHists",ak4CentralId);
+  wMuonFactory->addHists("Forward_topHad_JetHists",ak4ForwardId);
+  wMuonFactory->addHists("50GeV_topHad_JetHists",secondjet);
 
   HiggsFilter.reset(new GenParticleFilter(25,0,0));
   ZFilter.reset(new GenParticleFilter(23,0,0));
