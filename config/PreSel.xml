@@ -78,7 +78,7 @@
 
 <!--
    <ConfigParse NEventsBreak="0" FileSplit="10" />
-   <ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.PreSel_v1"/>
+   <ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.PreSel_v4"/>
 -->
 
 
@@ -87,7 +87,7 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v1/" PostFix="" TargetLumi="522">
+    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v4/" PostFix="" TargetLumi="522">
     <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="10" OutputDirectory="./PreSelection_v1/" PostFix="" TargetLumi="552.4" >-->
 
       <InputData Lumi="1" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">
@@ -199,104 +199,104 @@
 	  <OutputTree Name="AnalysisTree" />
 	</InputData> 
 
-	<InputData Lumi="0.61625366206" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-15to20_Mu" Cacheable="True">
+	<InputData Lumi="0.61625366206" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-15to20_Mu" Cacheable="False">
 	  &MC_QCD_Pt-15to20_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="1.76790356349" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-20to30_Mu" Cacheable="True">
+	<InputData Lumi="1.76790356349" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-20to30_Mu" Cacheable="False">
 	  &MC_QCD_Pt-20to30_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="2.98365497943" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-30to50_Mu" Cacheable="True">
+	<InputData Lumi="2.98365497943" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-30to50_Mu" Cacheable="False">
 	  &MC_QCD_Pt-30to50_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="11.5228268718" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-50to80_Mu" Cacheable="True">
+	<InputData Lumi="11.5228268718" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-50to80_Mu" Cacheable="False">
 	  &MC_QCD_Pt-50to80_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="36.5232665239" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-80to120_Mu" Cacheable="True">
+	<InputData Lumi="36.5232665239" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-80to120_Mu" Cacheable="False">
 	  &MC_QCD_Pt-80to120_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="159.471593879" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-120to170_Mu" Cacheable="True">
+	<InputData Lumi="159.471593879" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-120to170_Mu" Cacheable="False">
 	  &MC_QCD_Pt-120to170_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="454.541581098" NEventsMax="-1" Type="MC" Version="MC_QCDPt-170to300_Mu" Cacheable="True">
+	<InputData Lumi="454.541581098" NEventsMax="-1" Type="MC" Version="MC_QCDPt-170to300_Mu" Cacheable="False">
 	  &MC_QCD_Pt-170to300_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="4893.12703015" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-300to470_Mu" Cacheable="True">
+	<InputData Lumi="4893.12703015" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-300to470_Mu" Cacheable="False">
 	  &MC_QCD_Pt-300to470_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="24346.6486219" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-470to600_Mu" Cacheable="True">
+	<InputData Lumi="24346.6486219" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-470to600_Mu" Cacheable="False">
 	  &MC_QCD_Pt-470to600_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="78855.4031171" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-600to800_Mu" Cacheable="True">
+	<InputData Lumi="78855.4031171" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-600to800_Mu" Cacheable="False">
 	  &MC_QCD_Pt-600to800_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="420117.990718" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-800to1000_Mu" Cacheable="True">
+	<InputData Lumi="420117.990718" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-800to1000_Mu" Cacheable="False">
 	  &MC_QCD_Pt-800to1000_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="1219588.20981" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-1000toInf_Mu" Cacheable="True">
+	<InputData Lumi="1219588.20981" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-1000toInf_Mu" Cacheable="False">
 	  &MC_QCD_Pt-1000toInf_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
 
 <!--
-	<InputData Lumi="0.919" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-15to20_Em" Cacheable="True">
+	<InputData Lumi="0.919" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-15to20_Em" Cacheable="False">
 	  &MC_QCD_Pt-15to20_Em;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="1.710" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-20to30_Em" Cacheable="True">
+	<InputData Lumi="1.710" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-20to30_Em" Cacheable="False">
 	  &MC_QCD_Pt-20to30_Em;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="0.472" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-30to50_Em" Cacheable="True">
+	<InputData Lumi="0.472" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-30to50_Em" Cacheable="False">
 	  &MC_QCD_Pt-30to50_Em;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="1.804" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-50to80_Em" Cacheable="True">
+	<InputData Lumi="1.804" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-50to80_Em" Cacheable="False">
 	  &MC_QCD_Pt-50to80_Em;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="23.18" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-80to120_Em" Cacheable="True">
+	<InputData Lumi="23.18" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-80to120_Em" Cacheable="False">
 	  &MC_QCD_Pt-80to120_Em;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="134.7" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-120to170_Em" Cacheable="True">
+	<InputData Lumi="134.7" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-120to170_Em" Cacheable="False">
 	  &MC_QCD_Pt-120to170_Em;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="304.3" NEventsMax="-1" Type="MC" Version="MC_QCDPt-170to300_Em" Cacheable="True">
+	<InputData Lumi="304.3" NEventsMax="-1" Type="MC" Version="MC_QCDPt-170to300_Em" Cacheable="False">
 	  &MC_QCD_Pt-170to300_Em;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="2732.4" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-300toInf_Em" Cacheable="True">
+	<InputData Lumi="2732.4" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-300toInf_Em" Cacheable="False">
 	  &MC_QCD_Pt-300toInf_Em;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
@@ -368,72 +368,72 @@
 
 
 <!--
-	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt30to50" Cacheable="True">
+	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt30to50" Cacheable="False">
 	  &MC_QCD_Pt30to50;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt50to80" Cacheable="True">
+	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt50to80" Cacheable="False">
 	  &MC_QCD_Pt50to80;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt80to120" Cacheable="True">
+	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt80to120" Cacheable="False">
 	  &MC_QCD_Pt80to120;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="7.31523455741881" NEventsMax="-1" Type="MC" Version="QCD_Pt120to170" Cacheable="True">
+	<InputData Lumi="7.31523455741881" NEventsMax="-1" Type="MC" Version="QCD_Pt120to170" Cacheable="False">
 	  &MC_QCD_Pt120to170;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="29.3160237388724" NEventsMax="-1" Type="MC" Version="QCD_Pt170to300" Cacheable="True">
+	<InputData Lumi="29.3160237388724" NEventsMax="-1" Type="MC" Version="QCD_Pt170to300" Cacheable="False">
 	  &MC_QCD_Pt170to300;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="374.61050747795" NEventsMax="-1" Type="MC" Version="QCD_Pt300to470" Cacheable="True">
+	<InputData Lumi="374.61050747795" NEventsMax="-1" Type="MC" Version="QCD_Pt300to470" Cacheable="False">
 	  &MC_QCD_Pt300to470;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="2991.71397716754" NEventsMax="-1" Type="MC" Version="QCD_Pt470to600" Cacheable="True">
+	<InputData Lumi="2991.71397716754" NEventsMax="-1" Type="MC" Version="QCD_Pt470to600" Cacheable="False">
 	  &MC_QCD_Pt470to600;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="10113.7292669877" NEventsMax="-1" Type="MC" Version="QCD_Pt600to800" Cacheable="True">
+	<InputData Lumi="10113.7292669877" NEventsMax="-1" Type="MC" Version="QCD_Pt600to800" Cacheable="False">
 	  &MC_QCD_Pt600to800;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="59186.0774780912" NEventsMax="-1" Type="MC" Version="QCD_Pt800to1000" Cacheable="True">
+	<InputData Lumi="59186.0774780912" NEventsMax="-1" Type="MC" Version="QCD_Pt800to1000" Cacheable="False">
 	  &MC_QCD_Pt800to1000;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="155146.470169776" NEventsMax="-1" Type="MC" Version="QCD_Pt1000to1400" Cacheable="True">
+	<InputData Lumi="155146.470169776" NEventsMax="-1" Type="MC" Version="QCD_Pt1000to1400" Cacheable="False">
 	  &MC_QCD_Pt1000to1400;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="234924.345813802" NEventsMax="-1" Type="MC" Version="QCD_Pt1400to1800" Cacheable="True">
+	<InputData Lumi="234924.345813802" NEventsMax="-1" Type="MC" Version="QCD_Pt1400to1800" Cacheable="False">
 	  &MC_QCD_Pt1400to1800;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="1695831.84708943" NEventsMax="-1" Type="MC" Version="QCD_Pt1800to2400" Cacheable="True">
+	<InputData Lumi="1695831.84708943" NEventsMax="-1" Type="MC" Version="QCD_Pt1800to2400" Cacheable="False">
 	  &MC_QCD_Pt1800to2400;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="29046635.2651099" NEventsMax="-1" Type="MC" Version="QCD_Pt2400to3200" Cacheable="True">
+	<InputData Lumi="29046635.2651099" NEventsMax="-1" Type="MC" Version="QCD_Pt2400to3200" Cacheable="False">
 	  &MC_QCD_Pt2400to3200;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-	<InputData Lumi="1140536129.83167" NEventsMax="-1" Type="MC" Version="QCD_Pt3200toInf" Cacheable="True">
+	<InputData Lumi="1140536129.83167" NEventsMax="-1" Type="MC" Version="QCD_Pt3200toInf" Cacheable="False">
 	  &MC_QCD_Pt3200toInf;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
@@ -457,7 +457,7 @@
             <Item Name="JetCollection" Value="slimmedJets" />
 	    <Item Name="GenJetCollection" Value="slimmedGenJets" />
 	    <Item Name="TopJetCollection" Value="slimmedJetsAK8_CMSTopTag" />
-            <Item Name="METName" Value="slimmedMETsNoHF" />
+            <Item Name="METName" Value="slimmedMETs" />
             <Item Name="GenParticleCollection" Value="GenParticles" /> 
             <Item Name="additionalBranches" Value="slimmedJetsPuppi slimmedMETs patJetsHepTopTagCHSPacked_daughters" />
 	    <Item Name="SelectionTriggerName" Value=""/>
