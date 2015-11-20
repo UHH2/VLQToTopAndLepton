@@ -149,7 +149,7 @@ BprimeContainer BprimeDiscriminator::wTag_dis(uhh2::Event & event){
     if(chi<bprimechi || bprimechi==-1){
       bestHyp=hyp;
       bprimechi=chi;
-      recoType=3;
+      recoType=6;
     }
   }
   if(bprimechi==-1) return bestHyp;

@@ -131,7 +131,6 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   double chiVal = hyp.get_chiVal();
   int recotype = hyp.get_RecoTyp();
   //vector<Jet>* jets = event.jets;
-  string unusedJets = hyp.get_unusedJets();
 
   double matching_distance = 0.4;
 
@@ -186,11 +185,12 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     chi_top_pT->Fill(chiVal,tlep.pt(),weight);
     if(recotype==11) chiDis_lep->Fill(chiVal,weight);
   }
-  //forward Jet
   /*
+  //forward Jet
   LorentzVector forwardJet (0,0,0,0);
   LorentzVector balanceJet (0,0,0,0);
   if(recotype==11 || recotype==12||recotype==0){
+    string unusedJets = hyp.get_unusedJets();
     //cout<<unusedJets.size()<<" "<<jets->size()<<endl;
     for(unsigned int i =0; i<jets->size();i++){ 
       if(!unusedJets[i]){
@@ -202,7 +202,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     }
     //cout<<"forwardJet eta "<< forwardJet.eta()<<" balanceJet eta "<<balanceJet.eta()<<endl;
   }
-  else if (recotype==2){
+  else if(recotype==2 || recotype==6){
     for(unsigned int i =0; i<jets->size();i++){ 
       if(deltaR(jets->at(i).v4(),thad)>2)
 	if(fabs(forwardJet.eta())<fabs(jets->at(i).eta())){
@@ -219,8 +219,8 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   }
   else
     fill_BaseHists(whad+wlep+topJets,no_forwardJet,weight);
-
-
+  */
+  /*
   if(balanceJet.pt()>0)fill_BaseHists(balanceJet,balance,weight);
   */
 
