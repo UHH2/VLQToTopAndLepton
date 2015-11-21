@@ -273,7 +273,7 @@ bool SelectionModule::process(Event & event){
   if(WTagReco->hadronicW(event,2) && !reconstructed){
     if(chi2_wtag->process(event))
       reconstructed =true;
-      wreco = true;
+      //wreco = true;
       WTagRecoPlots->passAndFill(event,1);
   }
   if(Reco->massReco(event)){

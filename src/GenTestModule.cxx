@@ -117,6 +117,7 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   muonFactory->addHists("ElectronHists","muonChannel_ElectronHists");
   muonFactory->addHists("MuonHists","muonChannel_MuonHists");
   muonFactory->addHists("EventHists","muonChannel_EventHists");
+  muonFactory->addHists("EventKinematicHists","muonChannel_EventKinematicsHists");
   muonFactory->addHists("JetHists","muonChannel_JetHists");
   muonFactory->addHists("TopJetHists","muonChannel_TopJetHists");
   muonFactory->addHists("VLQGenHists","muonChannel_VLQGenHists");
@@ -157,6 +158,7 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   topWMuonFactory->addHists("ElectronHists","topLep_ElectronHists");
   topWMuonFactory->addHists("MuonHists","topLep_MuonHists");
   topWMuonFactory->addHists("EventHists","topLep_EventHists");
+  topWMuonFactory->addHists("EventKinematicHists","topLep_EventKinematicsHists");
   topWMuonFactory->addHists("JetHists","topLep_JetHists");
   topWMuonFactory->addHists("TopJetHists","topLep_TopJetHists");
   topWMuonFactory->addHists("VLQGenHists","topLep_VLQGenHists");
@@ -187,6 +189,7 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   wMuonFactory->addHists("MuonHists","topHad_MuonHists");
   wMuonFactory->addHists("EventHists","topHad_EventHists");
   wMuonFactory->addHists("JetHists","topHad_JetHists");
+  wMuonFactory->addHists("EventKinematicHists","topHad_EventKinematicsHists");
   wMuonFactory->addHists("TopJetHists","topHad_TopJetHists");
   wMuonFactory->addHists("VLQGenHists","topHad_VLQGenHists");
   wMuonFactory->addHists("Central_topHad_JetHists",ak4CentralId);
