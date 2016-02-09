@@ -44,11 +44,16 @@ class BprimeHypHists: public uhh2::Hists {
   TH1F* Bprime_res_pt, *Bprime_res_E, *Bprime_res_mass, *Bprime_res_phi, *Bprime_res_eta, *Bprime_res_deltaR;
 
   TH2F* topReco_dR_pT_lep, *topReco_dR_pTres_lep, *topReco_dR_pT_had, *topReco_dR_pTres_had, *wReco_dR_pT_lep, *wReco_dR_pTres_lep, *wReco_dR_pT_had, *wReco_dR_pTres_had;
-
+  TH2F* reco_pt_tW, *gen_pt_tW;
   TH2F* chi_top_pT, *chi_wlep_pT, *chi_whad_pT, chi_ST;
   TH2F* chi_deltaR_w_top;
   TH1F* deltaR_forward_B; 
   TH2F* forward_pt_eta;
+
+  TH1F* deltaPhi_tlep_whad, *deltaEta_tlep_whad, *deltaPhi_thad_wlep, *deltaEta_thad_wlep;
+  TH2F* deltaPhi_deltaEta_tlep_whad, *deltaPhi_deltaEta_thad_wlep;
+
+  TH1F* dR_forwardJet_bprime, *deltaPhi_forwardJet_bprime, *deltaEta_forwardJet_bprime;
 
 
   BaseHists matched_top_lep, matched_top_had, matched_W_lep, matched_W_had;

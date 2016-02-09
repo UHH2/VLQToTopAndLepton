@@ -4,6 +4,7 @@
 #include "UHH2/core/include/Event.h"
 
 #include <string>
+#include <vector>
 
 class BprimeContainer{
  public:
@@ -23,9 +24,11 @@ class BprimeContainer{
   
   LorentzVector get_wLep(){return wLep;}
   LorentzVector get_wHad(){return wHad;}
+  std::vector<LorentzVector> get_wHadLorentz(){return wHad_lorentz;}
   LorentzVector get_topHad(){return topHad;}
   LorentzVector get_topLep(){return topLep;}
   LorentzVector get_topJets(){return topJets;}
+  std::vector<LorentzVector> get_topLorentz(){return top_lorentz;}
   std::string get_wJets(){return whad_jets;}
   std::string get_unusedJets(){return unused_jets;}
   double get_chiVal(){return chi;}
@@ -33,8 +36,10 @@ class BprimeContainer{
   int get_RecoTyp(){return recoTyp;}
   
   void set_topJets(LorentzVector topJets_){topJets = topJets_;}
+  void set_topLorentz(std::vector<LorentzVector> top_LorentzJets){top_lorentz = top_LorentzJets;}
   void set_wLep(LorentzVector wLep_){wLep = wLep_;}
   void set_wHad(LorentzVector wHad_){wHad = wHad_;}
+  void set_wHadJets(std::vector<LorentzVector> whadJets){wHad_lorentz = whadJets;}
   void set_topLep(LorentzVector top_){topLep = top_;}
   void set_topHad(LorentzVector top_){topHad = top_;}
   //void set_forwardJet(LorentzVector forwardJet_){forwardJet = forwardJet_;}
@@ -48,6 +53,7 @@ class BprimeContainer{
  private:  
   int recoTyp;
   LorentzVector wLep, wHad, topLep, topHad, topJets;//, forwardJet, balanceJet;  
+  std::vector<LorentzVector> wHad_lorentz, top_lorentz;
   std::string whad_jets;
   std::string unused_jets;//additional jets for the top
   Particle m_lepton;
