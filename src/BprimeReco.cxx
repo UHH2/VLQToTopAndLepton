@@ -68,15 +68,20 @@ bool BprimeReco::massReco(uhh2::Event & event){
       unsigned int N = unusedJets.size();
       string bitmask(K, 1); // K leading 1's
       bitmask.resize(N, 0); // N-K trailing 0's 
+      vector<LorentzVector> jets_top;
       //permute bitmask
       do {
 	LorentzVector top(0,0,0,0);
 	for (unsigned int i = 0; i < N; ++i){ // [0..N-1] integers
-	  if (bitmask[i]) top = top+unusedJets.at(i).v4();
+	  if (bitmask[i]){
+	    top = top+unusedJets.at(i).v4();
+	    jets_top.push_back(unusedJets.at(i).v4());
+	  }
 	  //if (bitmask[i]) cout <<i<<endl;
 	}
 	if((top+hyp.get_wHad()).M()>500 && (top+hyp.get_wLep()).M()>500) continue;
 	hyp.set_topJets(top);
+	//hyp.set_topLorentz(jets_top);
 	for(unsigned int it = 0; it<bitmask.size(); it++){
 	  if(bitmask[it]){
 	    hyp_jet_string[unusedjetsMap[it]]=1;
@@ -95,7 +100,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
   event.set(hypothesis, move(recoHyps));
   return size_recoHyps > 0 ? true : false;
 }
-
+//just an example not used anywhere
 void BprimeReco::comb(int N, int K)//prototyp of the permutation algorithem
 {
     std::string bitmask(K, 1); // K leading 1's
@@ -188,17 +193,22 @@ vector<BprimeContainer> BprimeReco::reconstruct_WHyps(const std::vector<Jet> & j
     unsigned int N = jets.size();
     string bitmask(K, 1); // K leading 1's
     bitmask.resize(N, 0); // N-K trailing 0's 
+    vector<LorentzVector> whad_jets;
     //permute bitmask
     do {
       LorentzVector whad(0,0,0,0);
       for (unsigned int i = 0; i < N; ++i){ // [0..N-1] integers
-	if(bitmask[i]) whad = whad+jets.at(i).v4();
+	if(bitmask[i]){ 
+	  whad = whad+jets.at(i).v4();
+	  whad_jets.push_back(jets.at(i).v4());
+	}
 	if(whad.M()>cutoff_WHad_max*1.25) break;
       }
       for(auto & wlep:Wleps){
 	if(whad.M()<cutoff_WHad_max && whad.M()>cutoff_WHad_min){
 	  tmp_hyp.set_wJets(bitmask);
 	  tmp_hyp.set_wHad(whad);
+	  //tmp_hyp.set_wHadJets(whad_jets);
 	  tmp_hyp.set_wLep(wlep);
 	  recoWHyps.emplace_back(tmp_hyp);
 	}

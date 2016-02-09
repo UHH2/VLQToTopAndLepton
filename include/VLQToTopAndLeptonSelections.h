@@ -115,3 +115,20 @@ class ForwardJetPtEtaCut: public uhh2::Selection{
   float minPt_;
   float maxPt_;
 };
+
+
+class NSubJetCut: public uhh2::Selection{
+ public:
+  explicit NSubJetCut(int min_subjets_, int max_subjets_=2, int first_topjet_ =1, int last_topjet_=1);
+  virtual bool passes(const uhh2::Event & event) override;
+ private:
+  int min_subjets, max_subjets, first_topjet, last_topjet;
+};
+
+class TopJetMassCut: public uhh2::Selection{
+ public:
+  explicit TopJetMassCut(float mass_);
+  virtual bool passes(const uhh2::Event & event) override;
+ private:
+  float mass;
+};

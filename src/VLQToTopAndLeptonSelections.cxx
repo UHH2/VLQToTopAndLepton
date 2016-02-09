@@ -63,11 +63,26 @@ bool TwoDCut::passes(const Event & event){
     cout<<endl;
     return false;
   }
-						       */
+							 */
+  Muon leading_muon;
+  for(auto & muon : *event.muons)
+    if(muon.pt()>leading_muon.pt()) leading_muon = muon;
+
+  Electron leading_ele;
+  for(auto & ele : *event.electrons)
+    if(ele.pt()>leading_ele.pt())leading_ele = ele;
+
+  vector<Jet> jets;
+  for(const auto jet : *event.jets)
+    if(abs(jet.eta())<2.4) jets.push_back(jet);
+
   float drmin, ptrel;  
-  if(event.muons->size()) std::tie(drmin, ptrel) = drmin_pTrel(event.muons->at(0), *event.jets);
-  else std::tie(drmin, ptrel) = drmin_pTrel(event.electrons->at(0), *event.jets);
-  //cout<<"dR "<<drmin<<" pTrel "<<ptrel<<endl;
+  if(event.muons->size()){
+    std::tie(drmin, ptrel) = drmin_pTrel(leading_muon, jets);
+  }
+  else{
+    std::tie(drmin, ptrel) = drmin_pTrel(leading_ele, jets);
+  }
 
   return (drmin > min_deltaR_) || (ptrel > min_pTrel_);
 }
@@ -126,4 +141,31 @@ bool ForwardJetPtEtaCut::passes(const uhh2::Event & event){
   for(auto jet : jets)
     if(fabs(jet.eta())> fabs(maxEtaJet.eta()) && minPt_<jet.pt() && (maxPt_ > jet.pt() || maxPt_ ==-1) ) maxEtaJet = jet;
   return fabs(maxEtaJet.eta())>minEta_ && (fabs(maxEtaJet.eta()) < maxEta_ || maxEta_==-1);
+}
+
+
+NSubJetCut::NSubJetCut(int min_subjets_, int max_subjets_, int first_topjet_ , int last_topjet_):min_subjets(min_subjets_),max_subjets(max_subjets_),first_topjet(first_topjet_),last_topjet(last_topjet_){}
+
+bool NSubJetCut::passes(const uhh2::Event & event){
+  vector<TopJet> topjets = *event.topjets;
+  bool result = false;
+  for(unsigned int i =0; i< topjets.size(); i++){
+    if(i+1>= first_topjet && (i+1<= last_topjet || last_topjet ==-1)){
+      if(topjets.at(i).subjets().size() >=  min_subjets && (topjets.at(i).subjets().size()<= max_subjets || max_subjets ==-1 ))
+	{
+	result=true;
+      }
+      else
+	return false;
+    } 
+  }
+  return result;
+}
+
+
+TopJetMassCut::TopJetMassCut(float mass_): mass(mass_){}
+
+bool TopJetMassCut::passes(const uhh2::Event & event){
+  TopJet topjet = (*event.topjets)[0];
+  return topjet.prunedmass() > mass;
 }

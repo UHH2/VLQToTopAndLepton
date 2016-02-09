@@ -113,7 +113,7 @@ VLQToTopAndLeptonModule::VLQToTopAndLeptonModule(Context & ctx){
   
   // 2. set up selections:
   
-  jetCorr.reset(new JetCorrector(JERFiles::PHYS14_L123_MC));
+  jetCorr.reset(new JetCorrector(ctx,JERFiles::PHYS14_L123_MC));
   ht.reset(new HTCalc(ctx));
   elecleaner.reset(new ElectronCleaner(AndId<Electron>(ElectronID_Spring15_50ns_medium_noIso, PtEtaCut(20.0, 2.4))));
   mucleaner.reset(new MuonCleaner(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 2.1))));

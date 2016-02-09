@@ -31,7 +31,7 @@ GenParticleHists VLQGenHists::histoBooker(const string& HistName, double minMass
     if(i>0){ suffix = "_"+to_string(i); axisSuffix = to_string(i);}
 
     single.pt  = book<TH1F>(HistName+"_pt"+suffix, "p_{T}^{"+HistName+" "+axisSuffix+"} [GeV/c]", 200, 0, 1500);
-    single.eta = book<TH1F>(HistName+"_eta"+suffix,"#eta_{"+HistName+" "+axisSuffix+"}", 100, -4, 4);
+    single.eta = book<TH1F>(HistName+"_eta"+suffix,"#eta_{"+HistName+" "+axisSuffix+"}", 100, -5, 5);
     single.phi = book<TH1F>(HistName+"_phi"+suffix,"#phi_{"+HistName+" "+axisSuffix+"}", 100, -3.2, 3.2);
     single.mass = book<TH1F>(HistName+"_mass"+suffix,"mass_{"+HistName+" "+axisSuffix+"}", 100, minMass, maxMass);
     single.charge = book<TH1F>(HistName+"_charge"+suffix,"charge_{"+HistName+" "+axisSuffix+"}", 100, -5, 5);
@@ -126,10 +126,17 @@ VLQGenHists::VLQGenHists(Context & ctx, const string & dirname): Hists(ctx, dirn
 
   VLQ_mother = book<TH1F>("VLQ_mothers"   , "VLQ mothers", 61, -30.5, 30.5);
   VLQ_mother1_mother2= book<TH2F>("VLQ_mother1_mother2"   , "VLQ mothers", 61, -30.5, 30.5,61, -30.5, 30.5);
+  VLQ_E_daughters = book<TH2F>("VLQ_E_daughters"   , "VLQ E daughters", 100, 0, 3000, 100, 0, 3000);
+  VLQ_Eratio_daughters = book<TH1F>("VLQ_Eratio_daughters"   , "VLQ E_{ratio} daughters", 100, 0, 5);
+  VLQ_pt_daughters = book<TH2F>("VLQ_pt_daughters"   , "VLQ pt daughters", 100, 0, 1000, 100, 0, 1000);
+  VLQ_ptratio_daughters = book<TH1F>("VLQ_ptratio_daughters"   , "VLQ pt_{ratio} daughters", 100, 0, 5);
 
   deltaR_w   = book<TH1F>("deltaR_w "   , "#Delta R(W_{1},W_{2})", 100, 0, 8);
   deltaPhi_w = book<TH1F>("deltaPhi_w"  , "#Delta #phi(W_{1},W_{2})", 100, 0, 4);
 
+   deltaPhi_t_w = book<TH1F>("deltaPhi_t_w","#delta #phi (t,W)", 100, 0, 8);
+   deltaEta_t_w = book<TH1F>("deltaEta_t_w","#delta #eta (t,W)", 100, 0, 8);
+   deltaPhi_deltaEta_t_w = book<TH2F>("deltaPhi_deltaEta_t_w","", 100, 0, 8, 100,0,8);  
 }
 
 
@@ -181,6 +188,30 @@ void VLQGenHists::fill(const Event & event){
     
     if(abs(daughter1_pdgId)>6000000 || abs(daughter2_pdgId)>6000000){
       VLQ_mother->Fill(igenp.pdgId(),weight);
+    }
+    //Energy & pt ratios of daughters of VLQ
+    if(abs(igenp.pdgId())>6000000){
+      //cout<<"Found B'"<<endl;
+      //cout<<abs(daughter1_pdgId)<<" "<<abs(daughter2_pdgId)<<endl;
+      if(abs(daughter1_pdgId) > 0 && abs(daughter2_pdgId) > 0){
+	//cout<<abs(daughter1_pdgId)<<" "<<abs(daughter2_pdgId)<<endl;
+	//cout<<"Gen t,W delta phi "<<deltaPhi(daughter1->v4(),daughter2->v4())<<" delta eta "<<abs(daughter2->v4().eta()-daughter1->v4().eta())<<endl; 
+	deltaPhi_t_w->Fill(deltaPhi(daughter1->v4(),daughter2->v4()),weight);
+	deltaEta_t_w->Fill(abs(daughter2->v4().eta()-daughter1->v4().eta()),weight);
+	deltaPhi_deltaEta_t_w->Fill(deltaPhi(daughter1->v4(),daughter2->v4()),abs(daughter2->v4().eta()-daughter1->v4().eta()),weight);
+	if(abs(daughter1_pdgId)==6){
+	  VLQ_E_daughters->Fill(daughter1->energy(),daughter2->energy(),weight);
+	  VLQ_Eratio_daughters->Fill(daughter1->energy()/daughter2->energy(),weight);
+	  VLQ_pt_daughters->Fill(daughter1->pt(),daughter2->pt(),weight);
+	  VLQ_ptratio_daughters->Fill(daughter1->pt()/daughter2->pt(),weight);
+	}
+	else if(abs(daughter1_pdgId)==24){
+	  VLQ_E_daughters->Fill(daughter2->energy(),daughter1->energy(),weight);
+	  VLQ_Eratio_daughters->Fill(daughter2->energy()/daughter1->energy(),weight);
+	  VLQ_pt_daughters->Fill(daughter2->pt(),daughter1->pt(),weight);
+	  VLQ_ptratio_daughters->Fill(daughter2->pt()/daughter1->pt(),weight);
+	}
+      }
     }
     //forwardJet
     if(abs(daughter1_pdgId) < 5 && abs(daughter2_pdgId) > 6000000)forwardJet.push_back(*daughter1);

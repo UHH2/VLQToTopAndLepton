@@ -30,7 +30,7 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   mass_had = book_BaseHists("Mass_had","had. Hypothesis",50,3000); 
 
   forward = book_BaseHists("forward_jet","forward Jet",0,100,20,400);
-  balance = book_BaseHists("balance_jet","balance Jet",0,100,20,400); 
+  //balance = book_BaseHists("balance_jet","balance Jet",0,100,20,400); 
   combination = book_BaseHists("combination","forward + balance Jet",20,400,20,400); 
   no_forwardJet= book_BaseHists("no_forward_Jet","no forward Jet",50,3000); 
 
@@ -97,8 +97,8 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   chi_deltaR_w_top = book<TH2F>("chi_deltaR_w_top","#Chi^{2} - #Delta R (t,W)", 100, 0, 80, 100,0,6);  
   
   //forward Jet TH1F/TH2F
-  //deltaR_forward_B = book<TH1F>("deltaR_forward_B","#Delta R (Jet_{forward},whad)", 100, 0,8); 
-  //forward_pt_eta = book<TH2F>("forward_pt_eta","Jet_{forward} pT #eta", 100, 0, 250, 100,-8,8);  
+  deltaR_forward_B = book<TH1F>("deltaR_forward_B","#Delta R (Jet_{forward},whad)", 100, 0,8); 
+  forward_pt_eta = book<TH2F>("forward_pt_eta","Jet_{forward} pT #eta", 100, 0, 250, 100,-8,8);  
   
   //matching studies
   matched_top_lep          = book_BaseHists("matched_top_lep","Top_{lep,match}");
@@ -112,6 +112,21 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   matched_top_unmatched_W  = book_BaseHists("matched_top_unmatched_W","Top_{match} with W_{unmatch}");
   matched_W_unmatched_top  = book_BaseHists("matched_W_unmatched_top","W_{match} with Top_{unmatch}");
 
+  reco_pt_tW    = book<TH2F>("reco_pt_tW","Reco. p_{T,t} p_{T,W}", 100, 0, 1000,100,0,1000);
+  gen_pt_tW    = book<TH2F>("gen_pt_tW","Gen. p_{T,t} p_{T,W}", 100, 0, 1000,100,0,1000);
+
+  deltaPhi_tlep_whad = book<TH1F>("deltaPhi_tlep_whad","#Delta #phi (t_{lep},W_{had})", 100, 0, 8);
+  deltaEta_tlep_whad = book<TH1F>("deltaEta_tlep_whad","#delta #eta (t_{lep},W_{had})", 100, 0, 8);
+  deltaPhi_thad_wlep = book<TH1F>("deltaPhi_thad_wlep","#Delta #phi (t_{had},W_{lep})", 100, 0, 8);
+  deltaEta_thad_wlep = book<TH1F>("deltaEta_thad_wlep","#Delta #eta (t_{had},W_{lep})", 100, 0, 8);
+
+  deltaPhi_deltaEta_tlep_whad = book<TH2F>("deltaPhi_deltaEta_tlep_whad","", 100, 0, 8, 100,0,8); 
+  deltaPhi_deltaEta_thad_wlep = book<TH2F>("deltaPhi_deltaEta_thad_wlep","", 100, 0, 8, 100,0,8); 
+
+  
+  dR_forwardJet_bprime = book<TH1F>("dR_forwardJet_bprime","#Delta R (forwardJet,B)", 100, 0, 8);
+  deltaPhi_forwardJet_bprime = book<TH1F>("deltaPhi_forwardJet_bprime","#Delta #phi (forwardJet,B)", 100, 0, 5);
+  deltaEta_forwardJet_bprime = book<TH1F>("deltaEta_forwardJet_bprime","#Delta #eta (forwardJet,B)", 100, 0, 8);
 
   recohyp = ctx.get_handle<BprimeContainer>(hyp_name);
   gen = ctx.get_handle<BprimeGenContainer>("BprimeGen");
@@ -128,11 +143,31 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   LorentzVector thad = hyp.get_topHad();
   LorentzVector tlep = hyp.get_topLep();
   LorentzVector bprime;
+  std::vector<LorentzVector> jets_top = hyp.get_topLorentz();
+  std::vector<LorentzVector> jets_whad = hyp.get_wHadLorentz();
   double chiVal = hyp.get_chiVal();
   int recotype = hyp.get_RecoTyp();
   //vector<Jet>* jets = event.jets;
 
   double matching_distance = 0.4;
+   
+
+  if(recotype ==2 && !event.isRealData){
+    if(thad.pt()>=400 && thad.pt()<=550)
+      weight *= 0.784769;
+    else if(thad.pt()>550)
+      weight *= 0.772755;
+  }
+
+  /*
+  if(whad.M2()>30)
+    whad.SetE(sqrt(80.4*80.4+whad.Px()*whad.Px()+whad.Py()*whad.Py()+whad.Pz()*whad.Pz()));
+  if(thad.M2()>30)
+    thad.SetE(sqrt(175*175+thad.Px()*thad.Px()+thad.Py()*thad.Py()+thad.Pz()*thad.Pz()));
+  if(tlep.M2()>30)
+    tlep.SetE(sqrt(175*175+tlep.Px()*tlep.Px()+tlep.Py()*tlep.Py()+tlep.Pz()*tlep.Pz()));
+  */
+ 
 
   //cout<<recotype<<endl;
   /*
@@ -142,16 +177,40 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   */
   //special treatment since topjets are not needed or filled for toptags
 
-  if(recotype==11||recotype==6)
+  if(recotype==11||recotype==6){
     bprime = tlep+whad;
-  else if(recotype==12 || recotype==2)
+    reco_pt_tW->Fill(tlep.pt(),whad.pt(),weight);
+    //cout<< "tlep,Whad delta phi "<<deltaPhi(tlep,whad)<<" delta eta "<<abs(tlep.eta()-whad.eta())<<endl; 
+    deltaPhi_tlep_whad->Fill(deltaPhi(tlep,whad),weight);
+    deltaEta_tlep_whad->Fill(abs(tlep.eta()-whad.eta()),weight);
+    deltaPhi_deltaEta_tlep_whad->Fill(deltaPhi(tlep,whad),abs(tlep.eta()-whad.eta()),weight);
+  }
+  else if(recotype==12 || recotype==2){
     bprime = thad+wlep;
-
+    reco_pt_tW->Fill(thad.pt(),wlep.pt(),weight);
+    deltaPhi_thad_wlep->Fill(deltaPhi(thad,wlep),weight);
+    deltaEta_thad_wlep->Fill(abs(thad.eta()-wlep.eta()),weight);
+    deltaPhi_deltaEta_thad_wlep->Fill(deltaPhi(thad,wlep),abs(thad.eta()-wlep.eta()),weight);
+    //cout<< "thad,Wlep delta phi "<<deltaPhi(thad,wlep)<<" delta eta "<<abs(thad.eta()-wlep.eta())<<endl; 
+  }
+  
   if(recotype!=2)
     fill_BaseHists(topJets+whad+wlep, mass, weight);
   else if(recotype==2)
     fill_BaseHists(thad+wlep, mass, weight);
   
+
+  if(jets_top.size() ==1 && jets_whad.size() ==2 && 1==2){
+    cout<<"======================================================================================="<<endl;
+    cout<<"Reco Type "<<recotype<<" chi2 "<<chiVal<<" B Mass "<<bprime.M()<<" Top lep Mass "<<tlep.M()<<" W had Mass "<<whad.M()<<endl;
+    cout<<"W_lep: Mass "<<wlep.M()<<" ("<<wlep.px()<<","<<wlep.py()<<","<<wlep.pz()<<","<<wlep.energy()<<")"<<endl; 
+    cout<<"Top_jets ("<<jets_top[0].px()<<","<<jets_top[0].py()<<","<<jets_top[0].pz()<<","<<jets_top[0].energy()<<")"<<endl; 
+    cout<<"W_had :"<<endl;
+    cout<<"jet1 ("<<jets_whad[0].px()<<","<<jets_whad[0].py()<<","<<jets_whad[0].pz()<<","<<jets_whad[0].energy()<<")"<<endl; 
+    cout<<"jet2 ("<<jets_whad[1].px()<<","<<jets_whad[1].py()<<","<<jets_whad[1].pz()<<","<<jets_whad[1].energy()<<")"<<endl; 
+  }
+
+
   fill_BaseHists(whad, wHad, weight);
   fill_BaseHists(wlep, wLep, weight);
   chiDis->Fill(chiVal,weight);
@@ -185,6 +244,13 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     chi_top_pT->Fill(chiVal,tlep.pt(),weight);
     if(recotype==11) chiDis_lep->Fill(chiVal,weight);
   }
+
+  //most forward jet
+  LorentzVector forwardJet (0,0,0,0);
+  LorentzVector balanceJet (0,0,0,0);
+  for(auto jet : *event.jets)
+    if(abs(forwardJet.eta())<abs(jet.eta()))
+      forwardJet = jet.v4();
   /*
   //forward Jet
   LorentzVector forwardJet (0,0,0,0);
@@ -211,21 +277,30 @@ void BprimeHypHists::fill(const uhh2::Event & event){
 	}
     }
   }
+
+  */
+  
   if(forwardJet.pt()>0){
+    dR_forwardJet_bprime->Fill(deltaR(bprime,forwardJet),weight);
+    deltaPhi_forwardJet_bprime->Fill(deltaPhi(bprime,forwardJet),weight);
+    deltaEta_forwardJet_bprime->Fill(abs(bprime.eta()-forwardJet.eta()),weight);
     fill_BaseHists(forwardJet,forward,weight);
-    fill_BaseHists(forwardJet+balanceJet+whad+wlep+topJets,combination,weight);
+    //fill_BaseHists(forwardJet+balanceJet+whad+wlep+topJets,combination,weight);
     deltaR_forward_B->Fill(deltaR(forwardJet,whad),weight);
     forward_pt_eta->Fill(forwardJet.pt(),forwardJet.eta(),weight);
   }
-  else
-    fill_BaseHists(whad+wlep+topJets,no_forwardJet,weight);
-  */
+  //else
+  //  fill_BaseHists(whad+wlep+topJets,no_forwardJet,weight);
+  
+
   /*
   if(balanceJet.pt()>0)fill_BaseHists(balanceJet,balance,weight);
   */
 
   if(event.isRealData) return;
   BprimeGenContainer GenInfo = event.get(gen);
+  //cout<<" Reco Type "<<recotype << " pT B "<<bprime.pt()<< " t lep "<<tlep.pt()<<" w had "<< whad.pt()<< " t had "<<thad.pt()<<" w lep "<< wlep.pt()<<" Gen t lep "<<GenInfo.get_topLep().pt()<<" w had "<< GenInfo.get_wHad().pt()<<" t had "<<GenInfo.get_topHad().pt()<<" w lep "<< GenInfo.get_wLep().pt() <<endl;
+  
   if(GenInfo.get_wHad().pt()>0){
     wHad_res_pt->Fill((GenInfo.get_wHad().pt()-whad.pt())/GenInfo.get_wHad().pt(),weight);   
     wHad_res_E->Fill((GenInfo.get_wHad().E()-whad.E())/GenInfo.get_wHad().E(),weight);       
@@ -260,6 +335,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
 
   }
   if(GenInfo.get_topLep().pt()>0 && (recotype==11 || recotype==0 || recotype==6)){
+    gen_pt_tW->Fill(GenInfo.get_topLep().pt(),GenInfo.get_wHad().pt(),weight);
     topReco_dR_pT_lep->Fill(deltaR(GenInfo.get_topLep(),wlep+topJets),GenInfo.get_topLep().pt(),weight);   
     topReco_dR_pTres_lep->Fill(deltaR(GenInfo.get_topLep(),wlep+topJets),(GenInfo.get_topLep().pt()-(wlep+topJets).pt())/GenInfo.get_topLep().pt(),weight);
     topLep_res_pt->Fill((GenInfo.get_topLep().pt()-(wlep+topJets).pt())/GenInfo.get_topLep().pt(),weight);     
@@ -289,6 +365,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     }
   }
   if(GenInfo.get_topHad().pt()>0 && (recotype==12 || recotype==0 || recotype==2)){
+    gen_pt_tW->Fill(GenInfo.get_topHad().pt(),GenInfo.get_wLep().pt(),weight);
     topReco_dR_pT_had->Fill(deltaR(GenInfo.get_topHad(),thad),GenInfo.get_topHad().pt(),weight);   
     topReco_dR_pTres_had->Fill(deltaR(GenInfo.get_topHad(),thad),(GenInfo.get_topHad().pt()-(thad).pt())/GenInfo.get_topHad().pt(),weight);
     topHad_res_pt->Fill((GenInfo.get_topHad().pt()-(thad).pt())/GenInfo.get_topHad().pt(),weight);   
@@ -321,6 +398,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     Bprime_res_eta->Fill(abs(GenInfo.get_bprime().eta()-bprime.eta()),weight);  
     Bprime_res_deltaR->Fill(deltaR(GenInfo.get_bprime(),bprime),weight);  
    }
+
 }
 
 //double calc_Chi(LorentzVector top, LorentzVector w){

@@ -26,8 +26,6 @@ struct GenParticleHists
 { 
   TH1F* number, *decay_mom, *decay_daughter, *deltaRmin, *nextParticle, *deltaR_daughters;
   std::vector<singleHists> stdHists;
-  
-
 };
 
 
@@ -59,5 +57,11 @@ class VLQGenHists: public uhh2::Hists {
   TH1F* VLQ_mother;
   TH2F* VLQ_mother1_mother2;
 
+  TH2F* VLQ_pt_daughters, *VLQ_E_daughters;
+  TH1F* VLQ_ptratio_daughters, *VLQ_Eratio_daughters;
   TH1F* deltaR_w, *deltaPhi_w;
+
+   TH1F* deltaPhi_t_w, *deltaEta_t_w;
+   TH2F* deltaPhi_deltaEta_t_w;
+
 };
