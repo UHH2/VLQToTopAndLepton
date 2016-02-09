@@ -8,6 +8,7 @@
 
 #include "UHH2/VLQToTopAndLepton/include/BprimeRecoHists.h"
 #include "UHH2/VLQToTopAndLepton/include/BprimeHypHists.h"
+#include "UHH2/VLQToTopAndLepton/include/BprimeUncerHists.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 #include "UHH2/VLQToTopAndLepton/include/EventKinematicHists.h"
 
@@ -84,47 +85,103 @@ void HistFactory::addAnalysisModule(unique_ptr<uhh2::AnalysisModule> module){
 
 void HistFactory::addHists(const string& histClass, const string& histName, const string & hyp_name){
   unique_ptr<Hists> histTemplate;
+  vector<unique_ptr<Hists>> uncerHistsTemplate;
   for(const auto & cutName : cutNames){
     stringstream ss;
     if(!cutName.empty()) ss<<cutName<<"_"<<histName;
     else  ss<<histName;
     if(histClass.compare("ElectronHists")==0) {
       histTemplate.reset(new ElectronHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new ElectronHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
     }
     else if(histClass.compare("MuonHists")==0){
       histTemplate.reset(new MuonHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new MuonHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
     }
     else if(histClass.compare("JetHists")==0){
       histTemplate.reset(new JetHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new JetHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
     }
     else if(histClass.compare("EventHists")==0){
       histTemplate.reset(new EventHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new EventHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
     }
     else if(histClass.compare("TopJetHists")==0){
       histTemplate.reset(new TopJetHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new TopJetHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
     }
     else if(histClass.compare("VLQGenHists")==0){
       histTemplate.reset(new VLQGenHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new VLQGenHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
     }
     else if(histClass.compare("BprimeRecoHists")==0){
       histTemplate.reset(new BprimeRecoHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new BprimeRecoHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
     }
     else if(histClass.compare("BprimeHypHists")==0){
       histTemplate.reset(new BprimeHypHists(m_ctx,ss.str().c_str(),hyp_name));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new BprimeHypHists(m_ctx,(ss.str()+"_"+name).c_str(),hyp_name));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
+    }
+    else if(histClass.compare("BprimeUncerHists")==0){
+      histTemplate.reset(new BprimeUncerHists(m_ctx,ss.str().c_str(),hyp_name));
     }
     else if(histClass.compare("LuminosityHists")==0){
       histTemplate.reset(new LuminosityHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new LuminosityHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
     }
     else if(histClass.compare("EventKinematicHists")==0){
       histTemplate.reset(new EventKinematicHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new EventKinematicHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
     }
     else
       cerr<<"You ask for a not supported hist class, please check spelling or add class";
     factoryHists.push_back(move(histTemplate));
+    factoryUncer.push_back(move(uncerHistsTemplate));
   }
 }
 void HistFactory::addHists(const string& histName, JetId jetid){
   unique_ptr<JetHists> histTemplate;
+  vector<unique_ptr<Hists>> uncerHistsTemplate;
   for(const auto & cutName : cutNames){
     stringstream ss;
     if(!cutName.empty()) ss<<cutName<<"_"<<histName;
@@ -132,10 +189,19 @@ void HistFactory::addHists(const string& histName, JetId jetid){
     histTemplate.reset(new JetHists(m_ctx,ss.str().c_str()));
     histTemplate->set_JetId(jetid);
     factoryHists.push_back(move(histTemplate));
+    for(auto & name : uncerNames){
+	unique_ptr<JetHists> uncerHists;
+	uncerHists.reset(new JetHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHists->set_JetId(jetid);
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
+    factoryUncer.push_back(move(uncerHistsTemplate));
   }
 }
+
 void HistFactory::addHists(const string& histName, TopJetId topjetid){
   unique_ptr<TopJetHists> histTemplate;
+  vector<unique_ptr<Hists>> uncerHistsTemplate;
   for(const auto & cutName : cutNames){
     stringstream ss;
     if(!cutName.empty()) ss<<cutName<<"_"<<histName;
@@ -143,7 +209,19 @@ void HistFactory::addHists(const string& histName, TopJetId topjetid){
     histTemplate.reset(new TopJetHists(m_ctx,ss.str().c_str()));
     histTemplate->set_TopJetId(topjetid);
     factoryHists.push_back(move(histTemplate));
+    for(auto & name : uncerNames){
+	unique_ptr<TopJetHists> uncerHists;
+	uncerHists.reset(new TopJetHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHists->set_TopJetId(topjetid);
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
+    factoryUncer.push_back(move(uncerHistsTemplate));
   }
+}
+
+void HistFactory::ScaleUncer(){ 
+  uncerNames.push_back("ScaleUp_plus");
+  uncerNames.push_back("ScaleDown_minus");
 }
 
 //passOption: 0 event has to pass all cuts, 1 event passes this cut
@@ -171,8 +249,10 @@ bool HistFactory::passAndFill(Event & event, int passOption){
 	cutflow_raw->Fill(cuti);
 	cutflow_weighted->Fill(cuti, event.weight);
       }
-      for(unsigned int i = 0;i<hist_number;++i)
+      for(unsigned int i = 0;i<hist_number;++i){
 	factoryHists[cuti+i*(selectionClasses.size()+1)]->fill(event);
+	fillScaleUncer(event,cuti+i*(selectionClasses.size()+1));
+      }
       if(effiprint){
 	count[cuti] = count[cuti]+1;
 	weighted_count[cuti] = weighted_count[cuti]+event.weight;
@@ -199,4 +279,30 @@ void HistFactory::create_histos(){
   }
   m_ctx.put("cutflow", cutflow_raw);
   m_ctx.put("cutflow", cutflow_weighted);
+}
+
+
+void HistFactory::fillScaleUncer(Event & event,unsigned int i){
+  if(event.isRealData) return;
+  if(event.genInfo->systweights().size() ==0) return;
+  if(uncerNames.size()==0) return;
+  double syst_downWeight =1.;
+  double syst_upWeight =1.;
+  double old_weight = event.weight;
+  for(unsigned int it=1; it <9; it++){
+    if(it == 5 || it == 7) continue;
+    double temp_weight = event.genInfo->systweights().at(it)/event.genInfo->originalXWGTUP();
+    if(temp_weight<syst_downWeight) syst_downWeight = temp_weight;
+    if(temp_weight>syst_upWeight) syst_upWeight = temp_weight;
+  }
+  //for(unsigned int i= 0; i<uncerNames.size();i++ ){
+  //cout<<"Up weight "<<syst_upWeight<<" Down weight "<<syst_downWeight<<endl;
+
+  event.weight *=syst_upWeight;
+  factoryUncer.at(i).at(0)->fill(event);
+  event.weight = old_weight;
+  event.weight *= syst_downWeight;
+  factoryUncer.at(i).at(1)->fill(event);
+  event.weight = old_weight;
+  //}
 }
