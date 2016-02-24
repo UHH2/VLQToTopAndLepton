@@ -80,8 +80,8 @@ TriggerTestModule::TriggerTestModule(Context& ctx){
   genMuon.reset(new GenNSelection(13,1,1,20,-1));
   recoMuon.reset(new NMuonSelection(1,1));
 
-  jetcleaner.reset(new JetCleaner(30.0, 2.4));
-  jetCorr.reset(new JetCorrector(ctx,JERFiles::PHYS14_L123_MC));
+  jetcleaner.reset(new JetCleaner(ctx,30.0, 2.4));
+  jetCorr.reset(new JetCorrector(ctx,JERFiles::Summer15_25ns_L123_AK4PFchs_MC));
   elecleaner.reset(new ElectronCleaner(AndId<Electron>(ElectronID_Spring15_50ns_medium, PtEtaCut(30.0, 2.4))));
   mucleaner.reset(new MuonCleaner(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 3.0))));
 

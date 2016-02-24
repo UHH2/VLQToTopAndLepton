@@ -93,8 +93,8 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   common->set_muon_id(softMuon);
   common->switch_jetlepcleaner();
   common->switch_jetPtSorter();
-  common->init(ctx);
   common->set_HTjetid(softjet);
+  common->init(ctx);
 
   channelSel.add<NElectronSelection>("0Electrons",0,0);
   channelSel.add<NMuonSelection>("1Muon",1,1,muid_cut);
@@ -212,12 +212,13 @@ bool GenTestModule::process(Event & event){
   if(!common->process(event)) return false;
   
   lepton->process(event);
-  if(!event.isRealData && 1==0){
+  if(!event.isRealData){
     //event.weight *= 0.95;
     //bBprimeFactory->passAndFill(event);
     vlqGenHists->fill(event);  
     wMuonFactory->passAndFill(event);
     topWMuonFactory->passAndFill(event);
+    
   }
   //Reco->massReco(event);
   //channelSel.passes(event);  
