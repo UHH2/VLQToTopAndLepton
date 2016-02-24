@@ -80,7 +80,7 @@
 
 <!--
    <ConfigParse NEventsBreak="0" FileSplit="20" AutoResubmit="1"/>
-   <ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.PreSel_v22"/>
+   <ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.PreSel_v24"/>
 -->
 
 
@@ -89,16 +89,14 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v22/" PostFix="" TargetLumi="2110">
+    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v24/" PostFix="" TargetLumi="2110">
     <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="10" OutputDirectory="./PreSelection_v1/" PostFix="" TargetLumi="552.4" >-->
-
       <InputData Lumi="1" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">
         &DATA_SingleMu;
 	&DATA_SingleMu2;
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
-
       <InputData Lumi="293779" NEventsMax="-1" Type="MC" Version="Bpt_TW_800_LH_25ns" Cacheable="False">
         &Bpt_TW_800_LH;
         <InputTree Name="AnalysisTree" />
@@ -131,6 +129,7 @@
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
+
                        
       <InputData Lumi="116421" NEventsMax="-1" Type="MC" Version="TTJets" Cacheable="False">
 	&TTbar;
@@ -213,6 +212,9 @@
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
+
+
+
 <!--
 	<InputData Lumi="2.985" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-30to50_Mu" Cacheable="False">
 	  &MC_QCD_Pt-30to50_Mu;
@@ -220,6 +222,7 @@
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
 -->
+
 	<InputData Lumi="11.53" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-50to80_Mu" Cacheable="False">
 	  &MC_QCD_Pt-50to80_Mu;
 	  <InputTree Name="AnalysisTree" />
@@ -267,7 +270,6 @@
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-
 <!--
 	<InputData Lumi="0.919" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-15to20_Em" Cacheable="False">
 	  &MC_QCD_Pt-15to20_Em;
@@ -322,7 +324,6 @@
 	<InputTree Name="AnalysisTree" />
 	<OutputTree Name="AnalysisTree" />
       </InputData>
-
 <!--
      <InputData Lumi="60501928.33" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
         &WJets;
@@ -441,14 +442,13 @@
 	</InputData>
 -->
 
-
 <!--
 	<InputData Lumi="" NEventsMax="-1" Type="MC" Version="ZJetsM10to50" Cacheable="False">
           &ZJetsM10to50;
           <InputTree Name="AnalysisTree" /> 
           <OutputTree Name="AnalysisTree" />
           </InputData>
- -->
+-->
         <UserConfig>
             <!-- define which collections to read from the input. Only specify what you need to save I/O time -->
             <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices" /> 
@@ -468,9 +468,21 @@
 	    <!--<Item Name="pileup_directory" Value=""/>-->
 	    <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/marchesi/PUData/25ns_v2/MyDataPileupHistogram.root" />
 	    <Item Name="pileup_directory_25ns" Value="/nfs/dust/cms/user/nowatsd/PUHistogram-25ns-v2/Pileup.MC.TTbar.root"/>
+
+	    <Item Name="jecsmear_direction" Value="nominal" />
+	    <Item Name="jersmear_direction" Value="nominal" />
+	    
+	    <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/scripts/BTagMCEfficiencyHistsMu.root" />
+	    <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/common/data/CSVv2.csv" /> 
+	    <Item Name="SF_muonID" Value="nominal" /> 
+	    <Item Name="BTag_variation" Value="central" />
+
+	    <Item Name="PU_variation" Value="central" />
+	    <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/common/data/MyDataPileupHistogram_JSON_Golden_up.root" />
+	    <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/common/data/MyDataPileupHistogram_JSON_Golden_down.root" />
+
             <!-- The list of available collections to read in corresponds to the pointer members in event. The 'Name's to use here in the configuration are:
-            
-                 PrimaryVertexCollection
+		 PrimaryVertexCollection
                  ElectronCollection
                  MuonCollection
                  TauCollection
