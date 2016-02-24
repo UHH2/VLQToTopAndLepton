@@ -27,6 +27,12 @@ void BprimeUncerHists::fill(const uhh2::Event & event){
 
   if(event.isRealData) return;
 
+  if(recotype ==2 && !event.isRealData){
+    if(thad.pt()>=400 && thad.pt()<=550)
+      weight *= 0.784769;
+    else if(thad.pt()>550)
+      weight *= 0.772755;
+  }
 
   if(recotype==11||recotype==6){
     bprime = tlep+whad;

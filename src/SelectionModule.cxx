@@ -7,6 +7,7 @@
 #include "UHH2/core/include/GenParticle.h"
 #include "UHH2/core/include/Selection.h"
 
+#include "UHH2/common/include/CommonModules.h"
 #include "UHH2/common/include/EventVariables.h"
 #include "UHH2/common/include/ElectronIds.h"
 #include "UHH2/common/include/MuonIds.h"
@@ -47,6 +48,8 @@ public:
 
 private:
   string Version;
+
+  std::unique_ptr<CommonModules> common;
   std::unique_ptr<BprimeRecoHists> RecoHists;
   std::unique_ptr<BprimeDiscriminator> chi2_combo, chi2_tlep, chi2_thad, ttbar, cmstoptagDis, heptoptagDis, chi2_wtag;
   std::unique_ptr<AnalysisModule> ht, lepton, jetReweight;//, OptTree
@@ -64,44 +67,50 @@ private:
   std::unique_ptr<JetHists> btag_jetHists;
   std::unique_ptr<Hists> jetHists_sortbyeta, genjet_hists;
   std::unique_ptr<Hists> twoDjetHists_sortbyeta;
-  std::unique_ptr<MCPileupReweight> pileup_weights;
   //std::unique_ptr<TopJetCleaner> topjetcleaner;
   JetId subBtag, btag_medium,btag_tight,btag_loose, eta_cut, ak4ForwardId, ak4CentralId, jet;
   TopJetId topjetid,wjetId,heptopjetid;
   std::unique_ptr<Selection> hepselection;  
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffiHists;
-  
   std::unique_ptr<AnalysisModule> BTagScaleFactors,SF_muonID;
+
+  string SF_muonID_variation ="nominal";
+  string BTag_variation ="central";
+  string PU_variation ="central";
+
 };
 
 SelectionModule::SelectionModule(Context& ctx){
+ 
+
   //OptTree.reset(new OptTreeModule(ctx));
+  jet = PtEtaCut(40,3);
   
+  double forward_low = 2;
+  double forward_upper = 5;
+  double central_low = 0;
+  double central_upper = 2;
 
-  // output from Julie's fit //////////////////////////////////////////
-  /*
-    Minimizer is Linear
-    Chi2                      =      9.97134
-    NDf                       =            9
-    p0                        =      1.09771   ±   0.0384644
-    p1                        = -0.000517529   ±   9.94895e-05
-    covariance p0-p0 = 0.0014795109823
-    covariance p0-p1 = -3.6104869696e-06
-    covariance p1-p1 = 9.89815635815e-09
-  */
-  //////////////////////////////////////////
-  // parameters to get the sf per jet
-  float jetsf_p0 = 1.09771;
-  float jetsf_p1 = -0.000517529;
-  // get error from covariance matrix, again, values are taken from Julie
-  float cov_p0_p0 = 0.0014795109823;
-  float cov_p0_p1 = -3.6104869696e-06;
-  float cov_p1_p1 = 9.89815635815e-09; 
+  //variations
+  SF_muonID_variation = ctx.get("SF_muonID");
+  BTag_variation =  ctx.get("BTag_variation");
+  PU_variation = ctx.get("PU_variation");
+ //common modules
+  common.reset(new CommonModules());
+  common->disable_jersmear();
+  common->disable_jec();
+  common->disable_lumisel();
+  common->disable_metfilters();
+  common->disable_pvfilter();
+  common->disable_jetpfidfilter();
+  common->init(ctx,PU_variation);
 
-  jetReweight.reset(new JetPtAndMultFixerWeight<Jet>(ctx, "genjets", jetsf_p0, jetsf_p1, cov_p0_p0, cov_p0_p1, cov_p1_p1, "weight_ak4_jetpt",true));
-  jet = PtEtaCut(40,2.4);
-  pileup_weights.reset(new MCPileupReweight(ctx));
-  SF_muonID.reset(new MCMuonScaleFactor(ctx, "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/common/data/MuonID_Z_RunD_Reco74X_Nov20.root", "NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1", 1, "mediumID", "nominal")); 
+  //Muon ScaleFactors
+  SF_muonID.reset(new MCMuonScaleFactor(ctx, "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/common/data/MuonID_Z_RunD_Reco74X_Nov20.root", "NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1", 1, "mediumID", SF_muonID_variation)); 
+  //BTag Effi & Scale
+  BTagEffiHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_MEDIUM));
+  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_MEDIUM,"jets",BTag_variation));
+
   wjetId = AndId<TopJet>(WMass(),Tau21(0.5));
   ak4ForwardId = PtEtaCut(30.0,5,-1,2);
   ak4CentralId = PtEtaCut(30.0,2,-1,-1);
@@ -122,9 +131,6 @@ SelectionModule::SelectionModule(Context& ctx){
   //Event::Handle<std::vector<TopJet>> heptopjets_handle = ctx.get_handle<std::vector<TopJet>>("patJetsHepTopTagCHSPacked_daughters");
   //WTagReco.reset(new BprimeReco(ctx,"WTagReco"));
   //WTagReco->set_wjetRecoId(wjetId);
-
-  BTagEffiHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_MEDIUM));
-  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_MEDIUM));
 
   Gen.reset(new BprimeGen(ctx)); 
   eta_cut = PtEtaCut(20.0,2.6);
@@ -162,7 +168,7 @@ SelectionModule::SelectionModule(Context& ctx){
   TagPlots->addAndSelection(make_uvec(make_unique<NTopJetSelection>(0,0,topjetid),make_unique<NJetSelection>(0,0,btag_medium)),"AntiTopTag_AntiBTag");
   TagPlots->addAndSelection(make_uvec(make_unique<NTopJetSelection>(0,0,topjetid),make_unique<NJetSelection>(1,1,btag_medium)),"AntiTopTag_BTag");
   TagPlots->addAndSelection(make_uvec(make_unique<NTopJetSelection>(0,0,topjetid),make_unique<NJetSelection>(2,-1,btag_medium)),"AntiTopTag_2_BTag");
-  TagPlots->addSelection(make_unique<ForwardJetPtEtaCut>(2,-1,30),"ForwardJetEta_2");
+  TagPlots->addSelection(make_unique<ForwardJetPtEtaCut>(forward_low,forward_upper,30),"ForwardJetEta_2");
   //TagPlots->addAndSelection(make_uvec(make_unique<NTopJetSelection>(0,0,heptopjetid),make_unique<NJetSelection>(0,0,btag_medium)),"AntiHEPTopTag_AntiBTag");
   //TagPlots->addAndSelection(make_uvec(make_unique<NTopJetSelection>(0,0,heptopjetid),make_unique<NJetSelection>(1,1,btag_medium)),"AntiHEPTopTag_BTag");
   //TagPlots->addAndSelection(make_uvec(make_unique<NTopJetSelection>(0,0,heptopjetid),make_unique<NJetSelection>(2,-1,btag_medium)),"AntiHEPTopTag_2_BTag");
@@ -203,14 +209,14 @@ SelectionModule::SelectionModule(Context& ctx){
   Chi2Plots->addSelection(make_unique<NJetSelection>(2,-1,btag_medium),"Chi2_2plus_BTags");
   Chi2Plots->addSelection(make_unique<NJetSelection>(0,0,btag_medium),"Chi2_AntiBTag");
   */
-  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(1,1,btag_medium),make_unique<ForwardJetPtEtaCut>(2,5,30)),"Chi2_1_BTag_Forward");
-  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(2,2,btag_medium),make_unique<ForwardJetPtEtaCut>(2,5,30)),"Chi2_2_BTags_Forward");
-  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(2,-1,btag_medium),make_unique<ForwardJetPtEtaCut>(2,5,30)),"Chi2_2plus_BTags_Forward");
-  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(0,0,btag_medium),make_unique<ForwardJetPtEtaCut>(2,5,30)),"Chi2_AntiBTag_Forward");
-  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(1,1,btag_medium),make_unique<ForwardJetPtEtaCut>(0,2,30)),"Chi2_1_BTag_Central");
-  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(2,2,btag_medium),make_unique<ForwardJetPtEtaCut>(0,2,30)),"Chi2_2_BTags_Central");
-  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(2,-1,btag_medium),make_unique<ForwardJetPtEtaCut>(0,2,30)),"Chi2_2plus_BTags_Central");
-  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(0,0,btag_medium),make_unique<ForwardJetPtEtaCut>(0,2,30)),"Chi2_AntiBTag_Central");
+  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(1,1,btag_medium),make_unique<ForwardJetPtEtaCut> (forward_low,forward_upper,30)),"Chi2_1_BTag_Forward");
+  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(2,2,btag_medium),make_unique<ForwardJetPtEtaCut> (forward_low,forward_upper,30)),"Chi2_2_BTags_Forward");
+  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(2,-1,btag_medium),make_unique<ForwardJetPtEtaCut>(forward_low,forward_upper,30)),"Chi2_2plus_BTags_Forward");
+  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(0,0,btag_medium),make_unique<ForwardJetPtEtaCut> (forward_low,forward_upper,30)),"Chi2_AntiBTag_Forward");
+  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(1,1,btag_medium),make_unique<ForwardJetPtEtaCut> (central_low,central_upper,30)),"Chi2_1_BTag_Central");
+  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(2,2,btag_medium),make_unique<ForwardJetPtEtaCut> (central_low,central_upper,30)),"Chi2_2_BTags_Central");
+  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(2,-1,btag_medium),make_unique<ForwardJetPtEtaCut>(central_low,central_upper,30)),"Chi2_2plus_BTags_Central");
+  Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(0,0,btag_medium),make_unique<ForwardJetPtEtaCut> (central_low,central_upper,30)),"Chi2_AntiBTag_Central");
   /*
   Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(1,1,btag_medium) ,make_unique<NTopJetSelection>(1,-1,wjetId)),"Chi2_1_BTag_WTag");
   Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(2,2,btag_medium) ,make_unique<NTopJetSelection>(1,-1,wjetId)),"Chi2_2_BTags_WTag");
@@ -241,8 +247,8 @@ SelectionModule::SelectionModule(Context& ctx){
   Chi2Plots->addAndSelection(make_uvec(make_unique<NJetSelection>(0,0,btag_medium),make_unique<ForwardJetPtEtaCut>(0,2,30),make_unique<NTopJetSelection>(0,0,wjetId)),"Chi2_AntiBTag_Central_NoWTag");
   */
 
-  Chi2Plots->addSelection(make_unique<ForwardJetPtEtaCut>(2,5,30),"Chi2_Forward");
-  Chi2Plots->addSelection(make_unique<ForwardJetPtEtaCut>(0,2,30),"Chi2_Central");
+  Chi2Plots->addSelection(make_unique<ForwardJetPtEtaCut>(forward_low,forward_upper,30),"Chi2_Forward");
+  Chi2Plots->addSelection(make_unique<ForwardJetPtEtaCut>(central_low,central_upper,30),"Chi2_Central");
 
   Chi2Plots->addHists("ElectronHists","Chi2_ElectronHists");
   Chi2Plots->addHists("MuonHists","Chi2_MuonHists");
@@ -260,8 +266,8 @@ SelectionModule::SelectionModule(Context& ctx){
   TopTagPlots.reset(new HistFactory(ctx));
   //TopTagPlots->ScaleUncer();
   //TopTagPlots->setEffiHistName("TopTagReco");
-  TopTagPlots->addSelection(make_unique<ForwardJetPtEtaCut>(2,5,30),"TopTagReco_Forward");
-  TopTagPlots->addSelection(make_unique<ForwardJetPtEtaCut>(0,2,30),"TopTagReco_Central");
+  TopTagPlots->addSelection(make_unique<ForwardJetPtEtaCut>(forward_low,forward_upper,30),"TopTagReco_Forward");
+  TopTagPlots->addSelection(make_unique<ForwardJetPtEtaCut>(central_low,central_upper,30),"TopTagReco_Central");
   //TopTagPlots->addSelection(make_unique<NJetSelection>(2,-1,btag_medium),"TopTagReco_2_BTag");
   TopTagPlots->addHists("ElectronHists","TopTagReco_ElectronHists");
   TopTagPlots->addHists("MuonHists","TopTagReco_MuonHists");
@@ -285,10 +291,9 @@ SelectionModule::SelectionModule(Context& ctx){
 }
 
 bool SelectionModule::process(Event & event){
-  pileup_weights->process(event);
+  common->process(event);
   ht->process(event);
   lepton->process(event);
-  //jetReweight->process(event); 
 
   SF_muonID->process(event);
   BTagEffiHists->fill(event);
