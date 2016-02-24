@@ -216,7 +216,24 @@ void VLQGenHists::fill(const Event & event){
     //forwardJet
     if(abs(daughter1_pdgId) < 5 && abs(daughter2_pdgId) > 6000000)forwardJet.push_back(*daughter1);
     if(abs(daughter2_pdgId) < 5 && abs(daughter1_pdgId) > 6000000)forwardJet.push_back(*daughter2);
-     
+
+    if(abs(igenp.pdgId()) <5){
+      if((abs(mother1_pdgId) <5 || abs(mother1_pdgId) ==21)  && abs(mother2_pdgId) == 0 && abs(daughter1_pdgId)==0 &&  abs(daughter2_pdgId)==0)
+	forwardJet.push_back(igenp);
+      else if(abs(mother1_pdgId) ==0 && (abs(mother2_pdgId) <5 || abs(mother2_pdgId) ==21) && abs(daughter1_pdgId)==0 &&  abs(daughter2_pdgId)==0)
+	forwardJet.push_back(igenp);
+    }
+    /*
+    if(abs(igenp.pdgId()) <5 && (abs(mother1_pdgId) == 24 || abs(mother2_pdgId) == 24)){
+      auto help1_mother1 = mother1->mother(genparticles,1)->pdgId();
+      auto help1_mother2 = mother1->mother(genparticles,2)->pdgId();
+      auto help2_mother1 = mother2->mother(genparticles,1)->pdgId();
+      auto help2_mother2 = mother2->mother(genparticles,2)->pdgId();
+      if(abs(help1_mother1) != 6 && abs(help1_mother2) != 6 && abs(help2_mother1) != 6 && abs(help2_mother2) != 6 )
+	forwardJet.push_back(igenp);
+    }
+    */
+ 
     //put all the particles in vectors
     if (abs(igenp.pdgId())> 6000000){
       vlq.push_back(igenp);
@@ -227,7 +244,7 @@ void VLQGenHists::fill(const Event & event){
     }
     
     //if(abs(igenp.pdgId())==25 ||abs(igenp.pdgId())==23)
-    //cout<<"pdgId GenParticle: "<<igenp.pdgId() <<" mom1: "<<  mother1_pdgId<<" mom2: "<< mother2_pdgId <<" daughter1: "<<  daughter1_pdgId<<" daughter2: "<< daughter2_pdgId<<endl;
+    //cout<<"pdgId GenParticle: "<<igenp.pdgId() << " eta "<<igenp.eta() <<" mom1: "<<  mother1_pdgId<<" mom2: "<< mother2_pdgId <<" daughter1: "<<  daughter1_pdgId<<" daughter2: "<< daughter2_pdgId<<endl;
     
     //Fill decay histograms  
     if(abs(mother1_pdgId)> 6000000 || abs(mother2_pdgId)> 6000000){
@@ -269,11 +286,11 @@ void VLQGenHists::fill(const Event & event){
       
     } 
   }
-
-  //cout<<forwardJet.size()<<endl;
-  //cout<<"--------------------------------------"<<endl;
-  //cout<<"--------------------------------------"<<endl;
-  
+  /*
+  cout<<forwardJet.size()<<endl;
+  cout<<"--------------------------------------"<<endl;
+  cout<<"--------------------------------------"<<endl;
+  */
 
   histoFiller(vlq, positionHelper("VLQ"), weight);
   
