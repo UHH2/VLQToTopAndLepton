@@ -173,7 +173,7 @@ void VLQGenHists::fill(const Event & event){
     int daughter2_pdgId = 0;
     if(daughter2) daughter2_pdgId = daughter2->pdgId();
     
-    auto nearGen =  closestParticle(igenp, *genparticles);
+    auto nearGen =  closestParticle_noNeutrino(igenp, *genparticles);
 
     for(unsigned int i =0; i<PartPdgId.size();++i){
       if(abs(igenp.pdgId())<5 ||abs(igenp.pdgId())>25)break;
@@ -214,9 +214,9 @@ void VLQGenHists::fill(const Event & event){
       }
     }
     //forwardJet
-    if(abs(daughter1_pdgId) < 5 && abs(daughter2_pdgId) > 6000000)forwardJet.push_back(*daughter1);
-    if(abs(daughter2_pdgId) < 5 && abs(daughter1_pdgId) > 6000000)forwardJet.push_back(*daughter2);
-
+    if(abs(daughter1_pdgId) < 5 && abs(daughter1_pdgId) < 0 && abs(daughter2_pdgId) > 6000000)forwardJet.push_back(*daughter1);
+    if(abs(daughter2_pdgId) < 5 && abs(daughter2_pdgId) < 0 && abs(daughter1_pdgId) > 6000000)forwardJet.push_back(*daughter2);
+    
     if(abs(igenp.pdgId()) <5){
       if((abs(mother1_pdgId) <5 || abs(mother1_pdgId) ==21)  && abs(mother2_pdgId) == 0 && abs(daughter1_pdgId)==0 &&  abs(daughter2_pdgId)==0)
 	forwardJet.push_back(igenp);
@@ -309,3 +309,18 @@ void VLQGenHists::fill(const Event & event){
 
 
 VLQGenHists::~VLQGenHists(){}
+
+
+const GenParticle* VLQGenHists::closestParticle_noNeutrino(const Particle  & p, const std::vector<GenParticle> & particles){
+    double deltarmin = std::numeric_limits<double>::infinity();
+    const GenParticle* next=0;
+    for(unsigned int i=0; i<particles.size(); ++i) {
+        const GenParticle & pi = particles[i];
+        double dr = uhh2::deltaR(pi, p);
+        if(dr < deltarmin && &pi != &p && pi.pdgId() != 12 && pi.pdgId() != 14 && pi.pdgId() != 16) {
+            deltarmin = dr;
+            next = &pi;
+        }
+    }
+    return next;
+}

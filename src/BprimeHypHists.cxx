@@ -122,11 +122,14 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
 
   deltaPhi_deltaEta_tlep_whad = book<TH2F>("deltaPhi_deltaEta_tlep_whad","", 100, 0, 8, 100,0,8); 
   deltaPhi_deltaEta_thad_wlep = book<TH2F>("deltaPhi_deltaEta_thad_wlep","", 100, 0, 8, 100,0,8); 
-
+  
   
   dR_forwardJet_bprime = book<TH1F>("dR_forwardJet_bprime","#Delta R (forwardJet,B)", 100, 0, 8);
-  deltaPhi_forwardJet_bprime = book<TH1F>("deltaPhi_forwardJet_bprime","#Delta #phi (forwardJet,B)", 100, 0, 5);
-  deltaEta_forwardJet_bprime = book<TH1F>("deltaEta_forwardJet_bprime","#Delta #eta (forwardJet,B)", 100, 0, 8);
+  deltaPhi_forwardJet_bprime = book<TH1F>("deltaPhi_forwardJet_bprime","#Delta #phi (forward Jet,B)", 100, 0, 3.4);
+  deltaEta_forwardJet_bprime = book<TH1F>("deltaEta_forwardJet_bprime","#Delta #eta (forward Jet,B)", 100, 0, 8);
+  deltaEta_bprime_forwardJet_eta = book<TH2F>("deltaEta_bprime_forwardJet_eta","#Delta #eta (forward Jet,B) forward Jet #eta", 100, 0, 8, 100,-5,5);
+
+  forwardJet_bprime_deltaPhi_deltaEta = book<TH2F>("forwardJet_bprime_deltaPhi_deltaEta","#Delta #phi #Delta #eta (forwardJet,B)", 100, 0, 3.4, 100, 0, 8);
 
   recohyp = ctx.get_handle<BprimeContainer>(hyp_name);
   gen = ctx.get_handle<BprimeGenContainer>("BprimeGen");
@@ -154,9 +157,9 @@ void BprimeHypHists::fill(const uhh2::Event & event){
 
   if(recotype ==2 && !event.isRealData){
     if(thad.pt()>=400 && thad.pt()<=550)
-      weight *= 0.784769;
+      weight *= 0.91;
     else if(thad.pt()>550)
-      weight *= 0.772755;
+      weight *= 0.97;
   }
 
   /*
@@ -284,10 +287,12 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     dR_forwardJet_bprime->Fill(deltaR(bprime,forwardJet),weight);
     deltaPhi_forwardJet_bprime->Fill(deltaPhi(bprime,forwardJet),weight);
     deltaEta_forwardJet_bprime->Fill(abs(bprime.eta()-forwardJet.eta()),weight);
+    forwardJet_bprime_deltaPhi_deltaEta->Fill(deltaPhi(bprime,forwardJet),abs(bprime.eta()-forwardJet.eta()),weight);
     fill_BaseHists(forwardJet,forward,weight);
     //fill_BaseHists(forwardJet+balanceJet+whad+wlep+topJets,combination,weight);
     deltaR_forward_B->Fill(deltaR(forwardJet,whad),weight);
     forward_pt_eta->Fill(forwardJet.pt(),forwardJet.eta(),weight);
+    deltaEta_bprime_forwardJet_eta->Fill(deltaPhi(bprime,forwardJet),bprime.eta(),weight);
   }
   //else
   //  fill_BaseHists(whad+wlep+topJets,no_forwardJet,weight);

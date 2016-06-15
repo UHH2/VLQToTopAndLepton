@@ -51,6 +51,8 @@ class VLQGenHists: public uhh2::Hists {
   std::vector<std::string> PartNames;
   std::vector<int> PartPdgId;
 
+  const GenParticle* closestParticle_noNeutrino(const Particle  & p, const std::vector<GenParticle> & particles);
+
   TH1F* particles_noMother, *particles_noMother_pT, *particles_noMother_eta, *particles_noMother_phi;
   TH1F* particles_noMotherNoDaughter, *particles_noMotherNoDaughter_pT, *particles_noMotherNoDaughter_eta, *particles_noMotherNoDaughter_phi;
 
@@ -61,7 +63,7 @@ class VLQGenHists: public uhh2::Hists {
   TH1F* VLQ_ptratio_daughters, *VLQ_Eratio_daughters;
   TH1F* deltaR_w, *deltaPhi_w;
 
-   TH1F* deltaPhi_t_w, *deltaEta_t_w;
-   TH2F* deltaPhi_deltaEta_t_w;
+  TH1F* deltaPhi_t_w, *deltaEta_t_w;
+  TH2F* deltaPhi_deltaEta_t_w;
 
 };

@@ -54,7 +54,7 @@ class BprimeHypHists: public uhh2::Hists {
   TH2F* deltaPhi_deltaEta_tlep_whad, *deltaPhi_deltaEta_thad_wlep;
 
   TH1F* dR_forwardJet_bprime, *deltaPhi_forwardJet_bprime, *deltaEta_forwardJet_bprime;
-
+  TH2F* forwardJet_bprime_deltaPhi_deltaEta, *deltaEta_bprime_forwardJet_eta;
 
   BaseHists matched_top_lep, matched_top_had, matched_W_lep, matched_W_had;
   BaseHists matched_tops, matched_top_matched_W, matched_W_matched_top, matched_top_unmatched_W, matched_W_unmatched_top;

@@ -1,11 +1,13 @@
 #pragma once
-
-#include "UHH2/VLQToTopAndLepton/include/BprimeContainer.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/core/include/AnalysisModule.h"
-#include "UHH2/core/include/LorentzVector.h" 
+#include "UHH2/core/include/LorentzVector.h"
+ 
 #include "UHH2/common/include/JetIds.h"
 #include "UHH2/common/include/TopJetIds.h"
+
+#include "UHH2/VLQToTopAndLepton/include/BprimeContainer.h"
+#include "UHH2/VLQToTopAndLepton/include/NeutrinoFit.h"
 
 #include <vector>
 
@@ -35,6 +37,7 @@ class BprimeReco :public uhh2::AnalysisModule {
   boost::optional<JetId> jetId;
   boost::optional<TopJetId> topjetId;
   boost::optional<TopJetId> wjetId;
+  NeutrinoFit FitNeutrino;
 
 };
 

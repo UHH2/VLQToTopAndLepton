@@ -5,6 +5,7 @@
 #include "UHH2/common/include/JetHists.h"
 #include "UHH2/common/include/EventHists.h"
 #include "UHH2/common/include/LuminosityHists.h"
+#include "UHH2/common/include/GenJetsHists.h"
 
 #include "UHH2/VLQToTopAndLepton/include/BprimeRecoHists.h"
 #include "UHH2/VLQToTopAndLepton/include/BprimeHypHists.h"
@@ -114,6 +115,14 @@ void HistFactory::addHists(const string& histClass, const string& histName, cons
 	uncerHistsTemplate.push_back(move(uncerHists));
       }
     }
+    else if(histClass.compare("GenJetHists")==0){
+      histTemplate.reset(new GenJetsHists(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new GenJetsHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
+    }
     else if(histClass.compare("EventHists")==0){
       histTemplate.reset(new EventHists(m_ctx,ss.str().c_str()));
       for(auto & name : uncerNames){
@@ -219,11 +228,6 @@ void HistFactory::addHists(const string& histName, TopJetId topjetid){
   }
 }
 
-void HistFactory::ScaleUncer(){ 
-  uncerNames.push_back("ScaleUp_plus");
-  uncerNames.push_back("ScaleDown_minus");
-}
-
 //passOption: 0 event has to pass all cuts, 1 event passes this cut
 bool HistFactory::passAndFill(Event & event, int passOption){
   bool passCuts =true;
@@ -281,7 +285,7 @@ void HistFactory::create_histos(){
   m_ctx.put("cutflow", cutflow_weighted);
 }
 
-
+//not used since histograms are needed maybe later on an optiont
 void HistFactory::fillScaleUncer(Event & event,unsigned int i){
   if(event.isRealData) return;
   if(event.genInfo->systweights().size() ==0) return;
@@ -305,4 +309,9 @@ void HistFactory::fillScaleUncer(Event & event,unsigned int i){
   factoryUncer.at(i).at(1)->fill(event);
   event.weight = old_weight;
   //}
+}
+
+void HistFactory::ScaleUncer(){ 
+  uncerNames.push_back("ScaleUp_plus");
+  uncerNames.push_back("ScaleDown_minus");
 }

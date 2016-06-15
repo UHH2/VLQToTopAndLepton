@@ -29,8 +29,11 @@ class EventKinematicHists: public uhh2::Hists{
     void fill_BaseHists(const T & particle, BaseHists & hists, double weight);
 
  private:
-  TH1F* leadingAk8_lepton_dr, *leadingAk4_lepton_dr;
-  TH1F* leadingAk8_lepton_dphi, *leadingAk4_lepton_dphi;
-  BaseHists leadingEtaJetHists, secondEtaJetHists, leadingAk8Hists, leadingAk4Hists;
+  TH1F *leadingAk4_lepton_dr, *leadingAk4_lepton_dphi;
+  TH1F* leadingAk8_lepton_dr, *leadingAk8_lepton_dphi, *massleadingAk8_lepton_dr, *massleadingAk8_lepton_dphi;
+  TH1F* massleadingAk8_prunedmass;
+  TH1F* centrality_ak4, *centrality_ak8;
+  TH2F* leadingAk4_lepton_dphi_mass;
+  BaseHists leadingEtaJetHists, secondEtaJetHists, leadingAk8Hists, leadingAk4Hists, lbHists, METlHists;
   uhh2::Event::Handle<FlavorParticle> primlep;
 };

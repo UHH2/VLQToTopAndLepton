@@ -140,7 +140,7 @@ bool ForwardJetPtEtaCut::passes(const uhh2::Event & event){
   Jet maxEtaJet = Jet();
   for(auto jet : jets)
     if(fabs(jet.eta())> fabs(maxEtaJet.eta()) && minPt_<jet.pt() && (maxPt_ > jet.pt() || maxPt_ ==-1) ) maxEtaJet = jet;
-  return fabs(maxEtaJet.eta())>minEta_ && (fabs(maxEtaJet.eta()) < maxEta_ || maxEta_==-1);
+  return fabs(maxEtaJet.eta())> minEta_ && (fabs(maxEtaJet.eta()) < maxEta_ || maxEta_==-1);
 }
 
 

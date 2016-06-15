@@ -61,23 +61,35 @@ private:
   JetId secondjet, onejet, softjet, wide_softjet, ak4ForwardId, ak4CentralId;;
   TopJetId topjet,topjetid, hardtopjet;
   //std::unique_ptr<BprimeReco> Reco;
+  std::unique_ptr<JetCleaner> jet_preclean;
+
+
 };
 
 ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
+  //get rid of jets that are outside the range of jet corrections
+  jet_preclean.reset(new JetCleaner(ctx, PtEtaCut(5, 5)));
+
+
+  //put all variables here so that changes are applied to all cuts similar
+  double delR_2D  = 0.4;
+  double pTrel_2D = 40.;
+  double MET_val = 60. ;
+  double HTLep_val = 290.;
+
   //Version  = ctx.get("dataset_version", "<not set>");
   btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
   lepton.reset(new PrimaryLepton(ctx));
 
-  vlqGenHists.reset(new VLQGenHists(ctx,"GenHists"));
   muid_cut = AndId<Muon>(MuonIDTight(), PtEtaCut(50.0, 2.1));
   softMuon = AndId<Muon>(MuonIDLoose(), PtEtaCut(50.0, 2.1));
   softElectron = AndId<Electron>(ElectronID_Spring15_25ns_loose_noIso, PtEtaCut(50.0, 2.4));
-  eleId_cut =  AndId<Electron>(ElectronID_Spring15_25ns_tight_noIso, PtEtaCut(50.0, 2.4));
-  onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(250.0, 2.4)); secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(70.0, 2.4)); 
+  eleId_cut =  AndId<Electron>(ElectronID_Spring15_25ns_tight_noIso, PtEtaCut(110.0, 2.4));
+  onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(250.0, 2.4)); secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4)); 
   softjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
   wide_softjet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 5.0));
   topjet = PtEtaCut(150.0, 2.4); 
-  hardtopjet = PtEtaCut(300.0, 2.4); 
+  hardtopjet = PtEtaCut(190.0, 2.4); 
   topjetid = AndId<TopJet>(Type2TopTag(150,210, Type2TopTag::MassType::groomed,btag_medium),Tau32());
   ak4ForwardId = PtEtaCut(30.0,5,-1,2);
   ak4CentralId = PtEtaCut(30.0,2,-1,-1);
@@ -94,21 +106,23 @@ ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
   channelSel.add<NElectronSelection>("0Electrons",1,1);
   channelSel.add<NMuonSelection>("1Muon",0,0,muid_cut);
 
+
+  vlqGenHists.reset(new VLQGenHists(ctx,"GenHists")); 
+
   eleFactory.reset(new HistFactory(ctx));
   eleFactory->setEffiHistName("eleEffis");
-  //eleFactory->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"muonTrigger");
-  eleFactory->addSelection(make_unique<NElectronSelection>(1,1,softElectron),"1_softeleCut");
+  eleFactory->addSelection(make_unique<TriggerSelection>("HLT_Ele105_CaloIdVT_GsfTrkIdT_v*"),"eleTrigger");
   eleFactory->addSelection(make_unique<NMuonSelection>(0,0,softMuon),"0_softMuonCut");
-  eleFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
-  eleFactory->addSelection(make_unique<TwoDCut>(0.4,20),"2DCut");
+  eleFactory->addSelection(make_unique<NElectronSelection>(1,1,softElectron),"1_softeleCut");
   eleFactory->addSelection(make_unique<NElectronSelection>(1,1,eleId_cut),"1_eleCut");
-  eleFactory->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"70GeV_JetCut");
-  eleFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
-  eleFactory->addSelection(make_unique<NTopJetSelection>(1,-1,hardtopjet),"300GeV_TopJetCut");
-  //eleFactory->addSelection(make_unique<STSelection>(ctx,800),"800GeV_ST");
-  eleFactory->addSelection(make_unique<METSelection>(120),"120GeV_METCut");
-  eleFactory->addSelection(make_unique<HTLepSelection>(ctx,150),"150_HTLep");
-  eleFactory->addSelection(make_unique<NJetSelection>(4,-1,softjet),"4_JetCut");
+  eleFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
+  eleFactory->addSelection(make_unique<TwoDCut>(delR_2D,pTrel_2D),"2DCut");
+  eleFactory->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"50GeV_JetCut");
+  //eleFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
+  eleFactory->addSelection(make_unique<NTopJetSelection>(1,-1,hardtopjet),"190GeV_TopJetCut");
+  eleFactory->addSelection(make_unique<METSelection>(MET_val),to_string((int)MET_val)+"GeV_METCut");
+  eleFactory->addSelection(make_unique<HTLepSelection>(ctx,HTLep_val),to_string((int)HTLep_val)+"GeV_HTLep");
+  //eleFactory->addSelection(make_unique<NJetSelection>(4,-1,softjet),"4_JetCut");
 
   //eleFactory->addAnalysisModule(make_unique<JetCleaner>(secondjet));
   //eleFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"130GeV_JetCut");
@@ -145,17 +159,17 @@ ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
   topWMuonFactory->setEffiHistName("topLep");
   topWMuonFactory->addSelection(make_unique<GenFamilySelection>(topLep,2),"topLep");
   topWMuonFactory->addSelection(make_unique<GenFamilySelection>(wHad,2),"wHad");
-  topWMuonFactory->addSelection(make_unique<NElectronSelection>(1,1,softElectron),"1_softeleCut");
   topWMuonFactory->addSelection(make_unique<NMuonSelection>(0,0,softMuon),"0_sofMuonCut");
-  topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
-  topWMuonFactory->addSelection(make_unique<TwoDCut>(0.6,40),"2DCut");
+  topWMuonFactory->addSelection(make_unique<NElectronSelection>(1,1,softElectron),"1_softeleCut");
   topWMuonFactory->addSelection(make_unique<NElectronSelection>(1,1,eleId_cut),"1_eleCut");
-  topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
-  topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,secondjet),"70GeV_JetCut");
-  topWMuonFactory->addSelection(make_unique<NTopJetSelection>(1,-1,hardtopjet),"300GeV_TopJetCut");
-  topWMuonFactory->addSelection(make_unique<METSelection>(120),"120GeV_METCut");
-  topWMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,150),"150_HTLep");
-  topWMuonFactory->addSelection(make_unique<NJetSelection>(4,-1,softjet),"4_JetCut");
+  topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
+  topWMuonFactory->addSelection(make_unique<TwoDCut>(delR_2D,pTrel_2D),"2DCut");
+  //topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
+  topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,secondjet),"50GeV_JetCut");
+  topWMuonFactory->addSelection(make_unique<NTopJetSelection>(1,-1,hardtopjet),"190GeV_TopJetCut");
+  topWMuonFactory->addSelection(make_unique<METSelection>(MET_val),to_string((int)MET_val)+"GeV_METCut");
+  topWMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,HTLep_val),to_string((int)HTLep_val)+"GeV_HTLep");
+  //topWMuonFactory->addSelection(make_unique<NJetSelection>(4,-1,softjet),"4_JetCut");
   
 
   topWMuonFactory->addHists("ElectronHists","topLep_ElectronHists");
@@ -173,17 +187,17 @@ ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
   wMuonFactory->setEffiHistName("topHad");	
   wMuonFactory->addSelection(make_unique<GenFamilySelection>(topHad,2),"topHad");
   wMuonFactory->addSelection(make_unique<GenFamilySelection>(wLep,2),"wLep");
-  wMuonFactory->addSelection(make_unique<NElectronSelection>(1,1,softElectron),"1_softeleCut");
   wMuonFactory->addSelection(make_unique<NMuonSelection>(0,0,softMuon),"0_softMuonCut");
-  wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
-  wMuonFactory->addSelection(make_unique<TwoDCut>(0.4,40),"2DCut");
+  wMuonFactory->addSelection(make_unique<NElectronSelection>(1,1,softElectron),"1_softeleCut");
   wMuonFactory->addSelection(make_unique<NElectronSelection>(1,-1,eleId_cut),"1_eleCut");
-  wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
-  wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,secondjet),"70GeV_JetCut");
+  wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
+  wMuonFactory->addSelection(make_unique<TwoDCut>(delR_2D,pTrel_2D),"2DCut");
+  //wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
+  wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,secondjet),"50GeV_JetCut");
   wMuonFactory->addSelection(make_unique<NTopJetSelection>(1,-1,hardtopjet),"300GeV_TopJetCut");
-  wMuonFactory->addSelection(make_unique<METSelection>(120),"120GeV_METCut");
-  wMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,150),"150_HTLep");
-  wMuonFactory->addSelection(make_unique<NJetSelection>(4,-1,softjet),"4_JetCut");
+  wMuonFactory->addSelection(make_unique<METSelection>(MET_val),to_string((int)MET_val)+"GeV_METCut");
+  wMuonFactory->addSelection(make_unique<HTLepSelection>(ctx,HTLep_val),to_string((int)HTLep_val)+"GeV_HTLep");
+  //wMuonFactory->addSelection(make_unique<NJetSelection>(4,-1,softjet),"4_JetCut");
 
   wMuonFactory->addHists("ElectronHists","topHad_ElectronHists");
   wMuonFactory->addHists("MuonHists","topHad_MuonHists");
@@ -202,6 +216,7 @@ ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
 }
 
 bool ElePreSelModule::process(Event & event){
+  jet_preclean->process(event);
   if(!common->process(event)) return false;
   
   lepton->process(event);

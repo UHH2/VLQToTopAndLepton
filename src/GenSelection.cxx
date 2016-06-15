@@ -16,7 +16,7 @@ GenFamilySelection::GenFamilySelection(std::vector<int> familyTies_, int strateg
 
 
 bool GenFamilySelection::passes(const uhh2::Event & event){
-
+  if(event.isRealData) return false;
   if(strategy==0)
     return searchMother(event) && searchDaughter(event);
   else if(strategy==1)

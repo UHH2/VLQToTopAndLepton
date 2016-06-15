@@ -1,4 +1,5 @@
 #include "UHH2/VLQToTopAndLepton/include/BprimeReco.h"
+
 #include "UHH2/common/include/TTbarReconstruction.h"
 
 
@@ -16,6 +17,7 @@ BprimeReco::BprimeReco(uhh2::Context & ctx, const std::string & label){
   jetCollBool =false;
   jetId=boost::none;
   topjetId=boost::none;
+  FitNeutrino = NeutrinoFit();
 }
 
 bool BprimeReco::process(uhh2::Event & event){
@@ -47,7 +49,8 @@ bool BprimeReco::massReco(uhh2::Event & event){
   //vector<BprimeContainer> recoWHyps;
   vector<BprimeContainer> recoHyps;
   LorentzVector lep = event.get(primlep).v4();  
-  vector<LorentzVector> wleps = NeutrinoReconstruction(lep, event.met->v4());
+  //vector<LorentzVector> wleps = NeutrinoReconstruction(lep, event.met->v4());
+  vector<LorentzVector> wleps = FitNeutrino.NeutrinoFitPolar(lep,event.met->v4());
   for(unsigned int i=0; i<wleps.size();++i) wleps[i] +=  lep;
   vector<BprimeContainer> recoWHyps = reconstruct_WHyps(jets,wleps);
   //permutation of top jets
@@ -127,7 +130,9 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
     selected_topjets.swap(topjets);
   }	  
   LorentzVector lep = event.get(primlep).v4();  
-  vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
+  //vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
+  vector<LorentzVector> neutrinos = FitNeutrino.NeutrinoFitPolar(lep,event.met->v4());
+
   vector<BprimeContainer> recoHyps;
   BprimeContainer tmp_hyp;
   //if(topjets.size()==0||neutrinos.size()==0) return false;
@@ -163,7 +168,8 @@ bool BprimeReco::BTagReco(Event & event){
     else bjets.push_back(jets->at(i));
   }
   LorentzVector lep = event.get(primlep).v4();  
-  vector<LorentzVector> wleps = NeutrinoReconstruction(lep, event.met->v4());
+  //vector<LorentzVector> wleps = NeutrinoReconstruction(lep, event.met->v4());
+  vector<LorentzVector> wleps = FitNeutrino.NeutrinoFitPolar(lep,event.met->v4());
   for(unsigned int i=0; i<wleps.size();++i) wleps[i] +=  lep;
   vector<BprimeContainer> recoWHyps = reconstruct_WHyps(selected_jets,wleps);
   vector<BprimeContainer> recoHyps;
@@ -229,7 +235,8 @@ bool BprimeReco::hadronicW(uhh2::Event & event, double dRmin){
     selected_wjets.swap(wjets);
   }	  
   LorentzVector lep = event.get(primlep).v4();  
-  vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
+  //vector<LorentzVector> neutrinos = NeutrinoReconstruction(lep, event.met->v4());
+  vector<LorentzVector> neutrinos = FitNeutrino.NeutrinoFitPolar(lep,event.met->v4());
   vector<BprimeContainer> recoHyps;
   BprimeContainer tmp_hyp;
   for(auto & wjet : wjets){

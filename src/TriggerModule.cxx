@@ -50,9 +50,9 @@ private:
   std::unique_ptr<VLQGenHists> vlqGenHists;
   std::unique_ptr<AnalysisModule> lepton;
   std::unique_ptr<HistFactory> muonTrigger, eleTrigger, dataTrigger;
-  std::unique_ptr<AndSelection>  topHadSel, topLepSel;
+  std::unique_ptr<AndSelection> TopLepMuSel, TopLepEleLepSel, WLepMuSel, WLepEleSel;
 
-  JetId btag_medium;
+  JetId btag_medium, jet, hardjet;
   MuonId muid_cut;
   JetId twojet, onejet, lowjet;
   TopJetId topjet;
@@ -71,42 +71,77 @@ TriggerModule::TriggerModule(Context& ctx){
   common->set_muon_id(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 2.1)));
   common->switch_jetlepcleaner();
   common->switch_jetPtSorter();
-  common->disable_mclumiweight();
-  common->disable_mcpileupreweight();
+  //common->disable_mclumiweight();
+  //common->disable_mcpileupreweight();
   common->init(ctx);
   lepton.reset(new PrimaryLepton(ctx));
   vlqGenHists.reset(new VLQGenHists(ctx,"GenHists"));
 
+  //put all variables here so that changes are applied to all cuts similar
+  double MET_val = 50. ;
+  double HTLep_val = 150.;
+  jet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4));
+  hardjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(250.0, 2.4));
 
   dataTrigger.reset(new HistFactory(ctx));
-  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"HLT_Mu45_eta2p1");					     
-  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu50_v*"),"HLT_Mu50");						     
-  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_IsoMu24_eta2p1_v*"),"HLT_IsoMu24_eta2p1");			     
-  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu40_eta2p1_PFJet200_PFJet50_v*"),"HLT_Mu40_eta2p1_PFJet200_PFJet50");
- 
+  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"HLT_Mu45_eta2p1");
+  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu24_eta2p1_v*"),"HLT_Mu24_eta2p1");
+  dataTrigger->addAndSelection(make_uvec(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),make_unique<TriggerSelection>("HLT_Mu24_eta2p1_v*")),"HLT_Mu45_AND_Mu24");
+  dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v*"),"HLT_Ele45_PFJet200_PFJet50");
+  //dataTrigger->addSelection(make_unique<TriggerSelection>("HLT_Ele35_PFJet150_PFJet50_v*"),"HLT_Ele35_PFJet150_PFJet50");
+  //dataTrigger->addAndSelection(make_uvec(make_unique<TriggerSelection>("HLT_Ele35_CaloIdVT_GsfTrkIdT_PFJet150_PFJet50_v*"),make_unique<TriggerSelection>("HLT_Ele45_PFJet200_PFJet50_v*")),"HLT_Ele35_CaloIdVT_GsfTrkIdT_PFJet150_PFJet50_AND_HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50");
+  dataTrigger->addHists("MuonHists","data_trigger_MuonHists");
+  dataTrigger->addHists("ElectronHists","data_trigger_ElectronHists");
+  dataTrigger->addHists("JetHists","data_trigger_JetHists");
+
   muonTrigger.reset(new HistFactory(ctx));
   //muonTrigger.reset(new HistFactory(ctx));
-  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"HLT_Mu45_eta2p1");					     
+  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"HLT_Mu45_eta2p1");				     	     
   muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu50_v*"),"HLT_Mu50");						     
-  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_IsoMu24_eta2p1_v*"),"HLT_IsoMu24_eta2p1");			     
+  muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_IsoMu27_v*"),"HLT_IsoMu27");			     		     
   muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_Mu40_eta2p1_PFJet200_PFJet50_v*"),"HLT_Mu40_eta2p1_PFJet200_PFJet50");
-  muonTrigger->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),make_unique<TriggerSelection>("HLT_IsoMu24_eta2p1_v*")),"HLT_OR_Mu45_IsoMu24");
-  muonTrigger->addHists("MuonHists","trigger_MuonHists");
-  muonTrigger->addHists("JetHists","trigger_JetHists");
+  muonTrigger->addAndSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val),make_unique<METSelection>(MET_val),make_unique<NJetSelection>(2,-1,jet)),"Sel");		
+  muonTrigger->addAndSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val),make_unique<METSelection>(MET_val),make_unique<NJetSelection>(2,-1,jet),make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*")),"HLT_Mu45_eta2p1_Sel");				     
+  muonTrigger->addAndSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val),make_unique<METSelection>(MET_val),make_unique<NJetSelection>(2,-1,jet),make_unique<TriggerSelection>("HLT_Mu50_v*")),"HLT_Mu50_Sel");						     
+  muonTrigger->addAndSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val),make_unique<METSelection>(MET_val),make_unique<NJetSelection>(2,-1,jet),make_unique<TriggerSelection>("HLT_IsoMu27_v*")),"HLT_IsoMu27_Sel");			     		     
+  muonTrigger->addAndSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val),make_unique<METSelection>(MET_val),make_unique<NJetSelection>(2,-1,jet),make_unique<TriggerSelection>("HLT_Mu40_eta2p1_PFJet200_PFJet50_v*")),"HLT_Mu40_eta2p1_PFJet200_PFJet50_Sel");
+  muonTrigger->addHists("MuonHists","muon_trigger_MuonHists");
+  muonTrigger->addHists("JetHists","muon_trigger_JetHists");
 
-  vector<int> topLep {6,24,13};
+  eleTrigger.reset(new HistFactory(ctx));
+  eleTrigger->addSelection(make_unique<TriggerSelection>("HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v*"),"HLT_Ele45_PFJet200_PFJet50");	
+  eleTrigger->addSelection(make_unique<TriggerSelection>("HLT_Ele105_CaloIdVT_GsfTrkIdT_v*"),"HLT_Ele105_CaloIdVT_GsfTrkIdT");	
+  eleTrigger->addAndSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val),make_unique<METSelection>(MET_val),make_unique<NJetSelection>(2,-1,jet)),"Sel");		
+  eleTrigger->addAndSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val),make_unique<METSelection>(MET_val),make_unique<NJetSelection>(2,-1,jet),make_unique<TriggerSelection>("HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v*")),"HLT_Ele45_PFJet200_PFJet50_Sel");	
+  eleTrigger->addAndSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val),make_unique<METSelection>(MET_val),make_unique<NJetSelection>(2,-1,jet),make_unique<TriggerSelection>("HLT_Ele105_CaloIdVT_GsfTrkIdT_v*")),"HLT_Ele105_CaloIdVT_GsfTrkIdT_Sel");
+  eleTrigger->addAndSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val),make_unique<METSelection>(MET_val),make_unique<NJetSelection>(1,-1,hardjet),make_unique<TriggerSelection>("HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_v*")),"HLT_Ele45_CaloIdVT_GsfTrkIdT_PFJet200_PFJet50_Sel_with250GeVJet");
+  eleTrigger->addHists("ElectronHists","ele_trigger_ElectronHists");
+  eleTrigger->addHists("JetHists","ele_trigger_JetHists");
+
+  vector<int> topLepMu {6,24,13};
+  vector<int> topLepEle {6,24,11};
   vector<int> topHad {6,24,-54321};
   vector<int> wHad {24,-54321};
-  vector<int> wLep {24,13};
+  vector<int> wLepMu {24,13};
+  vector<int> wLepEle {24,11};
 
-  topHadSel.reset(new AndSelection(ctx));
-  topLepSel.reset(new AndSelection(ctx));
-  
-  topHadSel->add("BToThad",make_unique<GenFamilySelection>(topHad,2));
-  topHadSel->add("BToWlep",make_unique<GenFamilySelection>(wLep,2));
-  topLepSel->add("BToTlep",make_unique<GenFamilySelection>(topLep,2));
-  topLepSel->add("BToWhad",make_unique<GenFamilySelection>(wHad,2));
- 
+  TopLepMuSel.reset(new AndSelection(ctx));
+  TopLepEleLepSel.reset(new AndSelection(ctx));
+  WLepMuSel.reset(new AndSelection(ctx));
+  WLepEleSel.reset(new AndSelection(ctx));
+
+  TopLepMuSel->add("TopLepMuSel_lep",make_unique<GenFamilySelection>(topLepMu,2));
+  TopLepMuSel->add("TopLepMuSel_had",make_unique<GenFamilySelection>(wHad,2));
+
+  TopLepEleLepSel->add("TopLepEleLepSel_lep",make_unique<GenFamilySelection>(topLepEle,2));
+  TopLepEleLepSel->add("TopLepEleLepSel_had",make_unique<GenFamilySelection>(wHad,2));
+
+  WLepMuSel->add("WLepMuSel_lep",make_unique<GenFamilySelection>(wLepMu,2));
+  WLepMuSel->add("WLepMuSel_had",make_unique<GenFamilySelection>(topHad,2));
+
+  WLepEleSel->add("WLepEleSel_lep",make_unique<GenFamilySelection>(wLepEle,2));
+  WLepEleSel->add("WLepEleSel_had",make_unique<GenFamilySelection>(topHad,2));
+
 }
 
 bool TriggerModule::process(Event & event){
@@ -115,7 +150,10 @@ bool TriggerModule::process(Event & event){
   if(!event.isRealData){
     //if(topHadSel->passes(event) || topLepSel->passes(event))
     vlqGenHists->fill(event);
-    muonTrigger->passAndFill(event,1);
+    if(TopLepMuSel->passes(event)||WLepMuSel->passes(event))
+      muonTrigger->passAndFill(event,1);
+    if(TopLepEleLepSel->passes(event)||WLepEleSel->passes(event))
+      eleTrigger->passAndFill(event,1);
   }
   else{
     dataTrigger->passAndFill(event,1);
