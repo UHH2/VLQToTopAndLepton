@@ -4,33 +4,15 @@
 <!ENTITY DATA_SingleMu SYSTEM "../../common/datasets/RunII_76X_v1/DATA_SingleMuon_RunC2015.xml">
 <!ENTITY DATA_SingleMu2 SYSTEM "../../common/datasets/RunII_76X_v1/SingleMuon_Run2015D-16Dec2015-v1.xml">
 
-<!ENTITY Bpb_TW_800_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-800_LH_25ns.xml">
-<!ENTITY Bpb_TW_900_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-900_LH_25ns.xml">
-<!ENTITY Bpb_TW_1000_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1000_LH_25ns.xml">
-<!ENTITY Bpb_TW_1100_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1100_LH_25ns.xml">
-<!ENTITY Bpb_TW_1200_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1200_LH_25ns.xml">
-<!ENTITY Bpb_TW_1300_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1300_LH_25ns.xml">
-<!ENTITY Bpb_TW_1400_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1400_LH_25ns.xml">
-<!ENTITY Bpb_TW_1500_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1500_LH_25ns.xml">
-<!ENTITY Bpb_TW_1600_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1600_LH_25ns.xml">
-<!ENTITY Bpb_TW_1700_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1700_LH_25ns.xml">
-<!ENTITY Bpb_TW_1800_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1800_LH_25ns.xml">
-
-<!ENTITY Bpb_TW_800_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-800_RH_25ns.xml">
-<!ENTITY Bpb_TW_900_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-900_RH_25ns.xml">
-<!ENTITY Bpb_TW_1000_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1000_RH_25ns.xml">
-<!ENTITY Bpb_TW_1100_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1100_RH_25ns.xml">
-<!ENTITY Bpb_TW_1200_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1200_RH_25ns.xml">
-<!ENTITY Bpb_TW_1300_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1300_RH_25ns.xml">
-<!ENTITY Bpb_TW_1400_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1400_RH_25ns.xml">
-<!ENTITY Bpb_TW_1500_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1500_RH_25ns.xml">
-<!ENTITY Bpb_TW_1600_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1600_RH_25ns.xml">
-<!ENTITY Bpb_TW_1700_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1700_RH_25ns.xml">
-<!ENTITY Bpb_TW_1800_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeBToTW_M-1800_RH_25ns.xml">
+<!ENTITY Bpb_TW_800_LH SYSTEM "../../common/datasets/RunII_50ns_v2/MC_BprimeBToTW_M-800_LH_25ns.xml">
+<!ENTITY Bpb_TW_1000_LH SYSTEM "../../common/datasets/RunII_50ns_v2/MC_BprimeBToTW_M-1000_LH.xml">
+<!ENTITY Bpb_TW_1200_LH SYSTEM "../../common/datasets/RunII_50ns_v2/MC_BprimeBToTW_M-1200_LH_25ns.xml">
+<!ENTITY Bpb_TW_800_RH SYSTEM "../../common/datasets/RunII_50ns_v2/MC_BprimeBToTW_M-800_RH_25ns.xml">
+<!ENTITY Bpb_TW_1000_RH SYSTEM "../../common/datasets/RunII_50ns_v2/MC_BprimeBToTW_M-1000_RH.xml">
+<!ENTITY Bpb_TW_1200_RH SYSTEM "../../common/datasets/RunII_50ns_v2/MC_BprimeBToTW_M-1200_RH_25ns.xml">
 
 <!ENTITY Bpt_TW_800_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeTToTW_M-800_LH_25ns.xml">
 <!ENTITY Bpt_TW_1000_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeTToTW_M-1000_LH_25ns.xml">
-<!ENTITY Bpt_TW_1100_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeTToTW_M-1100_LH_25ns.xml">
 <!ENTITY Bpt_TW_1200_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeTToTW_M-1200_LH_25ns.xml">
 <!ENTITY Bpt_TW_1500_LH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeTToTW_M-1500_LH_25ns.xml">
 
@@ -39,6 +21,7 @@
 <!ENTITY Bpt_TW_1100_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeTToTW_M-1100_RH_25ns.xml">
 <!ENTITY Bpt_TW_1200_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeTToTW_M-1200_RH_25ns.xml">
 <!ENTITY Bpt_TW_1500_RH SYSTEM "../../common/datasets/RunII_76X_v1/BprimeTToTW_M-1500_RH_25ns.xml">
+
 
 <!ENTITY WJets SYSTEM "../../common/datasets/RunII_76X_v1/MC_WJetsToLNu.xml">
 <!ENTITY TTbar SYSTEM "../../common/datasets/RunII_76X_v1/MC_TTbar.xml">
@@ -103,26 +86,23 @@
 <!ENTITY MC_QCD_Pt-120to170_Em SYSTEM "../../common/datasets/RunII_76X_v1/MC_QCD_Pt120to170_EMEnriched.xml">
 <!ENTITY MC_QCD_Pt-170to300_Em SYSTEM "../../common/datasets/RunII_76X_v1/MC_QCD_Pt170to300_EMEnriched.xml">
 <!ENTITY MC_QCD_Pt-300toInf_Em SYSTEM "../../common/datasets/RunII_76X_v1/MC_QCD_Pt300toInf_EMEnriched.xml">
-
-<!ENTITY Zprime_1500 SYSTEM "../../common/datasets/RunII_76X_v1/MC_ZprimeToTT_01w_M1500.xml">
-<!ENTITY Zprime_2000 SYSTEM "../../common/datasets/RunII_76X_v1/MC_ZprimeToTT_01w_M2000.xml">
-<!ENTITY Zprime_2500 SYSTEM "../../common/datasets/RunII_76X_v1/MC_ZprimeToTT_01w_M2500.xml">
 ]>
 
 
 <!--
-   <ConfigParse NEventsBreak="0" FileSplit="30" AutoResubmit="3" MaxJobsPerProcess="150"/>
-   <ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.PreSel_v12"/>
+   <ConfigParse NEventsBreak="0" FileSplit="30" AutoResubmit="3"/>
+   <ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.PreSel_v7"/>
 -->
+
 
 <!-- OutputLevel controls which messages are printed; set to VERBOSE or DEBUG for more verbosity, to WARNING or ERROR for less -->
 <JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v12/" PostFix="" TargetLumi="2225">
+    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_vTest/" PostFix="" TargetLumi="2225">
     <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="10" OutputDirectory="./PreSelection_v1/" PostFix="" TargetLumi="552.4" >-->
-
+<!--
       <InputData Lumi="1" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">
         &DATA_SingleMu;
 	&DATA_SingleMu2;
@@ -130,119 +110,6 @@
         <OutputTree Name="AnalysisTree" />
       </InputData>
 
-      <InputData Lumi="98200" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_LH_25ns" Cacheable="False">
-        &Bpb_TW_800_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData>
-      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_900_LH_25ns" Cacheable="False">
-        &Bpb_TW_900_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData>
-      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1000_LH_25ns" Cacheable="False">
-        &Bpb_TW_1000_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="96800" NEventsMax="-1" Type="MC" Version="Bpb_TW_1100_LH_25ns" Cacheable="False">
-        &Bpb_TW_1100_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="99800" NEventsMax="-1" Type="MC" Version="Bpb_TW_1200_LH_25ns" Cacheable="False">
-        &Bpb_TW_1200_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData>
-      <InputData Lumi="99000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1300_LH_25ns" Cacheable="False">
-        &Bpb_TW_1300_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="99000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1400_LH_25ns" Cacheable="False">
-        &Bpb_TW_1400_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="99800" NEventsMax="-1" Type="MC" Version="Bpb_TW_1500_LH_25ns" Cacheable="False">
-        &Bpb_TW_1500_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1600_LH_25ns" Cacheable="False">
-        &Bpb_TW_1600_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1700_LH_25ns" Cacheable="False">
-        &Bpb_TW_1700_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1800_LH_25ns" Cacheable="False">
-        &Bpb_TW_1800_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-
-      <InputData Lumi="95000" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_RH_25ns" Cacheable="False">
-        &Bpb_TW_800_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData>
-      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_900_RH_25ns" Cacheable="False">
-        &Bpb_TW_900_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData>
-      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1000_RH_25ns" Cacheable="False">
-        &Bpb_TW_1000_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="99200" NEventsMax="-1" Type="MC" Version="Bpb_TW_1100_RH_25ns" Cacheable="False">
-        &Bpb_TW_1100_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="99200" NEventsMax="-1" Type="MC" Version="Bpb_TW_1200_RH_25ns" Cacheable="False">
-        &Bpb_TW_1200_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData>
-      <InputData Lumi="99200" NEventsMax="-1" Type="MC" Version="Bpb_TW_1300_RH_25ns" Cacheable="False">
-        &Bpb_TW_1300_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="95000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1400_RH_25ns" Cacheable="False">
-        &Bpb_TW_1400_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1500_RH_25ns" Cacheable="False">
-        &Bpb_TW_1500_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1600_RH_25ns" Cacheable="False">
-        &Bpb_TW_1600_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="99200" NEventsMax="-1" Type="MC" Version="Bpb_TW_1700_RH_25ns" Cacheable="False">
-        &Bpb_TW_1700_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="98800" NEventsMax="-1" Type="MC" Version="Bpb_TW_1800_RH_25ns" Cacheable="False">
-        &Bpb_TW_1800_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-    
-     
       <InputData Lumi="299000" NEventsMax="-1" Type="MC" Version="Bpt_TW_800_LH_25ns" Cacheable="False">
         &Bpt_TW_800_LH;
         <InputTree Name="AnalysisTree" />
@@ -251,11 +118,6 @@
 
       <InputData Lumi="299400" NEventsMax="-1" Type="MC" Version="Bpt_TW_1000_LH_25ns" Cacheable="False">
         &Bpt_TW_1000_LH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData> 
-      <InputData Lumi="296800" NEventsMax="-1" Type="MC" Version="Bpt_TW_1100_LH_25ns" Cacheable="False">
-        &Bpt_TW_1100_LH;
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData> 
@@ -282,11 +144,6 @@
       </InputData>
       <InputData Lumi="298000" NEventsMax="-1" Type="MC" Version="Bpt_TW_1100_RH_25ns" Cacheable="False">
         &Bpt_TW_1100_RH;
-        <InputTree Name="AnalysisTree" />
-        <OutputTree Name="AnalysisTree" />
-      </InputData>
-       <InputData Lumi="297600" NEventsMax="-1" Type="MC" Version="Bpt_TW_1200_RH_25ns" Cacheable="False">
-        &Bpt_TW_1200_RH;
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
@@ -333,7 +190,7 @@
         <InputTree Name="AnalysisTree" /> 
         <OutputTree Name="AnalysisTree" />
       </InputData>
-      <InputData Lumi="6475422" NEventsMax="-1" Type="MC" Version="WJets_HT2500ToInf_25ns" Cacheable="False">
+      <InputData Lumi="96823886.8" NEventsMax="-1" Type="MC" Version="WJets_HT2500ToInf_25ns" Cacheable="False">
         &WJets_HT2500ToInf;
         <InputTree Name="AnalysisTree" /> 
         <OutputTree Name="AnalysisTree" />
@@ -362,6 +219,7 @@
 	<OutputTree Name="AnalysisTree" />
       </InputData> 
 
+-->
            
 <!--
         <InputData Lumi="" NEventsMax="-1" Type="MC" Version="ZJetsM50toInf" Cacheable="False">
@@ -370,15 +228,14 @@
           <OutputTree Name="AnalysisTree" />
         </InputData>            
 -->
-
-
+<!--
 	<InputData Lumi="18992240" NEventsMax="-1" Type="MC" Version="SingleTtChannel" Cacheable="False">
 	  &TtChannel;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>    
 
-	<InputData Lumi="1001494" NEventsMax="-1" Type="MC" Version="SingleTsChannel" Cacheable="False">
+	<InputData Lumi="28073.03" NEventsMax="-1" Type="MC" Version="SingleTsChannel" Cacheable="False">
 	  &TsChannel;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
@@ -394,7 +251,7 @@
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData> 
-
+-->
 
 <!--
 	<InputData Lumi="0.61625366206" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-15to20_Mu" Cacheable="False">
@@ -403,7 +260,7 @@
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
 -->
-
+<!--
 	<InputData Lumi="10.7" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-20to30_Mu" Cacheable="False">
 	  &MC_QCD_Pt-20to30_Mu;
 	  <InputTree Name="AnalysisTree" />
@@ -431,12 +288,13 @@
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
+-->
 	<InputData Lumi="913.997" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-170to300_Mu" Cacheable="False">
 	  &MC_QCD_Pt-170to300_Mu;
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-
+<!--
 	<InputData Lumi="9790.74" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-300to470_Mu" Cacheable="False">
 	  &MC_QCD_Pt-300to470_Mu;
 	  <InputTree Name="AnalysisTree" />
@@ -463,7 +321,7 @@
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
-
+-->
 <!--
 	<InputData Lumi="0.919" NEventsMax="-1" Type="MC" Version="MC_QCD_Pt-15to20_Em" Cacheable="False">
 	  &MC_QCD_Pt-15to20_Em;
@@ -528,21 +386,115 @@
       </InputData>
 
 -->
-     <InputData Lumi="99690" NEventsMax="-1" Type="MC" Version="Zprime_1500" Cacheable="False">
-        &Zprime_1500;
-        <InputTree Name="AnalysisTree" /> 
+
+
+<!--
+      <InputData Lumi="98400" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_LH_25ns" Cacheable="False">
+        &Bpb_TW_800_LH;
+        <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
-     <InputData Lumi="200683" NEventsMax="-1" Type="MC" Version="Zprime_2000" Cacheable="False">
-        &Zprime_2000;
-        <InputTree Name="AnalysisTree" /> 
+      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_RH_25ns" Cacheable="False">
+        &Bpb_TW_800_RH;
+        <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
-     <InputData Lumi="100288" NEventsMax="-1" Type="MC" Version="Zprime_2500" Cacheable="False">
-        &Zprime_2500;
-        <InputTree Name="AnalysisTree" /> 
+      <InputData Lumi="99800" NEventsMax="-1" Type="MC" Version="Bpb_TW_1200_LH_25ns" Cacheable="False">
+        &Bpb_TW_1200_LH;
+        <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
+      <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1200_RH_25ns" Cacheable="False">
+        &Bpb_TW_1200_RH;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+      <InputData Lumi="299347.0" NEventsMax="-1" Type="MC" Version="Bpb_TW_1000_LH_25ns" Cacheable="False">
+        &Bpb_TW_1000_LH;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>    
+      <InputData Lumi="99800" NEventsMax="-1" Type="MC" Version="Bpb_TW_1000_RH_25ns" Cacheable="False">
+        &Bpb_TW_1000_RH;
+        <InputTree Name="AnalysisTree" />
+        <OutputTree Name="AnalysisTree" />
+      </InputData>
+
+-->
+
+
+<!--
+	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt30to50" Cacheable="False">
+	  &MC_QCD_Pt30to50;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt50to80" Cacheable="False">
+	  &MC_QCD_Pt50to80;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt80to120" Cacheable="False">
+	  &MC_QCD_Pt80to120;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="7.31523455741881" NEventsMax="-1" Type="MC" Version="QCD_Pt120to170" Cacheable="False">
+	  &MC_QCD_Pt120to170;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="29.3160237388724" NEventsMax="-1" Type="MC" Version="QCD_Pt170to300" Cacheable="False">
+	  &MC_QCD_Pt170to300;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="374.61050747795" NEventsMax="-1" Type="MC" Version="QCD_Pt300to470" Cacheable="False">
+	  &MC_QCD_Pt300to470;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="2991.71397716754" NEventsMax="-1" Type="MC" Version="QCD_Pt470to600" Cacheable="False">
+	  &MC_QCD_Pt470to600;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="10113.7292669877" NEventsMax="-1" Type="MC" Version="QCD_Pt600to800" Cacheable="False">
+	  &MC_QCD_Pt600to800;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="59186.0774780912" NEventsMax="-1" Type="MC" Version="QCD_Pt800to1000" Cacheable="False">
+	  &MC_QCD_Pt800to1000;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="155146.470169776" NEventsMax="-1" Type="MC" Version="QCD_Pt1000to1400" Cacheable="False">
+	  &MC_QCD_Pt1000to1400;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="234924.345813802" NEventsMax="-1" Type="MC" Version="QCD_Pt1400to1800" Cacheable="False">
+	  &MC_QCD_Pt1400to1800;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="1695831.84708943" NEventsMax="-1" Type="MC" Version="QCD_Pt1800to2400" Cacheable="False">
+	  &MC_QCD_Pt1800to2400;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="29046635.2651099" NEventsMax="-1" Type="MC" Version="QCD_Pt2400to3200" Cacheable="False">
+	  &MC_QCD_Pt2400to3200;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+	<InputData Lumi="1140536129.83167" NEventsMax="-1" Type="MC" Version="QCD_Pt3200toInf" Cacheable="False">
+	  &MC_QCD_Pt3200toInf;
+	  <InputTree Name="AnalysisTree" />
+	  <OutputTree Name="AnalysisTree" />
+	</InputData>
+-->
 
 <!--
 	<InputData Lumi="" NEventsMax="-1" Type="MC" Version="ZJetsM10to50" Cacheable="False">
