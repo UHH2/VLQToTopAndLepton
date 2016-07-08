@@ -71,6 +71,7 @@ bool BprimeReco::massReco(uhh2::Event & event){
       unsigned int N = unusedJets.size();
       string bitmask(K, 1); // K leading 1's
       bitmask.resize(N, 0); // N-K trailing 0's 
+      double bdiscrimi = -1;
       vector<LorentzVector> jets_top;
       //permute bitmask
       do {
@@ -79,11 +80,13 @@ bool BprimeReco::massReco(uhh2::Event & event){
 	  if (bitmask[i]){
 	    top = top+unusedJets.at(i).v4();
 	    jets_top.push_back(unusedJets.at(i).v4());
+	    bdiscrimi = unusedJets.at(i).btag_combinedSecondaryVertex();
 	  }
 	  //if (bitmask[i]) cout <<i<<endl;
 	}
 	if((top+hyp.get_wHad()).M()>500 && (top+hyp.get_wLep()).M()>500) continue;
 	hyp.set_topJets(top);
+	if(hyp.get_btag_discriminator() < bdiscrimi)hyp.set_btag_discriminator(bdiscrimi);
 	//hyp.set_topLorentz(jets_top);
 	for(unsigned int it = 0; it<bitmask.size(); it++){
 	  if(bitmask[it]){
@@ -196,6 +199,7 @@ vector<BprimeContainer> BprimeReco::reconstruct_WHyps(const std::vector<Jet> & j
   BprimeContainer tmp_hyp;
   //reconstruct hadronic W and add leptonic W
   for(unsigned int K=1; K<jets.size(); ++K){
+    double bdiscrimi = -1;
     unsigned int N = jets.size();
     string bitmask(K, 1); // K leading 1's
     bitmask.resize(N, 0); // N-K trailing 0's 
@@ -207,6 +211,7 @@ vector<BprimeContainer> BprimeReco::reconstruct_WHyps(const std::vector<Jet> & j
 	if(bitmask[i]){ 
 	  whad = whad+jets.at(i).v4();
 	  whad_jets.push_back(jets.at(i).v4());
+	  bdiscrimi = jets.at(i).btag_combinedSecondaryVertex();	   
 	}
 	if(whad.M()>cutoff_WHad_max*1.25) break;
       }
@@ -214,6 +219,7 @@ vector<BprimeContainer> BprimeReco::reconstruct_WHyps(const std::vector<Jet> & j
 	if(whad.M()<cutoff_WHad_max && whad.M()>cutoff_WHad_min){
 	  tmp_hyp.set_wJets(bitmask);
 	  tmp_hyp.set_wHad(whad);
+	  if(tmp_hyp.get_btag_whad() < bdiscrimi)tmp_hyp.set_btag_whad(bdiscrimi);
 	  //tmp_hyp.set_wHadJets(whad_jets);
 	  tmp_hyp.set_wLep(wlep);
 	  recoWHyps.emplace_back(tmp_hyp);

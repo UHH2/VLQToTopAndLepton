@@ -20,6 +20,8 @@ class BprimeContainer{
     chi =-1;
     mass =-1;
     recoTyp=-1;
+    btag_discriminand=-1;
+    btag_whad_discr =-1;
   }
   
   LorentzVector get_wLep(){return wLep;}
@@ -34,7 +36,11 @@ class BprimeContainer{
   double get_chiVal(){return chi;}
   double get_Mass(){return mass;}
   int get_RecoTyp(){return recoTyp;}
+  double get_btag_discriminator(){return btag_discriminand;}  
+  double get_btag_whad(){return btag_whad_discr;}
   
+  void set_btag_whad(double b_whad){btag_whad_discr =b_whad;}
+  void set_btag_discriminator(double btag){btag_discriminand = btag;}
   void set_topJets(LorentzVector topJets_){topJets = topJets_;}
   void set_topLorentz(std::vector<LorentzVector> top_LorentzJets){top_lorentz = top_LorentzJets;}
   void set_wLep(LorentzVector wLep_){wLep = wLep_;}
@@ -58,4 +64,5 @@ class BprimeContainer{
   std::string unused_jets;//additional jets for the top
   Particle m_lepton;
   double chi,mass;
+  double btag_discriminand, btag_whad_discr;
 };
