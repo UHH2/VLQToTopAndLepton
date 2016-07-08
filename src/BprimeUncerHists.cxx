@@ -8,9 +8,9 @@ BprimeUncerHists::BprimeUncerHists(uhh2::Context & ctx, const std::string & dirn
 
   vector<string> scale_names = {"muFup","muFdown","muRup","muRupmuFup","muRdown","muRdownmuFdown"};
   for(auto name : scale_names)
-    scale.push_back(book<TH1F>("Uncertainty_scale_"+name,"B Mass[GeV]",30,50,3000));
-  for(unsigned int i = 0; i<103; i++){
-    pdf.push_back(book<TH1F>("Uncertainty_pdf_weight_"+to_string(i),"B Mass[GeV]",30,50,3000));
+    scale.push_back(book<TH1F>("Uncertainty_scale_"+name,"B Mass[GeV]",50,50,3000));
+  for(unsigned int i = 0; i<102; i++){
+    pdf.push_back(book<TH1F>("Uncertainty_pdf_weight_"+to_string(i),"B Mass[GeV]",50,50,3000));
   }
 }
 
