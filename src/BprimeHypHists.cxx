@@ -8,7 +8,7 @@ BprimeHypHists::BaseHists BprimeHypHists::book_BaseHists(const std::string & nam
   hists.pt   = book<TH1F>("pt_"+name,"p_{T} "+ label+" [GeV]",100,minPt,maxPt);
   hists.eta  = book<TH1F>("eta_"+name,"#eta "+label,100,-4,4);
   hists.phi  = book<TH1F>("phi_"+name,"#phi "+label,100,-3.2,3.2);
-  hists.mass = book<TH1F>("mass_"+name,"Mass "+label+" [GeV]",30,minMass,maxMass);
+  hists.mass = book<TH1F>("mass_"+name,"Mass "+label+" [GeV]",50,minMass,maxMass);
   return hists;
 }
 
@@ -21,6 +21,9 @@ void BprimeHypHists::fill_BaseHists(const T & particle, BaseHists & hists, doubl
 }
 
 BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const string & hyp_name): Hists(ctx, dirname){
+  //btagReco = book_BaseHists("btagReco","highest b-Tag",0,200);
+  btagReco_csv = book<TH1F>("btagReco_cvs","highest b-Tag csv", 40, 0, 1);
+  
   wHad = book_BaseHists("wHad","W_{had}",0,300);
   wLep = book_BaseHists("wLep","W_{lep}",0,300); 
   topLep = book_BaseHists("topLep","Top_{lep}",0,400);
@@ -153,8 +156,12 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   //vector<Jet>* jets = event.jets;
 
   double matching_distance = 0.4;
-   
 
+  double btagdis = hyp.get_btag_discriminator();
+  double btagwhad = hyp.get_btag_whad();
+  if(btagdis != -1)
+    btagReco_csv->Fill(btagdis,weight);
+  
   if(recotype ==2 && !event.isRealData){
     if(thad.pt()>=400 && thad.pt()<=550)
       weight *= 0.91;
@@ -190,6 +197,8 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   }
   else if(recotype==12 || recotype==2){
     bprime = thad+wlep;
+    if(btagdis==-1)
+      btagReco_csv->Fill(btagwhad,weight);
     reco_pt_tW->Fill(thad.pt(),wlep.pt(),weight);
     deltaPhi_thad_wlep->Fill(deltaPhi(thad,wlep),weight);
     deltaEta_thad_wlep->Fill(abs(thad.eta()-wlep.eta()),weight);
@@ -201,6 +210,9 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     fill_BaseHists(topJets+whad+wlep, mass, weight);
   else if(recotype==2)
     fill_BaseHists(thad+wlep, mass, weight);
+
+  if((btagdis==-1 && recotype==12 && btagwhad==-1) || (btagdis==-1 && recotype!=12))
+    btagReco_csv->Fill(btagwhad,weight);
   
 
   if(jets_top.size() ==1 && jets_whad.size() ==2 && 1==2){
