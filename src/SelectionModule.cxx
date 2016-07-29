@@ -21,6 +21,7 @@
 #include "UHH2/common/include/MCWeight.h"
 #include "UHH2/common/include/TopPtReweight.h"
 
+#include "UHH2/VLQToTopAndLepton/include/UncertaintyWeightsModule.h"
 
 #include "UHH2/VLQToTopAndLepton/include/GenSelection.h"
 #include "UHH2/VLQToTopAndLepton/include/HistFactory.h"
@@ -36,7 +37,7 @@
 #include "UHH2/VLQToTopAndLepton/include/WTopJet.h"
 //#include "UHH2/VLQToTopAndLepton/include/OptTreeModule.h"
 #include "UHH2/VLQToTopAndLepton/include/JetReweight.h"
-
+#include "UHH2/VLQToTopAndLepton/include/TopTagScalefactor.h"
 
 using namespace std;
 using namespace uhh2;
@@ -74,6 +75,11 @@ private:
   std::unique_ptr<Selection> hepselection;  
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffiHists;
   std::unique_ptr<AnalysisModule> BTagScaleFactors,SF_muonID;
+  std::unique_ptr<AnalysisModule> pdf_scale_unc;
+  std::unique_ptr<AnalysisModule> toptag_scale;
+  
+  uhh2::Event::Handle<double> weight;
+  uhh2::Event::Handle<double> numberofjets;
 
   string SF_muonID_variation ="nominal";
   string BTag_variation ="central";
@@ -85,9 +91,12 @@ private:
 };
 
 SelectionModule::SelectionModule(Context& ctx){
+  weight = ctx.declare_event_output<double>("weight");
+  numberofjets= ctx.declare_event_output<double>("numberofjets");
   primlep = ctx.get_handle<FlavorParticle>("PrimaryLepton");
   ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819));
-
+  pdf_scale_unc.reset(new UncertaintyWeightsModule(ctx));
+  toptag_scale.reset(new TopTagScalefactor(ctx,"TopTagDis"));
 
   vector<int> topLepIds {6,24,13};
   vector<int> topHadIds {6,24,-54321};
@@ -97,8 +106,6 @@ SelectionModule::SelectionModule(Context& ctx){
   //topHad.reset(new GenFamilySelection(topHadIds,2));;
   //Reco_wHad.reset(new BprimeRecoHists(ctx, "Gen_wHad"));
   //Reco_wLep.reset(new BprimeRecoHists(ctx, "Gen_wLep"));
-
-
 
   //OptTree.reset(new OptTreeModule(ctx));
   jet = PtEtaCut(40,3);
@@ -166,8 +173,11 @@ SelectionModule::SelectionModule(Context& ctx){
   btagSel.reset(new NJetSelection(1,-1,btag_medium));
 
   cmstoptagDis.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::cmsTopTag,"TopTagReco","TopTagDis"));
+  cmstoptagDis->set_emptyHyp(true);
   ttbar.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::ttbar,"BprimeReco","TTbarDis"));
+  ttbar->set_emptyHyp(true);
   chi2_combo.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::chi2_combo,"BprimeReco","Chi2Dis"));
+  chi2_combo->set_emptyHyp(true);
   //chi2_tlep.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::lepTop,"BprimeReco","TLepDis"));
   //chi2_thad.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::hadTop,"BprimeReco","THadDis"));
   //chi2_wtag.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::wTag,"WTagReco","WTagDis"));
@@ -305,24 +315,21 @@ SelectionModule::SelectionModule(Context& ctx){
   TopTagPlots->addHists("BprimeHypHists","TopTagReco_BprimeHypHists","TopTagDis");
   TopTagPlots->addHists("BprimeUncerHists","TopTagReco_BprimeUncerHists","TopTagDis");
   TopTagPlots->addHists("EventKinematicHists","TopTagReco_EventKinematicHists");
-
-  
+ 
 }
 
 bool SelectionModule::process(Event & event){ 
   //cout<<"=============================="<<endl;
   //cout<<event.event<<endl;
-
   common->process(event);
   ht->process(event);
   lepton->process(event);
   ttbar_reweight->process(event);
+  Gen->process(event);  
 
   SF_muonID->process(event);
   BTagEffiHists->fill(event);
-
-  if(!event.isRealData){
-    Gen->process(event);  
+  if(!event.isRealData){ 
     genjet_hists->fill(event);
   }
   TagPlots->passAndFill(event,1);
@@ -338,29 +345,52 @@ bool SelectionModule::process(Event & event){
 
   bool reconstructed = false;
   //bool wreco = false; 
+
+  bool toptagreco_bool = TopTagReco->TopJetReco(event,2);
+  bool toptagdis_bool = cmstoptagDis->process(event);
+  bool reco_bool = Reco->massReco(event);
+  bool ttbardis_bool = ttbar->process(event);
+  bool chi2dis_bool =  chi2_combo->process(event);
+
+  if(toptagreco_bool && toptagdis_bool){
+    reconstructed =true;
+    TopTagPlots->passAndFill(event,1); 
+  }
+  if(reco_bool){
+    BTagScaleFactors->process(event);
+    if(ttbardis_bool)
+      if(btagSel->passes(event) && ttbar_chi2->passes(event)) ttbar_Hists->fill(event); 
+    if(chi2dis_bool && !reconstructed){
+      Chi2Plots->passAndFill(event,1);
+    }
+  }
+  toptag_scale->process(event);
+  
+  /*
+   *
+   * This is the version where I do not write out the tree and try to save some computing time
+   * only considering certain possible reconstructions
+   *
+   */
+  /*
   if(TopTagReco->TopJetReco(event,2)){
     if(cmstoptagDis->process(event)){
       reconstructed =true;
       TopTagPlots->passAndFill(event,1);
     }
   }
-  //if(deltaPhi(event.get(primlep).v4(),event.jets->at(0).v4()) < 0.1  || deltaPhi(event.get(primlep).v4(),event.jets->at(0).v4()) > 2.4){
-    if(Reco->massReco(event)){
-      BTagScaleFactors->process(event);
-      if(ttbar->process(event))
-	if(btagSel->passes(event) && ttbar_chi2->passes(event)) ttbar_Hists->fill(event); 
-      if(chi2_combo->process(event) && !reconstructed){
-	Chi2Plots->passAndFill(event,1);
-      }
-      /*
-	if(!event.isRealData){
-	if(topLep->passes(event))  Reco_wHad->fill(event);
-	if(topHad->passes(event))  Reco_wLep->fill(event);
-	}
-      */
-      //}
-}
-
+  if(Reco->massReco(event)){
+    BTagScaleFactors->process(event);
+    if(ttbar->process(event))
+      if(btagSel->passes(event) && ttbar_chi2->passes(event)) ttbar_Hists->fill(event); 
+    if(chi2_combo->process(event) && !reconstructed){
+      Chi2Plots->passAndFill(event,1);
+    }
+  }
+    */
+  event.set(numberofjets,event.jets->size()); 
+  event.set(weight,event.weight);
+  pdf_scale_unc->process(event);
   return true;
 }
 // make sure the class is found by class name. This is ensured by this macro:

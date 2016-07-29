@@ -122,8 +122,6 @@ bool GenNSelection::passes(const uhh2::Event & event){
       if(abs(genp.pdgId())==pdgId && genp.pt()>minPt && (genp.pt()<maxPt || maxPt ==-1) ) count++;
       if(count>nmax) return false;
     }
-
-
     return count>=nmin && count<=nmax;
 }
 
