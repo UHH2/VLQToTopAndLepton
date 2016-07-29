@@ -7,8 +7,12 @@ BprimeGen::BprimeGen(uhh2::Context & ctx, const std::string & label){
  BprimeGenLevel = ctx.declare_event_output<BprimeGenContainer>(label);
 }
 bool BprimeGen::process(uhh2::Event & event){
+  BprimeGenContainer myDecay;
+  if(event.isRealData){
+    event.set(BprimeGenLevel,move(myDecay)); 
+    return false;
+  }
   const vector<GenParticle> * genparticles = event.genparticles;
-  BprimeGenContainer  myDecay;
   vector<int> hadronicTop {6,24,-54321}; 
   vector<int> leptonicTopMu {6,24,13};
   vector<int> leptonicTopEle {6,24,11};

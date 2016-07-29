@@ -18,6 +18,33 @@ BprimeReco::BprimeReco(uhh2::Context & ctx, const std::string & label){
   jetId=boost::none;
   topjetId=boost::none;
   FitNeutrino = NeutrinoFit();
+  bjetId = CSVBTag(CSVBTag::WP_MEDIUM);
+
+}
+
+int BprimeReco::count_bjets(vector<Jet> & jets, Event & event){
+  int counter = 0;
+  for(unsigned int i =0; i<jets.size(); i++){
+    if(passes_id(jets.at(i),event,bjetId))
+      counter++;
+  }
+  return counter;
+}
+
+double BprimeReco::forwardeta(vector<Jet> & jets, Event & event){
+  double eta = 0;
+  if(forwardJetId){
+    for(unsigned int i =0; i<jets.size(); i++){
+      if(passes_id(jets.at(i),event,forwardJetId))
+	if(eta<fabs(jets.at(i).eta()))eta =fabs(jets.at(i).eta());
+    }
+  }
+  else{
+    for(unsigned int i =0; i<jets.size(); i++){
+      if(eta<fabs(jets.at(i).eta()))eta =fabs(jets.at(i).eta());
+    }
+  }
+  return eta;
 }
 
 bool BprimeReco::process(uhh2::Event & event){
@@ -38,6 +65,9 @@ bool BprimeReco::set_jetCollection(uhh2::Context & ctx,const string & jetCollect
 }
 
 bool BprimeReco::massReco(uhh2::Event & event){
+  int numberOfBjets = count_bjets(*event.jets,event);
+  double forwardjeteta = forwardeta(*event.jets,event); 
+
   vector<Jet> jets = jetCollBool ? event.get(jet_collection) : *event.jets;
   if(jetId){
     vector<Jet> selected_jets; 
@@ -55,6 +85,8 @@ bool BprimeReco::massReco(uhh2::Event & event){
   vector<BprimeContainer> recoWHyps = reconstruct_WHyps(jets,wleps);
   //permutation of top jets
   for(auto & hyp : recoWHyps){
+    hyp.set_forwardJetEta(forwardjeteta);
+    hyp.set_EventBtagNumber(numberOfBjets);
     string jet_string = hyp.get_wJets();
     hyp.set_unusedJets(jet_string);//setting unused Jets to wJets for hyp with no Jets!
     recoHyps.emplace_back(hyp);//hypothersis without any additional jets!
@@ -124,6 +156,9 @@ void BprimeReco::comb(int N, int K)//prototyp of the permutation algorithem
 
 
 bool BprimeReco::TopJetReco(Event & event, double dRmin){
+  int numberOfBjets = count_bjets(*event.jets,event);
+  double forwardjeteta = forwardeta(*event.jets,event); 
+
   vector<TopJet> topjets = topjetCollBool ?  event.get(topjet_collection) : *event.topjets;
   if(topjetId){
     vector<TopJet> selected_topjets;
@@ -138,6 +173,8 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
 
   vector<BprimeContainer> recoHyps;
   BprimeContainer tmp_hyp;
+  tmp_hyp.set_forwardJetEta(forwardjeteta);
+  tmp_hyp.set_EventBtagNumber(numberOfBjets);
   //if(topjets.size()==0||neutrinos.size()==0) return false;
   for(auto & topjet : topjets){
     const vector<Jet> & Top_subjets = topjet.subjets();
@@ -159,6 +196,9 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
 }
 
 bool BprimeReco::BTagReco(Event & event){
+  int numberOfBjets = count_bjets(*event.jets,event);
+  double forwardjeteta = forwardeta(*event.jets,event); 
+
   if(!jetId){
     cerr<<"You have to set a jet Id which to veto"<<endl;
     assert(0==1);
@@ -177,6 +217,8 @@ bool BprimeReco::BTagReco(Event & event){
   vector<BprimeContainer> recoWHyps = reconstruct_WHyps(selected_jets,wleps);
   vector<BprimeContainer> recoHyps;
   for(auto & hyp : recoWHyps){
+    hyp.set_forwardJetEta(forwardjeteta);
+    hyp.set_EventBtagNumber(numberOfBjets);
     for(auto & bjet :  bjets){
       hyp.set_topJets(bjet.v4());
       recoHyps.push_back(hyp);

@@ -23,7 +23,9 @@ void BprimeHypHists::fill_BaseHists(const T & particle, BaseHists & hists, doubl
 BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const string & hyp_name): Hists(ctx, dirname){
   //btagReco = book_BaseHists("btagReco","highest b-Tag",0,200);
   btagReco_csv = book<TH1F>("btagReco_cvs","highest b-Tag csv", 40, 0, 1);
-  
+  btagtoplepReco_csv = book<TH1F>("btagtoplepReco_cvs","highest b-Tag csv leptonic Top", 40, 0, 1);
+  btagtophadReco_csv = book<TH1F>("btagtophadReco_cvs","highest b-Tag csv hadronic Top", 40, 0, 1);
+
   wHad = book_BaseHists("wHad","W_{had}",0,300);
   wLep = book_BaseHists("wLep","W_{lep}",0,300); 
   topLep = book_BaseHists("topLep","Top_{lep}",0,400);
@@ -136,6 +138,11 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
 
   recohyp = ctx.get_handle<BprimeContainer>(hyp_name);
   gen = ctx.get_handle<BprimeGenContainer>("BprimeGen");
+  /*
+  weight_toptag = ctx.get_handle<double>("weight_toptag");
+  weight_toptag_up = ctx.get_handle<double>("weight_toptag_up");
+  weight_toptag_down = ctx.get_handle<double>("weight_toptag_up");
+  */
 }
 
 BprimeHypHists::~BprimeHypHists(){}
@@ -159,16 +166,29 @@ void BprimeHypHists::fill(const uhh2::Event & event){
 
   double btagdis = hyp.get_btag_discriminator();
   double btagwhad = hyp.get_btag_whad();
+  double toptag_weight = -1;
+
   if(btagdis != -1)
     btagReco_csv->Fill(btagdis,weight);
   
   if(recotype ==2 && !event.isRealData){
-    if(thad.pt()>=400 && thad.pt()<=550)
+    if(thad.pt()>=400 && thad.pt()<=550){
+      //event.weight *= 0.91;
       weight *= 0.91;
-    else if(thad.pt()>550)
+      toptag_weight = 0.91;
+    }
+    else if(thad.pt()>550){
+      //event.weight *= 0.97;
       weight *= 0.97;
+      toptag_weight = 0.97;
+    }
   }
 
+  /*
+  event.set(weight_toptag,toptag_weight);
+  event.set(weight_toptag_up,toptag_weight*toptag_weight);
+  event.set(weight_toptag_down,event.weight);
+  */
   /*
   if(whad.M2()>30)
     whad.SetE(sqrt(80.4*80.4+whad.Px()*whad.Px()+whad.Py()*whad.Py()+whad.Pz()*whad.Pz()));
@@ -189,6 +209,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
 
   if(recotype==11||recotype==6){
     bprime = tlep+whad;
+    btagtoplepReco_csv->Fill(btagwhad,weight);
     reco_pt_tW->Fill(tlep.pt(),whad.pt(),weight);
     //cout<< "tlep,Whad delta phi "<<deltaPhi(tlep,whad)<<" delta eta "<<abs(tlep.eta()-whad.eta())<<endl; 
     deltaPhi_tlep_whad->Fill(deltaPhi(tlep,whad),weight);
@@ -197,8 +218,10 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   }
   else if(recotype==12 || recotype==2){
     bprime = thad+wlep;
-    if(btagdis==-1)
+    btagtophadReco_csv->Fill(btagwhad,weight);
+    if(btagdis==-1){
       btagReco_csv->Fill(btagwhad,weight);
+    }
     reco_pt_tW->Fill(thad.pt(),wlep.pt(),weight);
     deltaPhi_thad_wlep->Fill(deltaPhi(thad,wlep),weight);
     deltaEta_thad_wlep->Fill(abs(thad.eta()-wlep.eta()),weight);
@@ -224,6 +247,10 @@ void BprimeHypHists::fill(const uhh2::Event & event){
     cout<<"jet1 ("<<jets_whad[0].px()<<","<<jets_whad[0].py()<<","<<jets_whad[0].pz()<<","<<jets_whad[0].energy()<<")"<<endl; 
     cout<<"jet2 ("<<jets_whad[1].px()<<","<<jets_whad[1].py()<<","<<jets_whad[1].pz()<<","<<jets_whad[1].energy()<<")"<<endl; 
   }
+
+  //if( recotype == 12 || recotype == 11)
+  //cout<<"recotype "<<recotype<< " "<<bprime.M()<<" "<<hyp.get_Mass()<<endl;
+
 
 
   fill_BaseHists(whad, wHad, weight);

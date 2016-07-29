@@ -47,7 +47,7 @@ void BprimeUncerHists::fill(const uhh2::Event & event){
     double tmp_weight = event.genInfo->systweights().at(entry)/event.genInfo->originalXWGTUP();
     scale[i]->Fill(sqrt(bprime.M2()),weight*tmp_weight);
   }
-  for(unsigned int i = 9; i<111; i++){ 
+  for(unsigned int i = 9; i<110; i++){ 
     if(event.genInfo->systweights().size()==0) break;
     double tmp_weight = event.genInfo->systweights().at(i)/event.genInfo->originalXWGTUP();
     pdf[i-9]->Fill(sqrt(bprime.M2()),weight*tmp_weight);
