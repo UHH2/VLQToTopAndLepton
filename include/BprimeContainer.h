@@ -22,6 +22,8 @@ class BprimeContainer{
     recoTyp=-1;
     btag_discriminand=-1;
     btag_whad_discr =-1;
+    
+    
   }
   
   LorentzVector get_wLep(){return wLep;}
@@ -38,7 +40,15 @@ class BprimeContainer{
   int get_RecoTyp(){return recoTyp;}
   double get_btag_discriminator(){return btag_discriminand;}  
   double get_btag_whad(){return btag_whad_discr;}
-  
+  int get_EventBtagNumber(){return btagEventNumber;}
+  double get_forwardJetEta(){return forwardJetAbsEta;}
+  double get_gentopdistance(){return topDR;}
+  double get_genWdistance(){return wDR;}
+
+  void set_EventBtagNumber(int number){btagEventNumber = number;}
+  void set_forwardJetEta(double eta){forwardJetAbsEta = fabs(eta);}
+  void set_gentopdistance(double dr){topDR = dr;}
+  void set_genWdistance(double dr){wDR = dr;}
   void set_btag_whad(double b_whad){btag_whad_discr =b_whad;}
   void set_btag_discriminator(double btag){btag_discriminand = btag;}
   void set_topJets(LorentzVector topJets_){topJets = topJets_;}
@@ -65,4 +75,8 @@ class BprimeContainer{
   Particle m_lepton;
   double chi,mass;
   double btag_discriminand, btag_whad_discr;
+  double topDR = -1;
+  double wDR = -1;//in case of ttbar it is used as second top!
+  int btagEventNumber=-1;
+  double forwardJetAbsEta=-1;
 };

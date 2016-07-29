@@ -24,8 +24,13 @@ class BprimeReco :public uhh2::AnalysisModule {
   void set_wjetRecoId(const TopJetId & my_wjetId){wjetId =my_wjetId;}
   bool set_topjetCollection(uhh2::Context & ctx, const std::string & topjetCollectionName);
   bool set_jetCollection(uhh2::Context & ctx, const std::string & jetCollectionName);  
+  void set_forwardId(const JetId & forwardId){forwardJetId = forwardId;}
+  void set_bjetId(const JetId & bjetId_){bjetId=bjetId_;}
+
  private:
   void comb(int N, int K);
+  int count_bjets(std::vector<Jet> & jets, uhh2::Event & event);
+  double forwardeta(std::vector<Jet> & jets, uhh2::Event & event);
   std::vector<BprimeContainer> reconstruct_WHyps(const std::vector<Jet> & jets, const std::vector<LorentzVector> & Wleps, double cutoff_WHad_min=50, double cutoff_WHad_max=400);
   template<typename T>
     bool passes_id(const T & object, const uhh2::Event & event, const boost::optional<std::function<bool (const T &, const uhh2::Event & )>> & object_id);
@@ -37,6 +42,9 @@ class BprimeReco :public uhh2::AnalysisModule {
   boost::optional<JetId> jetId;
   boost::optional<TopJetId> topjetId;
   boost::optional<TopJetId> wjetId;
+  boost::optional<JetId> forwardJetId;
+  boost::optional<JetId> bjetId;
+
   NeutrinoFit FitNeutrino;
 
 };

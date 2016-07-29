@@ -25,6 +25,9 @@ class BprimeDiscriminator :public uhh2::AnalysisModule {
   BprimeContainer chiCombo_dis(uhh2::Event & event);
   BprimeContainer cmsTopTag_dis(uhh2::Event & event);
   BprimeContainer wTag_dis(uhh2::Event & event);
- 
+  int numberOfBjets_event = -1;
+  double forwardjeteta = -1;
+  
+
   uhh2::Event::Handle<BprimeContainer> resultHyp;
 };
