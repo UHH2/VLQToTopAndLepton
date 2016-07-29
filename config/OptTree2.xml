@@ -112,7 +112,7 @@
 
 <!--
    <ConfigParse NEventsBreak="0" FileSplit="20" AutoResubmit="3" MaxJobsPerProcess="200"/>
-   <ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.OptTree_v3"/>
+   <ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.OptTree_v4"/>
 -->
 
 <!-- OutputLevel controls which messages are printed; set to VERBOSE or DEBUG for more verbosity, to WARNING or ERROR for less -->
@@ -120,7 +120,7 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./OptTree_v3/" PostFix="" TargetLumi="2225">
+    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./OptTree_v4/" PostFix="" TargetLumi="2225">
     <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="10" OutputDirectory="./PreSelection_v1/" PostFix="" TargetLumi="552.4" >-->
 
       <InputData Lumi="1" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">

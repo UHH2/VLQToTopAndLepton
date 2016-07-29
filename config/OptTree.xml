@@ -57,15 +57,15 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-    <!--<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_TESTv2/" PostFix="" TargetLumi="40.028">-->
-    <Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="10" OutputDirectory="./Selection_TEST/" PostFix="" TargetLumi="3000" >
+    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./PreSelection_v2/" PostFix="" TargetLumi="40.028">
+    <!--<Cycle Name="uhh2::AnalysisModuleRunner"  RunMode="PROOF" ProofServer="lite://"  ProofWorkDir="/nfs/dust/cms/user/gonvaq/proof-wd/" ProofNodes="10" OutputDirectory="./Selection_TEST/" PostFix="" TargetLumi="3000" >-->
 <!--
       <InputData Lumi="1" NEventsMax="-1" Type="DATA" Version="SingleMuDATA" Cacheable="False">
         &SingleMuDATA;
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
-
+-->
       <InputData Lumi="98400" NEventsMax="-1" Type="MC" Version="Bpb_TW_800_LH_25ns" Cacheable="False">
         &Bpb_TW_800_LH;
         <InputTree Name="AnalysisTree" />
@@ -86,8 +86,7 @@
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
--->
-<!--      
+     
       <InputData Lumi="294951" NEventsMax="-1" Type="MC" Version="Bpt_TW_800_LH_25ns" Cacheable="False">
         &Bpt_TW_800_LH;
         <InputTree Name="AnalysisTree" />
@@ -119,8 +118,8 @@
         <InputTree Name="AnalysisTree" />
         <OutputTree Name="AnalysisTree" />
       </InputData>
--->
-<!--
+
+
       <InputData Lumi="100000" NEventsMax="-1" Type="MC" Version="Bpb_TW_1000_LH" Cacheable="False">
         &Bpb_TW_1000_LH;
         <InputTree Name="AnalysisTree" />
@@ -132,7 +131,7 @@
         <OutputTree Name="AnalysisTree" />
       </InputData>
  
--->
+
 
      <InputData Lumi="60492481.7" NEventsMax="-1" Type="MC" Version="WJets" Cacheable="False">
         &WJets;
@@ -158,7 +157,7 @@
       </InputData>
 -->
 
-<!--
+
 
       <InputData Lumi="51947416.4" NEventsMax="-1" Type="MC" Version="ZJetsM50toInf" Cacheable="False">
         &ZJetsM50toInf;
@@ -182,9 +181,9 @@
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
 
--->
 
-<!--
+
+
 	<InputData Lumi="1.25429262306654" NEventsMax="-1" Type="MC" Version="QCD_Pt30to50" Cacheable="True">
 	  &MC_QCD_Pt30to50;
 	  <InputTree Name="AnalysisTree" />
@@ -255,7 +254,7 @@
 	  <InputTree Name="AnalysisTree" />
 	  <OutputTree Name="AnalysisTree" />
 	</InputData>
--->
+
 
 
 <!--
