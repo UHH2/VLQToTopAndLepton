@@ -11,9 +11,9 @@ if __name__ == "__main__":
     debug = False
     remove = False #remove directories with old results
     resume = True
-    variatons_uncer = True
-    jet_uncer = False
-    sframe_plotter = True
+    variatons_uncer = False # not needed anymore, done as weights
+    jet_uncer = True
+    sframe_plotter = False # not implemented for jet uncer
 
     submission_options = 'slac'
     resume_options = 'rlac' 
@@ -31,10 +31,10 @@ if __name__ == "__main__":
     currentDir = os.getcwd()
 
     #what you want to do, could also be done in parallel but then monitoring gets more difficult
-    variations_variables = ['PU_variation','SF_muonID','BTag_variation']
+    variations_variables = ['PU_variation','BTag_variation']#,'SF_muonID'
     variations = ['up','down']
-    xmlfiles = ['Sel.xml'] # 'Sel.xml', EleSel.xml
-    prefix = ['Mu']#,'Ele']
+    xmlfiles = ['EleSel.xml'] # 'Sel.xml', EleSel.xml
+    prefix = ['Ele']#,'Ele']
     for xmlfile in xmlfiles:
         sel_type = 'Mu'
 	if 'Ele' in xmlfile:
@@ -89,7 +89,7 @@ if __name__ == "__main__":
         for var in jet_variables:
             for value in jet_variatons:
                 step = xml.split('.')[0]
-                command_string = "-"+submission_options+" "+xml+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem "+var+","+value
+                command_string = "-"+submission_options+" "+xml+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem "+var+","+value+" --addTree '-1'"
                 if debug:
                     print command_string
                     print command_string.split(" ")
@@ -106,7 +106,7 @@ if __name__ == "__main__":
                     print var+"_"+value+"_"+step,"found:",os.path.isdir(var+"_"+value+"_"+step)
                     exit(1)
                 elif resume and (os.path.isdir("workdir."+var+"_"+value+'_'+step) or os.path.isdir(var+"_"+value+'_'+step)):
-                     command_string = "-"+resume_options+" "+xml+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem "+var+","+value
+                     command_string = "-"+resume_options+" "+xml+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem "+var+","+value+" --addTree -1"
                 print command_string
                 SFrameBatchMain(command_string.split(" "))
                 if sframe_plotter:
@@ -129,14 +129,14 @@ if __name__ == "__main__":
                     shutil.copyfile(currentDir+"/workdir."+var+"_"+value+"_"+step+"/Result.xml", currentDir+"/"+second_stepXML)
 
                 step = "Sel"                              
-                command_string = "-"+submission_options+" "+second_stepXML+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem AnalysisModule,SelectionModule"
+                command_string = "-"+submission_options+" "+second_stepXML+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem AnalysisModule,SelectionModule --RemoveEmptyFiles"
                 if (os.path.isdir("workdir."+var+"_"+value+'_'+step) or os.path.isdir(var+"_"+value+'_'+step)) and not resume:
                     print "Aborting since a directory already exists:"
                     print "workdir."+var+"_"+value+"_"+step,"found:",os.path.isdir("workdir."+var+"_"+value+"_"+step)
                     print var+"_"+value+"_"+step,"found:",os.path.isdir(var+"_"+value+"_"+step)
                     exit(1)
                 elif resume and (os.path.isdir("workdir."+var+"_"+value+'_'+step) or os.path.isdir(var+"_"+value+'_'+step)):
-                     command_string = "-"+resume_options+" "+second_stepXML+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem AnalysisModule,SelectionModule"
+                     command_string = "-"+resume_options+" "+second_stepXML+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem AnalysisModule,SelectionModule --RemoveEmptyFiles"
 
                 print command_string
                 SFrameBatchMain(command_string.split(" "))

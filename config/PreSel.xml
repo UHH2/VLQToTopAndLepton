@@ -573,15 +573,15 @@
 
 	    <Item Name="jecsmear_direction" Value="nominal" />
 	    <Item Name="jersmear_direction" Value="nominal" />
-	    
-	    <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/scripts/BTagMCEfficiencyHistsMu.root" />
+	    <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_6_3/src/UHH2/scripts/BTagMCEfficiencyHistsMu.root" />
+
 	    <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_6_3/src/UHH2/common/data/CSVv2.csv" /> 
 	    <Item Name="SF_muonID" Value="nominal" /> 
 	    <Item Name="BTag_variation" Value="central" />
 
 	    <Item Name="PU_variation" Value="central" />
-	    <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/common/data/MyDataPileupHistogram_JSON_Golden_up.root" />
-	    <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/common/data/MyDataPileupHistogram_JSON_Golden_down.root" />
+	      <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_6_3/src/UHH2/common/data/MyDataPileupHistogram_Golden_65550.root" />
+	    <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_6_3/src/UHH2/common/data/MyDataPileupHistogram_Golden_72450.root" />
 
             <!-- The list of available collections to read in corresponds to the pointer members in event. The 'Name's to use here in the configuration are:
 		 PrimaryVertexCollection

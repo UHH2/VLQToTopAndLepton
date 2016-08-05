@@ -74,7 +74,7 @@ private:
   TopJetId topjetid,wjetId,heptopjetid;
   std::unique_ptr<Selection> hepselection;  
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffiHists;
-  std::unique_ptr<AnalysisModule> BTagScaleFactors,SF_muonID;
+  std::unique_ptr<AnalysisModule> BTagScaleFactors,SF_muonID, SF_electronID;
   std::unique_ptr<AnalysisModule> pdf_scale_unc;
   std::unique_ptr<AnalysisModule> toptag_scale;
   
@@ -82,12 +82,16 @@ private:
   uhh2::Event::Handle<double> numberofjets;
 
   string SF_muonID_variation ="nominal";
+  //string SF_electronID_variation = "nominal";
+
   string BTag_variation ="central";
   string PU_variation ="central";
 
   std::unique_ptr<TopPtReweight> ttbar_reweight;
 
   uhh2::Event::Handle<FlavorParticle> primlep;
+
+  int event_number = 0;
 };
 
 SelectionModule::SelectionModule(Context& ctx){
@@ -133,7 +137,9 @@ SelectionModule::SelectionModule(Context& ctx){
   common->init(ctx,PU_variation);
 
   //Muon ScaleFactors
-  SF_muonID.reset(new MCMuonScaleFactor(ctx, "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_4_15_patch1/src/UHH2/common/data/MuonID_Z_RunD_Reco74X_Nov20.root", "NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1", 1, "mediumID", SF_muonID_variation)); 
+  SF_muonID.reset(new MCMuonScaleFactor(ctx, "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_6_3/src/UHH2/common/data/MuonID_Z_RunCD_Reco76X_Feb15.root", "MC_NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1", 1, "mediumID", SF_muonID_variation)); 
+  //SF_electronID.reset(new MCElecScaleFactor(ctx, 
+
   //BTag Effi & Scale
   BTagEffiHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_MEDIUM));
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_MEDIUM,"jets",BTag_variation));
@@ -319,8 +325,6 @@ SelectionModule::SelectionModule(Context& ctx){
 }
 
 bool SelectionModule::process(Event & event){ 
-  //cout<<"=============================="<<endl;
-  //cout<<event.event<<endl;
   common->process(event);
   ht->process(event);
   lepton->process(event);
@@ -338,8 +342,6 @@ bool SelectionModule::process(Event & event){
   btag_jetHists->fill(event);
   twoDjetHists_sortbyeta->fill(event);
   sort_by_pt(*event.jets);
-
-
   //if(event.met->pt()+event.muons->at(0).pt() < 250)
   //  return false;
 
@@ -356,8 +358,9 @@ bool SelectionModule::process(Event & event){
     reconstructed =true;
     TopTagPlots->passAndFill(event,1); 
   }
+
+  BTagScaleFactors->process(event);
   if(reco_bool){
-    BTagScaleFactors->process(event);
     if(ttbardis_bool)
       if(btagSel->passes(event) && ttbar_chi2->passes(event)) ttbar_Hists->fill(event); 
     if(chi2dis_bool && !reconstructed){
@@ -388,9 +391,12 @@ bool SelectionModule::process(Event & event){
     }
   }
     */
+
   event.set(numberofjets,event.jets->size()); 
   event.set(weight,event.weight);
   pdf_scale_unc->process(event);
+  
+
   return true;
 }
 // make sure the class is found by class name. This is ensured by this macro:
