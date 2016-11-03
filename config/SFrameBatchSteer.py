@@ -13,7 +13,7 @@ if __name__ == "__main__":
     resume = True
     variatons_uncer = False # not needed anymore, done as weights
     jet_uncer = True
-    sframe_plotter = False # not implemented for jet uncer
+    sframe_plotter = False 
 
     submission_options = 'slac'
     resume_options = 'rlac' 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         if not variatons_uncer: break
         for var in variations_variables:
             for value in variations:
-                command_string = "-"+submission_options+" "+xmlfile+" -w workdir."+var+"_"+value+'_'+sel_type+" -o ./"+var+"_"+value+'_'+sel_type+" --ReplaceUserItem "+var+","+value
+                command_string = "-"+submission_options+" "+xmlfile+" -w workdir."+var+"_"+value+'_'+sel_type+" -o ./"+var+"_"+value+'_'+sel_type+" --ReplaceUserItem "+var+","+value+" --addTree -1"
                 if debug:
                     print command_string.split(" ")
                     continue
@@ -56,7 +56,7 @@ if __name__ == "__main__":
                     print var+"_"+value+'_'+sel_type,"found:",os.path.isdir(var+"_"+value+'_'+sel_type)
                     exit(1)
                 elif resume and (os.path.isdir("workdir."+var+"_"+value+'_'+sel_type) or os.path.isdir(var+"_"+value+'_'+sel_type)):
-                    command_string = "-"+resume_options+" "+xmlfile+" -w workdir."+var+"_"+value+"_"+sel_type+" -o ./"+var+"_"+value+"_"+sel_type+" --ReplaceUserItem "+var+","+value
+                    command_string = "-"+resume_options+" "+xmlfile+" -w workdir."+var+"_"+value+"_"+sel_type+" -o ./"+var+"_"+value+"_"+sel_type+" --ReplaceUserItem "+var+","+value+" --addTree -1"
 
                 print command_string
                 SFrameBatchMain(command_string.split(" "))
@@ -78,74 +78,85 @@ if __name__ == "__main__":
                     sys.exit(1)
                 """
 
-
+    print 'Starting jer and jec uncertainties'
     #Do the jer and jec uncertainties, since they need to be done before any selction
     jet_variables = ["jecsmear_direction","jersmear_direction"]
     jet_variatons = ['up','down']
-    jet_xmlfiles = ['PreSel.xml']
+    jet_xmlfiles = ['PreSel.xml','Ele_PreSel.xml']
 
     for xml in jet_xmlfiles:
+        sel_type = 'Mu'
+	if 'Ele' in xml:
+            sel_type = 'Ele'
         if not jet_uncer: break
         for var in jet_variables:
             for value in jet_variatons:
-                step = xml.split('.')[0]
-                command_string = "-"+submission_options+" "+xml+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem "+var+","+value+" --addTree '-1'"
+                step = 'Presel'
+                command_string = "-"+submission_options+" "+xml+" -w workdir."+var+"_"+value+"_"+step+"_"+sel_type+" -o ./"+var+"_"+value+"_"+step+"_"+sel_type+" --ReplaceUserItem "+var+","+value+" --addTree -1"
                 if debug:
                     print command_string
                     print command_string.split(" ")
-                    continue
+                    #continue
 
                 if remove:
-                    if os.path.isdir("workdir."+var+"_"+value+"_"+step): shutil.rmtree("workdir."+var+"_"+value+"_"+step)
-                    if os.path.isdir(var+"_"+value+"_"+step): shutil.rmtree(var+"_"+value+"_"+step) 
-                    if os.path.isdir(var+"_"+value+"_"+'Sel'): shutil.rmtree(var+"_"+value+"_"+'Sel') 
-                    if os.path.isdir(var+"_"+value+"_"+'Sel'): shutil.rmtree(var+"_"+value+"_"+'Sel') 
-                elif (os.path.isdir("workdir."+var+"_"+value+'_'+step) or os.path.isdir(var+"_"+value+'_'+step)) and not resume:
+                    if os.path.isdir("workdir."+var+"_"+value+"_"+step+"_"+sel_type): shutil.rmtree("workdir."+var+"_"+value+"_"+step+"_"+sel_type)
+                    if os.path.isdir(var+"_"+value+"_"+step+"_"+sel_type): shutil.rmtree(var+"_"+value+"_"+step+"_"+sel_type) 
+                elif (os.path.isdir("workdir."+var+"_"+value+'_'+step+"_"+sel_type) or os.path.isdir(var+"_"+value+'_'+step+"_"+sel_type)) and not resume:
                     print "Aborting since a directory already exists:"
-                    print "workdir."+var+"_"+value+"_"+step,"found:",os.path.isdir("workdir."+var+"_"+value+"_"+step)
-                    print var+"_"+value+"_"+step,"found:",os.path.isdir(var+"_"+value+"_"+step)
+                    print "workdir."+var+"_"+value+"_"+step+"_"+sel_type,"found:",os.path.isdir("workdir."+var+"_"+value+"_"+step+"_"+sel_type)
+                    print var+"_"+value+"_"+step+"_"+sel_type,"found:",os.path.isdir(var+"_"+value+"_"+step+"_"+sel_type)
                     exit(1)
-                elif resume and (os.path.isdir("workdir."+var+"_"+value+'_'+step) or os.path.isdir(var+"_"+value+'_'+step)):
-                     command_string = "-"+resume_options+" "+xml+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem "+var+","+value+" --addTree -1"
+                elif resume and (os.path.isdir("workdir."+var+"_"+value+'_'+step+"_"+sel_type) or os.path.isdir(var+"_"+value+'_'+step+"_"+sel_type)):
+                     command_string = "-"+resume_options+" "+xml+" -w workdir."+var+"_"+value+"_"+step+"_"+sel_type+" -o ./"+var+"_"+value+"_"+step+"_"+sel_type+" --ReplaceUserItem "+var+","+value+" --addTree -1"
                 print command_string
-                SFrameBatchMain(command_string.split(" "))
+                #if not debug: SFrameBatchMain(command_string.split(" "))
                 if sframe_plotter:
                     os.chdir(sframePlotterDir)
                     with open(sframePlotterDst, "wt") as fout:
                         with open(sframePlotterSteer, "rt") as fin:
                             for line in fin:
-                                fout.write(line.replace('__ChangeME__',var+"_"+value+"_"+step))
-                    subprocess.call('Plots -f '+sframePlotterDst, shell=True)
+                                if '__ChangeME__' in line:
+                                    fout.write(line.replace('__ChangeME__',var+"_"+value+"_"+step+"_"+sel_type))
+                                else:
+                                    fout.write(line.replace('__SELTYPE__',sel_type))
+                    if debug: print 'Plots -f '+sframePlotterDst
+                    if not debug: subprocess.call('Plots -f '+sframePlotterDst, shell=True)
                     os.chdir(currentDir)
                 
-                second_stepXML = 'Sel'+"_"+var+"_"+value+".xml"
+                second_stepXML = 'Sel'+"_"+var+"_"+value+sel_type+".xml"
 
-                if not os.path.isfile(currentDir+"/workdir."+var+"_"+value+"_"+step+"/Result.xml"):
-                    print 'Result.xml File not found something went wrong going to abort'
-                    print 'Searched in',currentDir+"/workdir."+var+"_"+value+"_"+step+"/Result.xml"
-                    exit(2)
-                else:
-                   
-                    shutil.copyfile(currentDir+"/workdir."+var+"_"+value+"_"+step+"/Result.xml", currentDir+"/"+second_stepXML)
+                if not debug:
+                    if not os.path.isfile(currentDir+"/workdir."+var+"_"+value+"_"+step+"_"+sel_type+"/Result.xml"):
+                        print 'Result.xml File not found something went wrong going to abort'
+                        print 'Searched in',currentDir+"/workdir."+var+"_"+value+"_"+step+"_"+sel_type+"/Result.xml"
+                        exit(2)
+                    else:
+                        shutil.copyfile(currentDir+"/workdir."+var+"_"+value+"_"+step+"_"+sel_type+"/Result.xml", currentDir+"/"+second_stepXML)
 
                 step = "Sel"                              
-                command_string = "-"+submission_options+" "+second_stepXML+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem AnalysisModule,SelectionModule --RemoveEmptyFiles"
-                if (os.path.isdir("workdir."+var+"_"+value+'_'+step) or os.path.isdir(var+"_"+value+'_'+step)) and not resume:
+                command_string = "-"+submission_options+" "+second_stepXML+" -w workdir."+var+"_"+value+"_"+step+"_"+sel_type+" -o ./"+var+"_"+value+"_"+step+"_"+sel_type+" --ReplaceUserItem AnalysisModule,SelectionModule --RemoveEmptyFiles"
+                if (os.path.isdir("workdir."+var+"_"+value+'_'+step+"_"+sel_type) or os.path.isdir(var+"_"+value+'_'+step+"_"+sel_type)) and not resume:
                     print "Aborting since a directory already exists:"
-                    print "workdir."+var+"_"+value+"_"+step,"found:",os.path.isdir("workdir."+var+"_"+value+"_"+step)
-                    print var+"_"+value+"_"+step,"found:",os.path.isdir(var+"_"+value+"_"+step)
+                    print "workdir."+var+"_"+value+"_"+step+"_"+sel_type,"found:",os.path.isdir("workdir."+var+"_"+value+"_"+step+"_"+sel_type)
+                    print var+"_"+value+"_"+step+"_"+sel_type,"found:",os.path.isdir(var+"_"+value+"_"+step+"_"+sel_type)
                     exit(1)
-                elif resume and (os.path.isdir("workdir."+var+"_"+value+'_'+step) or os.path.isdir(var+"_"+value+'_'+step)):
-                     command_string = "-"+resume_options+" "+second_stepXML+" -w workdir."+var+"_"+value+"_"+step+" -o ./"+var+"_"+value+"_"+step+" --ReplaceUserItem AnalysisModule,SelectionModule --RemoveEmptyFiles"
+                elif resume and (os.path.isdir("workdir."+var+"_"+value+'_'+step+"_"+sel_type) or os.path.isdir(var+"_"+value+'_'+step+"_"+sel_type)):
+                     command_string = "-"+resume_options+" "+second_stepXML+" -w workdir."+var+"_"+value+"_"+step+"_"+sel_type+" -o ./"+var+"_"+value+"_"+step+"_"+sel_type+" --ReplaceUserItem AnalysisModule,SelectionModule --RemoveEmptyFiles"
 
-                print command_string
-                SFrameBatchMain(command_string.split(" "))
+                if debug: 
+                    print command_string
+                    print command_string.split(" ")
+                if not debug: SFrameBatchMain(command_string.split(" "))
                 if sframe_plotter:
                     os.chdir(sframePlotterDir)
                     with open(sframePlotterDst, "wt") as fout:
                         with open(sframePlotterSteer, "rt") as fin:
                             for line in fin:
-                                fout.write(line.replace('__ChangeME__',var+"_"+value+"_"+step))
-                    subprocess.call('Plots -f '+sframePlotterDst, shell=True)
+                                if '__ChangeME__' in line:
+                                    fout.write(line.replace('__ChangeME__',var+"_"+value+"_"+step+'_'+sel_type))
+                                else:
+                                    fout.write(line.replace('__SELTYPE__',sel_type))
+                    if debug : print 'Plots -f '+sframePlotterDst
+                    if not debug: subprocess.call('Plots -f '+sframePlotterDst, shell=True)
                     os.chdir(currentDir)
                 

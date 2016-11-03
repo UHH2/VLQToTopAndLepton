@@ -175,10 +175,10 @@ void HistFactory::addHists(const string& histClass, const string& histName, cons
       }
     }
     else if(histClass.compare("EventKinematicHists")==0){
-      histTemplate.reset(new EventKinematicHists(m_ctx,ss.str().c_str()));
+      histTemplate.reset(new EventKinematicHists(m_ctx,ss.str().c_str(),hyp_name));
       for(auto & name : uncerNames){
 	unique_ptr<Hists> uncerHists;
-	uncerHists.reset(new EventKinematicHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHists.reset(new EventKinematicHists(m_ctx,(ss.str()+"_"+name).c_str(),hyp_name));
 	uncerHistsTemplate.push_back(move(uncerHists));
       }
     }

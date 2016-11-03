@@ -107,13 +107,12 @@ class PTWhadCut: public uhh2::Selection{
 
 class ForwardJetPtEtaCut: public uhh2::Selection{
  public:
-  explicit ForwardJetPtEtaCut(float minEta, float maxEta=-1, float minPt=0, float maxPt=-1);
+  explicit ForwardJetPtEtaCut(uhh2::Context & ctx, float minEta, float maxEta=-1, float minPt=0, float maxPt=-1, float minDrmin = -1, float minEnergy =-1, std::string hyp_name ="");
   virtual bool passes(const uhh2::Event & event) override;
  private:
-  float minEta_;
-  float maxEta_;
-  float minPt_;
-  float maxPt_;
+  float minEta_, maxEta_, minPt_, maxPt_, minDrmin_, minEnergy_;
+  uhh2::Event::Handle<BprimeContainer> recohyp;
+  std::string hyp_name_;
 };
 
 

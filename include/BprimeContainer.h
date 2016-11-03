@@ -15,15 +15,14 @@ class BprimeContainer{
     wHad = emptyLorentz;
     wLep = emptyLorentz;
     topJets = emptyLorentz;
+    forwardJet = emptyLorentz;    
     whad_jets="";
     unused_jets="";
     chi =-1;
     mass =-1;
     recoTyp=-1;
     btag_discriminand=-1;
-    btag_whad_discr =-1;
-    
-    
+    btag_whad_discr =-1;   
   }
   
   LorentzVector get_wLep(){return wLep;}
@@ -44,6 +43,8 @@ class BprimeContainer{
   double get_forwardJetEta(){return forwardJetAbsEta;}
   double get_gentopdistance(){return topDR;}
   double get_genWdistance(){return wDR;}
+  LorentzVector get_forwardJet(){return forwardJet;}
+
 
   void set_EventBtagNumber(int number){btagEventNumber = number;}
   void set_forwardJetEta(double eta){forwardJetAbsEta = fabs(eta);}
@@ -58,17 +59,18 @@ class BprimeContainer{
   void set_wHadJets(std::vector<LorentzVector> whadJets){wHad_lorentz = whadJets;}
   void set_topLep(LorentzVector top_){topLep = top_;}
   void set_topHad(LorentzVector top_){topHad = top_;}
-  //void set_forwardJet(LorentzVector forwardJet_){forwardJet = forwardJet_;}
+  void set_forwardJet(LorentzVector forwardJet_){forwardJet = forwardJet_;}
   //void set_balanceJet(LorentzVector balanceJet_){balanceJet = balanceJet_;}
   void set_wJets(std::string jets){whad_jets = jets;}
   void set_unusedJets(std::string jets){unused_jets = jets;}
   void set_chiVal(double chi_){chi=chi_;}
   void set_Mass(double mass_){mass=mass_;}
   void set_RecoTyp(int i_){recoTyp= i_;}
-  
+  void set_jetIso(double iso){jetiso=iso;}
+
  private:  
   int recoTyp;
-  LorentzVector wLep, wHad, topLep, topHad, topJets;//, forwardJet, balanceJet;  
+  LorentzVector wLep, wHad, topLep, topHad, topJets, forwardJet;//, forwardJet, balanceJet;  
   std::vector<LorentzVector> wHad_lorentz, top_lorentz;
   std::string whad_jets;
   std::string unused_jets;//additional jets for the top
@@ -79,4 +81,5 @@ class BprimeContainer{
   double wDR = -1;//in case of ttbar it is used as second top!
   int btagEventNumber=-1;
   double forwardJetAbsEta=-1;
+  double jetiso =-1;
 };

@@ -31,7 +31,7 @@ class HistFactory{
   void addAndSelection(vector<unique_ptr<Selection>> selection, const string& cutName);
   void addOrSelection(vector<unique_ptr<Selection>> selection, const string& cutName);
   //void addSelection(shared_ptr<Selection> selection, string cutName);
-  void addHists(const string& histClass, const string& histName, const std::string & hyp_name = "BprimeReco");
+  void addHists(const string& histClass, const string& histName, const std::string & hyp_name = "");
   void addHists(const string& histName, JetId jetid);
   void addHists(const string& histName, TopJetId topjetid);
   void ScaleUncer();

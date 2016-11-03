@@ -133,14 +133,37 @@ bool PTWhadCut::passes(const uhh2::Event & event){
   return false;
 }
 
-ForwardJetPtEtaCut::ForwardJetPtEtaCut(float minEta, float maxEta, float minPt, float maxPt):minEta_(minEta),maxEta_(maxEta),minPt_(minPt),maxPt_(maxPt){}
+ForwardJetPtEtaCut::ForwardJetPtEtaCut(Context & ctx,float minEta, float maxEta, float minPt, float maxPt, float minDrmin, float minEnergy, std::string hyp_name):minEta_(minEta),maxEta_(maxEta),minPt_(minPt),maxPt_(maxPt),minDrmin_(minDrmin),minEnergy_(minEnergy),hyp_name_(hyp_name){
+  if(!hyp_name.empty())
+    recohyp = ctx.get_handle<BprimeContainer>(hyp_name);
+}
 
 bool ForwardJetPtEtaCut::passes(const uhh2::Event & event){
   vector<Jet> jets = *event.jets;
-  Jet maxEtaJet = Jet();
-  for(auto jet : jets)
-    if(fabs(jet.eta())> fabs(maxEtaJet.eta()) && minPt_<jet.pt() && (maxPt_ > jet.pt() || maxPt_ ==-1) ) maxEtaJet = jet;
-  return fabs(maxEtaJet.eta())> minEta_ && (fabs(maxEtaJet.eta()) < maxEta_ || maxEta_==-1);
+  LorentzVector maxEtaJet(0,0,0,0);
+  float minimaldr = -1;
+  if(hyp_name_.empty()){
+    for(auto jet : jets){
+      if(fabs(jet.eta())> fabs(maxEtaJet.eta()) && minPt_<jet.pt() && (maxPt_ > jet.pt() || maxPt_ ==-1) ) 
+	maxEtaJet = jet.v4();
+    }
+  }
+  else{
+    BprimeContainer hyp = event.get(recohyp);
+    maxEtaJet=hyp.get_forwardJet();
+  }
+  for(auto jet : jets){
+    if((deltaR(maxEtaJet,jet.v4()) < minimaldr || minimaldr==-1 ) && deltaR(maxEtaJet,jet.v4()) > 0) 
+      minimaldr = deltaR(maxEtaJet,jet.v4());
+  }
+   
+
+
+  //cout<<"E "<<maxEtaJet.v4().E()<<" > "<<minEnergy_<<" min dR "<<minimaldr<<" > "<<minDrmin_<<endl;
+  return fabs(maxEtaJet.eta())>= minEta_ && (fabs(maxEtaJet.eta()) <= maxEta_ || maxEta_==-1) && maxEtaJet.energy() >= minEnergy_;
+  //return fabs(maxEtaJet.eta())> minEta_ && (fabs(maxEtaJet.eta()) < maxEta_ || maxEta_==-1) && maxEtaJet.energy() > minEnergy_ && minimaldr > minDrmin_;
+  //return ((fabs(maxEtaJet.eta())>= minEta_  && (fabs(maxEtaJet.eta()) <= maxEta_ || maxEta_==-1)) || (minimaldr >= minDrmin_ && minDrmin_ >=0) ) && (maxEtaJet.energy() >= minEnergy_ || minEnergy_ ==0.);
+  
 }
 
 

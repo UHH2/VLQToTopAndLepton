@@ -132,6 +132,10 @@ BprimeHypHists::BprimeHypHists(Context & ctx, const string & dirname, const stri
   dR_forwardJet_bprime = book<TH1F>("dR_forwardJet_bprime","#Delta R (forwardJet,B)", 100, 0, 8);
   deltaPhi_forwardJet_bprime = book<TH1F>("deltaPhi_forwardJet_bprime","#Delta #phi (forward Jet,B)", 100, 0, 3.4);
   deltaEta_forwardJet_bprime = book<TH1F>("deltaEta_forwardJet_bprime","#Delta #eta (forward Jet,B)", 100, 0, 8);
+  dRmin_forwardJet_top_w = book<TH1F>("dRmin_forwardJet_top_w","#Delta Rmin(forward Jet,(top,W))", 100, 0, 8);
+  dR_forwardJet_top = book<TH1F>("dR_forwardJet_top","#Delta R (forward Jet,top)", 100, 0, 8);
+  dR_forwardJet_w = book<TH1F>("dR_forwardJet_w","#Delta R (forward Jet,W)", 100, 0, 8);
+    
   deltaEta_bprime_forwardJet_eta = book<TH2F>("deltaEta_bprime_forwardJet_eta","#Delta #eta (forward Jet,B) forward Jet #eta", 100, 0, 8, 100,-5,5);
 
   forwardJet_bprime_deltaPhi_deltaEta = book<TH2F>("forwardJet_bprime_deltaPhi_deltaEta","#Delta #phi #Delta #eta (forwardJet,B)", 100, 0, 3.4, 100, 0, 8);
@@ -323,6 +327,16 @@ void BprimeHypHists::fill(const uhh2::Event & event){
   */
   
   if(forwardJet.pt()>0){
+    if(recotype == 11 || recotype==0 || recotype==6){
+      dR_forwardJet_top->Fill(deltaR(forwardJet,tlep),weight);
+      dR_forwardJet_w->Fill(deltaR(forwardJet,whad),weight);
+      dRmin_forwardJet_top_w->Fill(deltaR(forwardJet,tlep) < deltaR(forwardJet,whad) ? deltaR(forwardJet,tlep) : deltaR(forwardJet,whad), weight);
+    }
+    if(recotype==12 || recotype==0 || recotype==2){
+      dR_forwardJet_top->Fill(deltaR(forwardJet,thad),weight);
+      dR_forwardJet_w->Fill(deltaR(forwardJet,wlep),weight);
+      dRmin_forwardJet_top_w->Fill(deltaR(forwardJet,thad) < deltaR(forwardJet,wlep) ? deltaR(forwardJet,thad) : deltaR(forwardJet,wlep), weight);				       
+    }
     dR_forwardJet_bprime->Fill(deltaR(bprime,forwardJet),weight);
     deltaPhi_forwardJet_bprime->Fill(deltaPhi(bprime,forwardJet),weight);
     deltaEta_forwardJet_bprime->Fill(abs(bprime.eta()-forwardJet.eta()),weight);

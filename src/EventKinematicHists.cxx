@@ -4,12 +4,13 @@ using namespace std;
 using namespace uhh2;
 
 
-EventKinematicHists::BaseHists EventKinematicHists::book_BaseHists(const std::string & name, const std::string & label, double minMass, double maxMass, double minPt, double maxPt){
+EventKinematicHists::BaseHists EventKinematicHists::book_BaseHists(const std::string & name, const std::string & label, double minMass, double maxMass, double minPt, double maxPt, double minE, double maxE){
   BaseHists hists;
-  hists.pt   = book<TH1F>("pt_"+name,"p_{T} "+ label+" [GeV]",100,minPt,maxPt);
-  hists.eta  = book<TH1F>("eta_"+name,"#eta "+label,100,-5,5);
-  hists.phi  = book<TH1F>("phi_"+name,"#phi "+label,100,-3.2,3.2);
-  hists.mass = book<TH1F>("mass_"+name,"Mass "+label+" [GeV]",30,minMass,maxMass);
+  hists.pt     = book<TH1F>("pt_"+name,"p_{T} "+ label+" [GeV]",100,minPt,maxPt);
+  hists.eta    = book<TH1F>("eta_"+name,"#eta "+label,100,-5,5);
+  hists.phi    = book<TH1F>("phi_"+name,"#phi "+label,100,-3.2,3.2);
+  hists.mass   = book<TH1F>("mass_"+name,"Mass "+label+" [GeV]",30,minMass,maxMass);
+  hists.energy = book<TH1F>("energy_"+name,"E "+label+" [GeV]",30,minE,maxE);
   return hists;
 }
 template<typename T>
@@ -18,9 +19,10 @@ void EventKinematicHists::fill_BaseHists(const T & particle, BaseHists & hists, 
   hists.eta->Fill(particle.eta(),weight);
   hists.phi->Fill(particle.phi(),weight);
   hists.mass->Fill(sqrt(particle.M2()),weight);
+  hists.energy->Fill(particle.E(),weight);
 }
 
-EventKinematicHists::EventKinematicHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
+EventKinematicHists::EventKinematicHists(uhh2::Context & ctx, const std::string & dirname, std::string hyp_name): Hists(ctx, dirname){
   primlep = ctx.get_handle<FlavorParticle>("PrimaryLepton");
   leadingAk4_lepton_dr = book<TH1F>("leadingAk4_lepton_dr","#Delta R (AK4,lepton)", 100, 0, 8);
   leadingAk4_lepton_dphi  = book<TH1F>("leadingAk4_lepton_dphi","#Delta #Phi (Ak4,lepton)", 100, 0, 3.41);
@@ -30,14 +32,25 @@ EventKinematicHists::EventKinematicHists(uhh2::Context & ctx, const std::string 
   massleadingAk8_lepton_dphi  = book<TH1F>("massleadingAk8_lepton_dphi","mass leading Ak8 #Delta #Phi (Ak8,lepton)", 100, 0, 3.41); 
   massleadingAk8_prunedmass  = book<TH1F>("massleadingAk8_prunedmass","mass leading Ak8 pruned mas", 100, 0, 500); 
   leadingAk4_lepton_dphi_mass  = book<TH2F>("leadingAk4_lepton_dphi_mass","#Delta #Phi(Ak4,lep) mass Ak4", 100, 0, 3.41, 100, 0, 500); 
+  leadingEtadrmin_eta = book<TH2F>("leadingEtadrmin_eta","leadingEtadrmin #eta", 100, 0, 5, 100, -5, 5); 
+  leadingEtadrmin_energy = book<TH2F>("leadingEtadrmin_energy","leadingEtadrmin Energy", 100, 0, 5, 100, 0, 2000); 
+  energy_eta = book<TH2F>("energy_eta","Energy #eta", 100, 0, 2000, 100, -5, 5); 
   centrality_ak4 = book<TH1F>("centrality_ak4","Centrality Ak4", 100, 0, 1); 
   centrality_ak8 = book<TH1F>("centrality_ak8","Centrality Ak8", 100, 0, 1); 
   leadingAk8Hists = book_BaseHists("leadingAk8Jet", "leading p_{T} Ak8", 0, 400,0, 1200);
   leadingAk4Hists = book_BaseHists("leadingAk4Jet", "leading p_{T} Ak4", 0, 400,0, 1200);
   leadingEtaJetHists = book_BaseHists("leadingEtaJet", "leading #eta -Jet", 0, 300,0, 1000);
+  leadingEtadrmin = book<TH1F>("leadingEtadrmin","#Delta R_{min} (leading eta Ak4,Ak4) leading eta jet", 100, 0, 5);
   secondEtaJetHists  = book_BaseHists("secondEtaJet", "second #eta -Jet", 0, 300,0, 1000);
+  recoForward = book_BaseHists("RecoForward", "reco forward-Jet", 0, 300,0, 1000);
+  forwardjet_iso = book<TH1F>("iso_recoforward","iso for the reconstructed forward jet", 200, 0, 10);
+  noforward_Jet = book<TH1F>("number_noforward","No Forward jet in the Event",5,0.5,1.5);
   lbHists = book_BaseHists("mass_lb","lep+b [GeV]",0,2000.);
   METlHists = book_BaseHists("METl","MET+lep [GeV]",0,2000.);
+  hyp_name_= hyp_name;
+  ///cout<<hyp_name_<<" "<< hyp_name<<endl;
+  if(!hyp_name_.empty())
+    recohyp = ctx.get_handle<BprimeContainer>(hyp_name);
 }
 
 EventKinematicHists::~EventKinematicHists(){}
@@ -50,6 +63,23 @@ void EventKinematicHists::fill(const uhh2::Event & event){
   double sum_ak4_E = 0;
   double sum_ak8_pt = 0;
   double sum_ak8_E =0;
+
+  if(!hyp_name_.empty()){
+    BprimeContainer hyp = event.get(recohyp);
+    //cout<<"pt "<<hyp.get_forwardJet().pt()<<" phi "<<hyp.get_forwardJet().phi()<<" eta "<<hyp.get_forwardJet().eta()<<" E "<<hyp.get_forwardJet().E()<<endl;
+    if(hyp.get_forwardJet().pt()>0){
+      fill_BaseHists(hyp.get_forwardJet(),recoForward,weight);
+      double iso_new = 999999999;
+      for(auto & ak4 : *event.jets){
+	if(iso_new > deltaR(ak4.v4(),hyp.get_forwardJet()) && deltaR(ak4.v4(),hyp.get_forwardJet())>0)
+	  iso_new = deltaR(ak4.v4(),hyp.get_forwardJet());
+      }
+      forwardjet_iso->Fill(iso_new,weight);
+    }
+    else{
+      noforward_Jet->Fill(1,weight);
+    }
+  }
 
   if(event.jets->size()>0 ){
     //cout<<event.jets->size()<<endl;
@@ -80,6 +110,16 @@ void EventKinematicHists::fill(const uhh2::Event & event){
     fill_BaseHists(leadingEtaJet, leadingEtaJetHists, weight);
     fill_BaseHists(secondEtaJet, secondEtaJetHists, weight);
     fill_BaseHists(highest_btag_score.v4()+lep,lbHists,weight);
+
+    double drmin_leadingeta_ak4 = -1;
+    for(auto & ak4 : *event.jets){
+      if((deltaR(ak4,leadingEtaJet) < drmin_leadingeta_ak4 || drmin_leadingeta_ak4 ==-1) && deltaR(ak4,leadingEtaJet) > 0)
+	drmin_leadingeta_ak4 = deltaR(ak4,leadingEtaJet);
+    }
+    leadingEtadrmin->Fill(drmin_leadingeta_ak4,weight);
+    leadingEtadrmin_eta->Fill(drmin_leadingeta_ak4,leadingEtaJet.eta(),weight);
+    leadingEtadrmin_energy->Fill(drmin_leadingeta_ak4,leadingEtaJet.E(),weight);
+    energy_eta->Fill(leadingEtaJet.E(),leadingEtaJet.eta(),weight);
   }
 
   if(event.topjets->size()>0){

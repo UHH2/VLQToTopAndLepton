@@ -18,7 +18,6 @@ BprimeDiscriminator::BprimeDiscriminator(uhh2::Context & ctx, discriminatorType 
 
 bool BprimeDiscriminator::process(uhh2::Event & event){
   BprimeContainer result;
-
   vector<GenParticle> tops;
   vector<GenParticle> wbosons;
   if(!event.isRealData){
@@ -40,15 +39,32 @@ bool BprimeDiscriminator::process(uhh2::Event & event){
       }
     }
   }
-  else if(dis >0 && dis <4)
+  else if(dis >0 && dis <4){
     result  = chiCombo_dis(event);
+    /*
+    if(!event.isRealData){
+      BprimeGenContainer GenInfo = event.get(gen);
+      LorentzVector wLep = GenInfo.get_wLep();
+      LorentzVector wHad = GenInfo.get_wHad();
+      LorentzVector topHad = GenInfo.get_topHad();
+      LorentzVector topLep = GenInfo.get_topLep();
+      if(result.get_RecoTyp() == 11){
+	if() result.set_gentopdistance();
+	if() result.set_genWdistance();
+      }
+      else if(result.get_RecoTyp() == 21){
+	if() result.set_gentopdistance();
+	if() result.set_genWdistance();
+      }
+    }
+    */
+  }
   else if(dis == 4)
     result  = cmsTopTag_dis(event);
   else if(dis == 5)
     result  = cmsTopTag_dis(event);
   else if (dis ==6)
     result = wTag_dis(event);
-
 
   if(dis!=0 && !event.isRealData){
     LorentzVector leadingtop(0,0,0,0);
@@ -67,6 +83,35 @@ bool BprimeDiscriminator::process(uhh2::Event & event){
       result.set_genWdistance(deltaR(result.get_wLep(),leadingW));
     }
   }
+
+  LorentzVector forwardjet(0,0,0,0); 
+  for(auto jet : *event.jets)
+    if(fabs(jet.eta())>fabs(forwardjet.eta()))forwardjet = jet.v4();
+
+  if(fabs(forwardjet.eta()) <=2.4 && dis <4){
+    forwardjet = LorentzVector(0,0,0,0); 
+    string unusedjets = result.get_unusedJets();
+    //cout<<"Not used jets "<<unusedjets<<endl;
+    for(unsigned int i= 0; i<event.jets->size(); i++){
+      //cout<<!bool(unusedjets[i])<<" eta jet "<< event.jets->at(i).eta()<<endl;
+      if(!unusedjets[i] && fabs(event.jets->at(i).eta())>fabs(forwardjet.eta()))
+	forwardjet = event.jets->at(i).v4();
+    }
+  }
+  else if(fabs(forwardjet.eta()) <=2.4){
+    forwardjet = LorentzVector(0,0,0,0); 
+    LorentzVector toptagjet = result.get_topHad();
+     for(unsigned int i= 0; i<event.jets->size(); i++){
+       if(deltaR(toptagjet,event.jets->at(i).v4())>0.8 && fabs(event.jets->at(i).eta())>fabs(forwardjet.eta()))
+	forwardjet = event.jets->at(i).v4();
+     }
+  }
+  result.set_forwardJet(forwardjet);
+  double jetiso = -1;
+  if(forwardjet.E()>0)
+    for(auto jet : *event.jets)
+      if((jetiso > deltaR(jet.v4(),forwardjet) || jetiso ==-1) && deltaR(jet.v4(),forwardjet)>0)jetiso = deltaR(jet.v4(),forwardjet);
+  result.set_jetIso(jetiso);
 
   if(result.get_RecoTyp()==-1){
     if(emptyHyp){
@@ -142,6 +187,7 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
       hadTop +=1000;
     
     if(dis==1){
+      // Top lep == 11 / Top had == 12
       double combochi = lepTop > hadTop ? hadTop : lepTop;
       int recoType_help = lepTop > hadTop ? 12 : 11;
       if(combochi < bprimechi || bprimechi ==-1){
