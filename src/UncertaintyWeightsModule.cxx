@@ -19,15 +19,16 @@ bool UncertaintyWeightsModule::process(uhh2::Event & event){
     return true;
   }
 
+  double pdf_weight = event.genInfo->weights().at(0);
   for(unsigned int i = 9; i<109; i++){
     if(event.genInfo->systweights().size()==0){ 
       pdf_final = -1;
       break;
     }
     double tmp_weight = event.genInfo->systweights().at(i)/event.genInfo->originalXWGTUP();
-    pdf_final += tmp_weight;
+    pdf_final += (pdf_weight-tmp_weight)*(pdf_weight-tmp_weight);
   }
-  pdf_final = pdf_final/100;
+  pdf_final = sqrt(pdf_final/99);
 
   double scale_final_up = -9999999999;
   double scale_final_down = 999999999;
