@@ -77,7 +77,7 @@ TriggerTestModule::TriggerTestModule(Context& ctx){
   recoMuon.reset(new NMuonSelection(1,1));
 
   jetcleaner.reset(new JetCleaner(ctx,30.0, 2.4));
-  jetCorr.reset(new JetCorrector(ctx,JERFiles::Summer15_25ns_L123_AK4PFchs_MC));
+  //jetCorr.reset(new JetCorrector(ctx,JERFiles::Summer15_25ns_L123_AK4PFchs_MC));
   elecleaner.reset(new ElectronCleaner(AndId<Electron>(ElectronID_Spring15_50ns_medium, PtEtaCut(30.0, 2.4))));
   mucleaner.reset(new MuonCleaner(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 3.0))));
 
@@ -216,7 +216,7 @@ TriggerTestModule::TriggerTestModule(Context& ctx){
 
 bool TriggerTestModule::process(Event & event){
 
-  jetCorr->process(event);
+  //jetCorr->process(event);
   jetcleaner->process(event);
   elecleaner->process(event);
   mucleaner->process(event);

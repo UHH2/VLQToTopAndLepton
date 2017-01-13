@@ -53,7 +53,7 @@ private:
 
   std::unique_ptr<CommonModules> common;
   std::unique_ptr<BprimeRecoHists> RecoHists;
-  std::unique_ptr<BprimeDiscriminator> chi2_combo, chi2_tlep, chi2_thad, ttbar, cmstoptagDis, heptoptagDis, chi2_wtag;
+  std::unique_ptr<BprimeDiscriminator> chi2_combo, chi2_tlep, chi2_thad, ttbar, cmstoptagDis, heptoptagDis, chi2_wtag, bestchi2_Dis;
   std::unique_ptr<AnalysisModule> ht, lepton, jetReweight;//, OptTree
   std::unique_ptr<BprimeReco> Reco, TopTagReco, HEPTopTagReco, WTagReco;
   std::unique_ptr<BprimeRecoHists> Reco_wHad, Reco_wLep;
@@ -142,7 +142,7 @@ SelectionModule::SelectionModule(Context& ctx){
   common->init(ctx,PU_variation);
 
   //Muon ScaleFactors
-  SF_muonID.reset(new MCMuonScaleFactor(ctx, "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_6_3/src/UHH2/common/data/MuonID_Z_RunCD_Reco76X_Feb15.root", "MC_NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1", 1, "mediumID", SF_muonID_variation)); 
+  ///SF_muonID.reset(new MCMuonScaleFactor(ctx, "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_7_6_3/src/UHH2/common/data/MuonID_Z_RunCD_Reco76X_Feb15.root", "MC_NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1", 1, "mediumID", SF_muonID_variation)); 
   //SF_electronID.reset(new MCElecScaleFactor(ctx, 
 
   //BTag Effi & Scale
@@ -191,6 +191,8 @@ SelectionModule::SelectionModule(Context& ctx){
   ttbar->set_emptyHyp(true);
   chi2_combo.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::chi2_combo,"BprimeReco","Chi2Dis"));
   chi2_combo->set_emptyHyp(true);
+  bestchi2_Dis.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::chi_bestfit,"BprimeReco","BestFit"));
+  bestchi2_Dis->set_emptyHyp(true);
   //chi2_tlep.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::lepTop,"BprimeReco","TLepDis"));
   //chi2_thad.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::hadTop,"BprimeReco","THadDis"));
   //chi2_wtag.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::wTag,"WTagReco","WTagDis"));
@@ -341,7 +343,7 @@ bool SelectionModule::process(Event & event){
   ttbar_reweight->process(event);
   Gen->process(event);  
 
-  SF_muonID->process(event);
+  //SF_muonID->process(event);
   BTagEffiHists->fill(event);
   if(!event.isRealData){ 
     genjet_hists->fill(event);
@@ -363,6 +365,7 @@ bool SelectionModule::process(Event & event){
   bool reco_bool = Reco->massReco(event);
   bool ttbardis_bool = ttbar->process(event);
   bool chi2dis_bool =  chi2_combo->process(event);
+  bestchi2_Dis->process(event);
 
   if(toptagreco_bool && toptagdis_bool){
     reconstructed =true;

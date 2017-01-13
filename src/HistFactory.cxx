@@ -246,7 +246,11 @@ bool HistFactory::passAndFill(Event & event, int passOption){
     factoryHists[i*(selectionClasses.size()+1)]->fill(event);
   for(auto & selection : selectionClasses){
     for(auto & module : orderAnalysisModules)
-      if(module == cuti)  AnalysisModules.at(&module-&orderAnalysisModules[0])->process(event);
+      if(module == cuti){
+	  bool modulePass = AnalysisModules.at(&module-&orderAnalysisModules[0])->process(event);
+	  if(!modulePass && passOption==0) return false;
+	  else if(!modulePass && passOption==1) passCuts = false;  
+      }	
     cuti++;
     if(selection->passes(event)){
       if(cutflow_raw){

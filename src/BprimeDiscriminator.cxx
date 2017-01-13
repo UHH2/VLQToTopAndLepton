@@ -14,6 +14,9 @@ BprimeDiscriminator::BprimeDiscriminator(uhh2::Context & ctx, discriminatorType 
   if(!Outputname.empty())
     disName = Outputname;
   resultHyp = ctx.declare_event_output<BprimeContainer>(disName);
+  if (dis==7)
+    primlep = ctx.get_handle<FlavorParticle>("PrimaryLepton");
+
 }
 
 bool BprimeDiscriminator::process(uhh2::Event & event){
@@ -39,32 +42,18 @@ bool BprimeDiscriminator::process(uhh2::Event & event){
       }
     }
   }
-  else if(dis >0 && dis <4){
+  else if((dis >0 && dis <4) || dis == 7){
     result  = chiCombo_dis(event);
-    /*
-    if(!event.isRealData){
-      BprimeGenContainer GenInfo = event.get(gen);
-      LorentzVector wLep = GenInfo.get_wLep();
-      LorentzVector wHad = GenInfo.get_wHad();
-      LorentzVector topHad = GenInfo.get_topHad();
-      LorentzVector topLep = GenInfo.get_topLep();
-      if(result.get_RecoTyp() == 11){
-	if() result.set_gentopdistance();
-	if() result.set_genWdistance();
-      }
-      else if(result.get_RecoTyp() == 21){
-	if() result.set_gentopdistance();
-	if() result.set_genWdistance();
-      }
-    }
-    */
   }
-  else if(dis == 4)
+  else if(dis == 4 || dis == 8)
     result  = cmsTopTag_dis(event);
   else if(dis == 5)
     result  = cmsTopTag_dis(event);
-  else if (dis ==6)
+  else if(dis == 6)
     result = wTag_dis(event);
+  //else if(dis == 7)
+  //  result = gendis(event);
+  
 
   if(dis!=0 && !event.isRealData){
     LorentzVector leadingtop(0,0,0,0);
@@ -157,6 +146,9 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
   double bprimechi =-1;
   int recoType =-1;
   double mass =-1;
+  BprimeGenContainer genPart;
+  if(dis==7) genPart = event.get(gen);
+
   for(auto hyp :  event.get(hyps)){
     const LorentzVector & whad    = hyp.get_wHad();
     const LorentzVector & wlep    = hyp.get_wLep();
@@ -175,17 +167,16 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
 
     if(topJets.pt()>0&&( dis==1 || dis ==2))lepTop = (((topJets+wlep).M()-mean_topLep)*((topJets+wlep).M()-mean_topLep)/(sigma_topLep*sigma_topLep)+(whad.M()-mean_wHad)*(whad.M()-mean_wHad)/(sigma_wHad*sigma_wHad)+pow(deltaR(whad,wlep+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(whad.pt()/(wlep+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio))*0.25;
     if(dis==1 || dis ==3)hadTop = (((topJets+whad).M()-mean_topHad)*((topJets+whad).M()-mean_topHad)/(sigma_topHad*sigma_topHad)+pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio))/3; 
-    
+     
     if(sqrt((wlep+topJets).M2()) < 125)
-      lepTop +=999999;
+      lepTop +=1000;
     if(whad.M()>120){
-      lepTop +=999999;
-      hadTop +=999999; 
+      lepTop +=5000;
+      hadTop +=5000; 
     }
-
     if(sqrt((whad+topJets).M2()) < 120)
       hadTop +=1000;
-    
+   
     if(dis==1){
       // Top lep == 11 / Top had == 12
       double combochi = lepTop > hadTop ? hadTop : lepTop;
@@ -213,20 +204,128 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
 	mass = sqrt((wlep+whad+topJets).M2());
       }
     }
-   
+    
+    else if(dis==7){
+      if(genPart.get_bprime().M()<100)continue;
+      //double gen_chi = pow(genPart.get_bprime().M()-(whad+wlep+topJets).M(),2)/pow(genPart.get_bprime().M()/5,2);
+      double gen_chi = 0;//pow(deltaR(genPart.get_bprime(),(whad+wlep+topJets)),2)0.25;
+      //double chi2_tophad = pow((whad+topJets).M()-175,2)/64;
+      //double chi2_toplep = (pow((wlep+topJets).M()-175,2)/64+pow(whad.M()-80.4,2)/100);
+
+      //gen_chi += chi2_tophad<chi2_toplep ? chi2_tophad : chi2_toplep;
+      //gen_chi = sqrt(gen_chi);
+      //gen_chi /= chi2_tophad<chi2_toplep ? 2 : 3;
+      
+      
+
+      if(genPart.get_wLep().pt()==0 || genPart.get_wHad().pt()==0)
+	continue;
+      bool toplep_gen =true;
+      if ((genPart.get_topHad().pt()>0 && genPart.get_topLep().pt()>0 ) || (genPart.get_topHad().pt()==0 && genPart.get_topLep().pt()==0)){
+	continue;
+      }
+      else if(genPart.get_topHad().pt()>0)
+	toplep_gen =false;
+
+      if(!toplep_gen) 
+	gen_chi = pow(deltaR(genPart.get_topHad(),(whad+topJets)),2)/0.16+pow((whad+topJets).M()-genPart.get_topHad().M(),2)/8;
+      else 
+	gen_chi = pow(deltaR(genPart.get_topLep(),wlep+topJets),2)+pow(deltaR(genPart.get_wHad(),whad),2)+pow((wlep+topJets).M()-genPart.get_topLep().M(),2)/8+pow(whad.M()-genPart.get_wHad().M(),2)/8;
+
+      if(gen_chi<bprimechi || bprimechi ==-1){
+        bestHyp = hyp;
+        bprimechi = gen_chi;
+	//if(chi2_tophad<chi2_toplep)recoType = 22;
+	//else recoType = 21;
+	if(genPart.get_topHad().pt()>0)recoType = 22;
+        else if(genPart.get_topLep().pt()>0)recoType = 21;
+	mass = sqrt((wlep+whad+topJets).M2());
+      }
+    }
+       
   }
   if(bprimechi ==-1) return bestHyp;
   bestHyp.set_chiVal(bprimechi);
   bestHyp.set_RecoTyp(recoType);
   bestHyp.set_Mass(mass);
-  if(recoType==12){
+  if(recoType==12 || recoType==22){
     bestHyp.set_topHad(bestHyp.get_wHad()+bestHyp.get_topJets());
   }
-  else if(recoType==11){
+  else if(recoType==11 || recoType==21){
     bestHyp.set_topLep(bestHyp.get_wLep()+bestHyp.get_topJets());
+  }
+  if((recoType==22|| recoType==21) && bestHyp.get_topJets().pt()<=0 && print_bprime) {
+    cout<<"============================================================"<<endl;
+    cout<<"B mass: "<< (bestHyp.get_wLep()+bestHyp.get_wHad()+bestHyp.get_topJets()).M()<<endl;
+    cout<<"W mass had: "<<bestHyp.get_wHad().M()<<" lep: "<<bestHyp.get_wLep().M()<<endl;
+    cout<<"W eta had: "<<bestHyp.get_wHad().eta()<<" lep: "<<bestHyp.get_wLep().eta()<<endl;
+    cout<<"top mass had: "<<(bestHyp.get_wHad()+bestHyp.get_topJets()).M()<<" lep: "<<(bestHyp.get_wLep()+bestHyp.get_topJets()).M()<<" reco: "<<bestHyp.get_RecoTyp()<<endl;
+    cout<<"top eta had: "<<(bestHyp.get_wHad()+bestHyp.get_topJets()).eta()<<" lep: "<<(bestHyp.get_wLep()+bestHyp.get_topJets()).eta()<<endl;
+    cout<<"chi^2: "<< bestHyp.get_chiVal()<<endl;
+    cout<<"============ gen particles ============"<<endl;
+    cout<<"B mass: "<<genPart.get_bprime().M()<<endl;
+    cout<<"W mass had : "<<genPart.get_wHad().M()<<" lep: "<<genPart.get_wLep().M()<<endl;
+    cout<<"W eta had : "<<genPart.get_wHad().eta()<<" lep: "<<genPart.get_wLep().eta()<<endl;
+    cout<<"top mass had: "<<genPart.get_topHad().M()<<" lep: "<<genPart.get_topLep().M()<<endl;
+    cout<<"top eta had: "<<genPart.get_topHad().eta()<<" lep: "<<genPart.get_topLep().eta()<<endl;
+    cout<<"top pt had : "<<genPart.get_topHad().pt()<<" lep: "<<genPart.get_topLep().pt()<<endl;
+    cout<<"W pt had : "<<genPart.get_wHad().pt()<<" lep: "<<genPart.get_wLep().pt()<<endl;
+    cout<<"============================================================"<<endl;
   }
   return bestHyp;
 }
+
+BprimeContainer BprimeDiscriminator::gendis(uhh2::Event & event){
+  BprimeContainer bestHyp;
+  int recoType = -1;
+  double mass =-1;
+  BprimeGenContainer genPart = event.get(gen);
+
+  LorentzVector whad = LorentzVector(0,0,0,0);
+  LorentzVector wlep = LorentzVector(0,0,0,0);
+  LorentzVector top  = LorentzVector(0,0,0,0);
+
+  if(genPart.get_bprime().M()<100)
+    return bestHyp;
+
+  NeutrinoFit FitNeutrino;
+  double wlep_min = 999999999;
+  LorentzVector lep = event.get(primlep).v4();  
+  for(auto  wlep_fit : FitNeutrino.NeutrinoFitPolar(lep,event.met->v4())){
+    if(deltaR(genPart.get_wLep(),wlep_fit)<wlep_min){
+      wlep = wlep_fit;
+      wlep_min = deltaR(genPart.get_wLep(),wlep_fit);
+    }
+  }
+
+  for(auto jet : *event.jets){
+    if(genPart.get_wHad().pt()>0 && deltaR(genPart.get_wHad(),jet.v4())<0.4)
+      whad += jet.v4();
+    if(genPart.get_topLep().pt()>0 && deltaR(genPart.get_topLep(),jet.v4())<0.4)
+      top += jet.v4();
+    if(genPart.get_topHad().pt()>0 && deltaR(genPart.get_topHad(),jet.v4())<0.4)
+      top += jet.v4();
+  }
+  if(genPart.get_topLep().pt()>0){
+    recoType = 11;
+    bestHyp.set_topLep(top+wlep);
+    mass = (top+wlep+whad).M();
+  }
+  else if(genPart.get_topHad().pt()>0){
+    recoType = 12;
+    bestHyp.set_topHad(top);
+    mass = (top+wlep).M();
+  }
+
+  bestHyp.set_wHad(whad);
+  bestHyp.set_wLep(wlep);
+  bestHyp.set_chiVal(-1);
+  bestHyp.set_RecoTyp(recoType);
+  bestHyp.set_Mass(mass);
+  
+  return bestHyp;
+}
+
 
 BprimeContainer BprimeDiscriminator::cmsTopTag_dis(uhh2::Event & event){
   BprimeContainer bestHyp;

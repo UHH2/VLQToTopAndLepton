@@ -113,7 +113,7 @@ VLQToTopAndLeptonModule::VLQToTopAndLeptonModule(Context & ctx){
   
   // 2. set up selections:
   
-  jetCorr.reset(new JetCorrector(ctx,JERFiles::Summer15_25ns_L123_AK4PFchs_MC));
+  //jetCorr.reset(new JetCorrector(ctx,JERFiles::Summer15_25ns_L123_AK4PFchs_MC));
   ht.reset(new HTCalc(ctx));
   elecleaner.reset(new ElectronCleaner(AndId<Electron>(ElectronID_Spring15_50ns_medium_noIso, PtEtaCut(20.0, 2.4))));
   mucleaner.reset(new MuonCleaner(AndId<Muon>(MuonIDTight(),PtEtaCut(20.0, 2.1))));
@@ -202,7 +202,7 @@ bool VLQToTopAndLeptonModule::process(Event & event) {
     
     // 1. run all modules; here: only jet cleaning.
 
-    jetCorr->process(event);
+    //jetCorr->process(event);
     jetcleaner->process(event);
     elecleaner->process(event);
     mucleaner->process(event);

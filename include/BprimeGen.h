@@ -1,6 +1,8 @@
 #pragma once
 
 #include "UHH2/VLQToTopAndLepton/include/BprimeGenContainer.h"
+#include "UHH2/VLQToTopAndLepton/include/GenSelection.h"
+
 #include "UHH2/core/include/Event.h"
 #include "UHH2/core/include/AnalysisModule.h"
 #include "UHH2/core/include/LorentzVector.h" 
@@ -13,7 +15,11 @@ class BprimeGen :public uhh2::AnalysisModule {
   virtual bool process(uhh2::Event & event) override;
  private:
   uhh2::Event::Handle<BprimeGenContainer> BprimeGenLevel;
-  bool family(std::vector<int> ties, const GenParticle & part, uhh2::Event & event);
+  LorentzVector family(std::vector<int> ties, const uhh2::Event & event);
+  LorentzVector searchMother(std::vector<int> familyTies ,const uhh2::Event & event);
+  LorentzVector searchDaughter(std::vector<int> familyTies, const uhh2::Event & event);
+  int quark_decay;
+
 };
 
 

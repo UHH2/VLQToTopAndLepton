@@ -5,14 +5,14 @@
 #include "UHH2/core/include/fwd.h"
 
 class GenFamilySelection: public uhh2::Selection {
-public:
+ public:
    explicit GenFamilySelection(std::vector<int> familyTies, int strategy=0);
    virtual bool passes(const uhh2::Event & event);
-
-private:
+       
+ private:
    bool searchMother(const uhh2::Event & event);
-   bool searchDaughter(const uhh2::Event & event);	
-
+   bool searchDaughter(const uhh2::Event & event);
+   
    std::vector<int> familyTies;
    int strategy;
    int quark_decay;
