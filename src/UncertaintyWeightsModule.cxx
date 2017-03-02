@@ -13,22 +13,23 @@ UncertaintyWeightsModule::UncertaintyWeightsModule(uhh2::Context & ctx){
 bool UncertaintyWeightsModule::process(uhh2::Event & event){
   double pdf_final = 0;
   if(event.isRealData){
-    event.set(scaleWeight_up,-1);
-    event.set(scaleWeight_down,-1);
-    event.set(pdfWeight,-1);
+    event.set(scaleWeight_up,0.);
+    event.set(scaleWeight_down,0.);
+    event.set(pdfWeight,0);
     return true;
   }
 
-  double pdf_weight = event.genInfo->weights().at(0);
+  double pdf_weight = 1.; //event.genInfo->originalXWGTUP();
   for(unsigned int i = 9; i<109; i++){
     if(event.genInfo->systweights().size()==0){ 
       pdf_final = -1;
       break;
     }
-    double tmp_weight = event.genInfo->systweights().at(i)/event.genInfo->originalXWGTUP();
+    double tmp_weight = fabs(event.genInfo->systweights().at(i)/event.genInfo->originalXWGTUP());
     pdf_final += (pdf_weight-tmp_weight)*(pdf_weight-tmp_weight);
   }
-  pdf_final = sqrt(pdf_final/99);
+  //get the sign correctly
+  pdf_final = sqrt(pdf_final/99)*event.genInfo->originalXWGTUP()/fabs(event.genInfo->originalXWGTUP());
 
   double scale_final_up = -9999999999;
   double scale_final_down = 999999999;

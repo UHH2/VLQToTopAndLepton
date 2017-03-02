@@ -7,6 +7,7 @@
 #include "UHH2/core/include/GenParticle.h"
 #include "UHH2/core/include/Selection.h"
 
+#include "UHH2/common/include/AdditionalSelections.h"
 #include "UHH2/common/include/CommonModules.h"
 #include "UHH2/common/include/CleaningModules.h"
 #include "UHH2/common/include/EventVariables.h"
@@ -62,8 +63,6 @@ private:
 };
 
 GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
-  //get rid of jets that are outside the range of jet corrections
-  jet_preclean.reset(new JetCleaner(ctx, PtEtaCut(15, 5)));
 
   //Version  = ctx.get("dataset_version", "<not set>");
   btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
@@ -71,17 +70,20 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
 
   //put all variables here so that changes are applied to all cuts similar
   double delR_2D  = 0.4;
-  double pTrel_2D = 40.;
+  double pTrel_2D = 25.;
   double MET_val = 50. ;
   double HTLep_val = 240.;
   double hardjetpt = 150.;
+  double minjetpt = 30.;
 
-  muid_cut = AndId<Muon>(MuonIDTight(), PtEtaCut(50.0, 2.1));
-  softMuon = AndId<Muon>(MuonIDLoose(), PtEtaCut(50.0, 2.1));
-  softElectron = AndId<Electron>(ElectronID_Spring15_25ns_loose_noIso, PtEtaCut(50.0, 2.5));
-  onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(130.0, 2.4)); secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4)); 
-  softjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(15.0, 3.0));
-  wide_softjet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 5.0));
+
+  muid_cut = AndId<Muon>(MuonIDMedium_ICHEP(), PtEtaCut(55.0, 2.1)); //MuonIDTight()
+  softMuon = AndId<Muon>(MuonIDLoose(), PtEtaCut(55.0, 2.1));
+  softElectron = AndId<Electron>(ElectronID_Spring16_veto_noIso, PtEtaCut(115.0, 2.4));
+  onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(130.0, 2.4)); 
+  secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4)); 
+  softjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(minjetpt, 3.0));
+  wide_softjet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(minjetpt, 5.0));
   topjet = PtEtaCut(150.0, 2.4); 
   hardtopjet = PtEtaCut(hardjetpt, 2.4); 
   topjetid = AndId<TopJet>(Type2TopTag(150,210, Type2TopTag::MassType::groomed,btag_medium),Tau32());
@@ -90,15 +92,19 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
 
   vlqGenHists.reset(new VLQGenHists(ctx,"GenHists"));
 
+  //get rid of jets that are outside the range of jet corrections and do a first cleaning
+  jet_preclean.reset(new JetCleaner(ctx,wide_softjet));
+
+
   common.reset(new CommonModules());
-  common->set_jet_id(wide_softjet);
+  //common->set_jet_id(wide_softjet);
   common->set_electron_id(softElectron);
   common->set_muon_id(softMuon);
-  //common->switch_jetlepcleaner();
-  //common->switch_jetPtSorter();
-  //common->set_HTjetid(softjet);
+  common->switch_jetlepcleaner();
+  common->switch_jetPtSorter();
+  common->set_HTjetid(softjet);
   common->init(ctx);
-
+  
   jetlepcleaning.reset(new CommonModules());
   //disable reweighting that was already done in common
   jetlepcleaning->disable_mclumiweight();
@@ -113,23 +119,23 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   jetlepcleaning->set_jet_id(wide_softjet);
   jetlepcleaning->set_electron_id(softElectron);
   jetlepcleaning->set_muon_id(softMuon);
-  jetlepcleaning->switch_jetlepcleaner();
+  //jetlepcleaning->switch_jetlepcleaner();
   jetlepcleaning->switch_jetPtSorter();
-  jetlepcleaning->init(ctx);
   jetlepcleaning->set_HTjetid(softjet);
-
+  jetlepcleaning->init(ctx);
+  
 
   channelSel.add<NElectronSelection>("0Electrons",0,0);
   channelSel.add<NMuonSelection>("1Muon",1,1,muid_cut);
 
   muonFactory.reset(new HistFactory(ctx));
   muonFactory->setEffiHistName("muonEffis");
-  //muonFactory->addSelection(make_unique<TriggerSelection>("HLT_Mu45_eta2p1_v*"),"muonTrigger");
+  muonFactory->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Mu50_v*"),make_unique<TriggerSelection>("HLT_TkMu50_v*")),"muonTrigger");
   //muonFactory->addSelection(make_unique<TriggerSelection>("HLT_Mu50_v*"),"muonTrigger");
   muonFactory->addSelection(make_unique<NElectronSelection>(0,0,softElectron),"0_eleCut");
   muonFactory->addSelection(make_unique<NMuonSelection>(1,1,softMuon),"1_softMuonCut");
   muonFactory->addSelection(make_unique<NMuonSelection>(1,1,muid_cut),"1_muonCut");
-  muonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"15GeV_JetCut");
+  muonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
   muonFactory->addSelection(make_unique<TwoDCut>(delR_2D,pTrel_2D),"2DCut");
   muonFactory->addAnalysisModule(move(jetlepcleaning));
   muonFactory->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"50GeV_JetCut");

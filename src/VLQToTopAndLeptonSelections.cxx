@@ -51,7 +51,21 @@ METSelection::METSelection(double METmin_): METmin(METmin_){}
 bool METSelection::passes(const Event & event){
   return METmin < event.met->pt();
 }
+bool RelIso::passes(const Event & event){
+  assert((event.muons || event.electrons) && event.jets);
+  Muon leading_muon;
+  for(auto & muon : *event.muons)
+    if(muon.pt()>leading_muon.pt()) leading_muon = muon;
+  Electron leading_ele;
+  for(auto & ele : *event.electrons)
+    if(ele.pt()>leading_ele.pt())leading_ele = ele;
+  if(event.muons->size()){
+    return leading_muon.relIso() < reliso;
+  }
+  else
+    return leading_ele.relIso() < reliso;
 
+}
 bool TwoDCut::passes(const Event & event){
 
   assert((event.muons || event.electrons) && event.jets);/*
@@ -74,7 +88,7 @@ bool TwoDCut::passes(const Event & event){
 
   vector<Jet> jets;
   for(const auto jet : *event.jets)
-    if(abs(jet.eta())<2.4) jets.push_back(jet);
+    if(abs(jet.eta())<2.4 && jet.pt()>=30) jets.push_back(jet);
 
   float drmin, ptrel;  
   if(event.muons->size()){
@@ -83,6 +97,19 @@ bool TwoDCut::passes(const Event & event){
   else{
     std::tie(drmin, ptrel) = drmin_pTrel(leading_ele, jets);
   }
+  /*
+  Jet close_jet = jets[0];
+  for(auto jet : jets){
+    if(deltaR(leading_muon.v4(),close_jet.v4()) > deltaR(leading_muon.v4(),jet.v4()))
+       close_jet = jet;
+  }
+  cout<<"======================"<<endl;
+  cout<<"Jet"<<endl;
+  cout<<"pt "<<close_jet.pt()<<" eta "<<close_jet.eta()<<endl;
+  cout<<"Muon"<<endl;
+  cout<<"pt "<<leading_muon.pt()<<" eta "<<leading_muon.eta()<<endl;
+  cout<<"ptrel "<<ptrel<<" drmin "<<drmin<<endl;
+  */
 
   return (drmin > min_deltaR_) || (ptrel > min_pTrel_);
 }

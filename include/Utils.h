@@ -36,6 +36,16 @@ inline std::vector<std::unique_ptr<Selection>> make_uvec(std::unique_ptr<Selecti
   my_vec.push_back(move(a)); my_vec.push_back(move(b)); my_vec.push_back(move(c)); my_vec.push_back(move(d));
   return my_vec;
 }
+inline std::vector<std::unique_ptr<Selection>> make_uvec(std::unique_ptr<Selection> a, std::unique_ptr<Selection> b, std::unique_ptr<Selection> c, std::unique_ptr<Selection> d, std::unique_ptr<Selection> e){
+  std::vector<std::unique_ptr<Selection>> my_vec;
+  my_vec.push_back(move(a)); my_vec.push_back(move(b)); my_vec.push_back(move(c)); my_vec.push_back(move(d)); my_vec.push_back(move(e));
+  return my_vec;
+}
+inline std::vector<std::unique_ptr<Selection>> make_uvec(std::unique_ptr<Selection> a, std::unique_ptr<Selection> b, std::unique_ptr<Selection> c, std::unique_ptr<Selection> d, std::unique_ptr<Selection> e, std::unique_ptr<Selection> f){
+  std::vector<std::unique_ptr<Selection>> my_vec;
+  my_vec.push_back(move(a)); my_vec.push_back(move(b)); my_vec.push_back(move(c)); my_vec.push_back(move(d)); my_vec.push_back(move(e)); my_vec.push_back(move(f));
+  return my_vec;
+}
 /*
 //template<typename T>
 vector<unique_ptr<Selection>> make_uvec(std::initializer_list<unique_ptr<Selection>> list){

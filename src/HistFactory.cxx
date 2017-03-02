@@ -83,7 +83,6 @@ void HistFactory::addAnalysisModule(unique_ptr<uhh2::AnalysisModule> module){
   orderAnalysisModules.push_back(selectionClasses.size());
 }
 
-
 void HistFactory::addHists(const string& histClass, const string& histName, const string & hyp_name){
   unique_ptr<Hists> histTemplate;
   vector<unique_ptr<Hists>> uncerHistsTemplate;
@@ -167,7 +166,7 @@ void HistFactory::addHists(const string& histClass, const string& histName, cons
       histTemplate.reset(new BprimeUncerHists(m_ctx,ss.str().c_str(),hyp_name));
     }
     else if(histClass.compare("LuminosityHists")==0){
-      histTemplate.reset(new LuminosityHists(m_ctx,ss.str().c_str()));
+      histTemplate.reset(new LuminosityHists(m_ctx,(ss.str()+"_perlumibin").c_str()));
       for(auto & name : uncerNames){
 	unique_ptr<Hists> uncerHists;
 	uncerHists.reset(new LuminosityHists(m_ctx,(ss.str()+"_"+name).c_str()));

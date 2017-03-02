@@ -74,6 +74,16 @@ class TwoDCut: public uhh2::Selection {
  private:
   float min_deltaR_, min_pTrel_;
 };
+
+class RelIso: public uhh2::Selection {
+ public:
+  explicit RelIso(float reliso_): reliso(reliso_) {}
+  virtual bool passes(const uhh2::Event & event) override;
+  
+ private:
+  float reliso;
+};
+
   /////
 
 class ChiSquareCut: public uhh2::Selection{
@@ -131,3 +141,5 @@ class TopJetMassCut: public uhh2::Selection{
  private:
   float mass;
 };
+
+

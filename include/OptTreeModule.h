@@ -23,13 +23,16 @@ explicit OptTreeModule(uhh2::Context & ctx);
   uhh2::Event::Handle<BprimeContainer> ttbarHandle;
   uhh2::Event::Handle<BprimeContainer> wTagHypHandle;
   //Output
+  uhh2::Event::Handle<double> ST;
   uhh2::Event::Handle<double> MET;
   uhh2::Event::Handle<double> HTLep;
   uhh2::Event::Handle<double> leadingLepPt;
   uhh2::Event::Handle<double> leadingJetPt;
+  uhh2::Event::Handle<double> subleadJetPt;
   uhh2::Event::Handle<double> leadingTopJetPt;
-  uhh2::Event::Handle<double> mostForwardJetEta;
+  uhh2::Event::Handle<double> ForwardJetEta;
   uhh2::Event::Handle<double> numberJet;
+  //uhh2::Event::Handle<double> additonalJets;
   uhh2::Event::Handle<double> chi2Mass;	
   uhh2::Event::Handle<double> chi2Val;
   uhh2::Event::Handle<double> TopTagMass;
@@ -43,6 +46,7 @@ explicit OptTreeModule(uhh2::Context & ctx);
   uhh2::Event::Handle<double> NBmediumtags;
   uhh2::Event::Handle<double> NBtighttags;
   uhh2::Event::Handle<double> NBloosetags;
+ 
 //uhh2::Event::Handle<double> ;
   JetId mediumbtag_id, tightbtag_id, loosebtag_id;
 };

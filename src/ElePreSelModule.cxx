@@ -73,7 +73,7 @@ ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
 
   //put all variables here so that changes are applied to all cuts similar
   double delR_2D  = 0.4;
-  double pTrel_2D = 40.;
+  double pTrel_2D = 25.;
   double MET_val = 60. ;
   double HTLep_val = 290.;
   double hardtopjetpt = 190;
@@ -82,10 +82,10 @@ ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
   btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
   lepton.reset(new PrimaryLepton(ctx));
 
-  muid_cut = AndId<Muon>(MuonIDTight(), PtEtaCut(50.0, 2.1));
+  muid_cut = AndId<Muon>(MuonIDMedium_ICHEP(), PtEtaCut(50.0, 2.1));//MuonIDTight()
   softMuon = AndId<Muon>(MuonIDLoose(), PtEtaCut(50.0, 2.1));
-  softElectron = AndId<Electron>(ElectronID_Spring15_25ns_loose_noIso, PtEtaCut(50.0, 2.4));
-  eleId_cut =  AndId<Electron>(ElectronID_Spring15_25ns_tight_noIso, PtEtaCut(110.0, 2.4));
+  softElectron = AndId<Electron>(ElectronID_Spring16_loose_noIso, PtEtaCut(110.0, 2.4));
+  eleId_cut =  AndId<Electron>(ElectronID_Spring16_tight_noIso, PtEtaCut(118.0, 2.4));
   onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(250.0, 2.4)); secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4)); 
   softjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
   wide_softjet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 5.0));
@@ -99,10 +99,11 @@ ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
   common->set_jet_id(wide_softjet);
   common->set_electron_id(softElectron);
   common->set_muon_id(softMuon);
-  //common->switch_jetlepcleaner();
-  //common->switch_jetPtSorter();
+  common->switch_jetlepcleaner();
+  common->switch_jetPtSorter();
+  common->set_HTjetid(softjet);
   common->init(ctx);
-  //common->set_HTjetid(softjet);
+  
 
   jetlepcleaning.reset(new CommonModules());
   //disable reweighting that was already done in common
@@ -118,7 +119,7 @@ ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
   jetlepcleaning->set_jet_id(wide_softjet);
   jetlepcleaning->set_electron_id(softElectron);
   jetlepcleaning->set_muon_id(softMuon);
-  jetlepcleaning->switch_jetlepcleaner();
+  //jetlepcleaning->switch_jetlepcleaner();
   jetlepcleaning->switch_jetPtSorter();
   jetlepcleaning->init(ctx);
   jetlepcleaning->set_HTjetid(softjet);
@@ -133,7 +134,7 @@ ElePreSelModule::ElePreSelModule(Context& ctx):channelSel(ctx){
 
   eleFactory.reset(new HistFactory(ctx));
   eleFactory->setEffiHistName("eleEffis");
-  //eleFactory->addSelection(make_unique<TriggerSelection>("HLT_Ele105_CaloIdVT_GsfTrkIdT_v*"),"eleTrigger");
+  eleFactory->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*"),make_unique<TriggerSelection>("HLT_Ele105_CaloIdVT_GsfTrkIdT_v*")),"eleTrigger");
   eleFactory->addSelection(make_unique<NMuonSelection>(0,0,softMuon),"0_softMuonCut");
   eleFactory->addSelection(make_unique<NElectronSelection>(1,1,softElectron),"1_softeleCut");
   eleFactory->addSelection(make_unique<NElectronSelection>(1,1,eleId_cut),"1_eleCut");

@@ -11,12 +11,15 @@ OptTreeModule::OptTreeModule(Context & ctx){
   ttbarHandle = ctx.get_handle<BprimeContainer>("TTbarDis");
   //wTagHypHandle = ctx.get_handle<BprimeContainer>("WTagDis");
   //Output Variables 
+  ST = ctx.declare_event_output<double>("ST");
   MET = ctx.declare_event_output<double>("MET");
   HTLep = ctx.declare_event_output<double>("HTLep");
   leadingLepPt = ctx.declare_event_output<double>("leadingLepPt");
   leadingJetPt = ctx.declare_event_output<double>("leadingJetPt");
+  subleadJetPt = ctx.declare_event_output<double>("subleadJetPt");
   leadingTopJetPt = ctx.declare_event_output<double>("leadingTopJetPt");
-  mostForwardJetEta = ctx.declare_event_output<double>("mostForwardJetEta");
+  ForwardJetEta = ctx.declare_event_output<double>("ForwardJetEta");
+  //additonalJets = ctx.declare_event_output<double>("additonalJets");
   numberJet = ctx.declare_event_output<double>("numberJets");
   chi2Mass = ctx.declare_event_output<double>("chi2Mass");
   chi2Val = ctx.declare_event_output<double>("chi2Val");
@@ -34,40 +37,43 @@ OptTreeModule::OptTreeModule(Context & ctx){
   mediumbtag_id = CSVBTag(CSVBTag::WP_MEDIUM);
   tightbtag_id = CSVBTag(CSVBTag::WP_TIGHT);
   loosebtag_id = CSVBTag(CSVBTag::WP_LOOSE);
-  
 }
 
 bool OptTreeModule::process(Event & event){
   event.set(MET,event.met->pt());
   event.set(leadingJetPt,event.jets->at(0).pt());
   event.set(leadingTopJetPt,event.jets->at(0).pt());
+  event.set(subleadJetPt,event.jets->at(1).pt());
+  double leadingpt_lepton = 0;
   if(event.muons->size()>0){
     event.set(HTLep,event.met->pt()+event.muons->at(0).pt());
     event.set(leadingLepPt,event.muons->at(0).pt());
+    leadingpt_lepton=event.muons->at(0).pt();
   }
   else{
     event.set(HTLep,event.met->pt()+event.electrons->at(0).pt());
     event.set(leadingLepPt,event.electrons->at(0).pt());
+    leadingpt_lepton=event.electrons->at(0).pt();
   }
   event.set(numberJet,event.jets->size());
-  LorentzVector forwardjet(0,0,0,0);
   int n_btagmedium =0;
   int n_btagtight=0;
   int n_btagloose=0;
+  double sum_jetpt=0;
   for(auto jet : *event.jets){
-    if((mediumbtag_id)(jet, event)) ++n_btagmedium;
+    sum_jetpt += jet.pt();
+    if((mediumbtag_id)(jet, event))++n_btagmedium;
     if((tightbtag_id)(jet, event)) ++n_btagtight;
     if((loosebtag_id)(jet, event)) ++n_btagloose;
-    if(jet.eta()>forwardjet.eta())
-      forwardjet = jet.v4();
   }
+  event.set(ST,event.met->pt()+leadingpt_lepton+sum_jetpt);
   event.set(NBmediumtags,n_btagmedium);
   event.set(NBtighttags,n_btagtight);
   event.set(NBloosetags,n_btagloose);
-  event.set(mostForwardJetEta,forwardjet.eta());
   event.set(weight,event.weight);
   event.set(chi2Mass,event.get(chi2HypHandle).get_Mass());
   event.set(chi2Val,event.get(chi2HypHandle).get_chiVal());
+  
   if(event.get(chi2HypHandle).get_Mass()!=-1){  
     if((event.get(chi2HypHandle)).get_RecoTyp() == 11)
       event.set(pTT,(event.get(chi2HypHandle)).get_topLep().pt()/(event.get(chi2HypHandle)).get_wHad().pt());
@@ -83,6 +89,8 @@ bool OptTreeModule::process(Event & event){
   event.set(ttbarChi2,event.get(ttbarHandle).get_chiVal());
   event.set(TopTagMass,event.get(TopTagHypHandle).get_Mass());
   event.set(TopTagChi2,event.get(TopTagHypHandle).get_chiVal());
+  event.set(ForwardJetEta,abs(event.get(TopTagHypHandle).get_forwardJet().eta()));
+  if(event.get(TopTagHypHandle).get_Mass()==-1)event.set(ForwardJetEta,abs(event.get(chi2HypHandle).get_forwardJet().eta()));
   //event.set(wTagMass,event.get(wTagHypHandle).get_Mass());
   return true;
 }
