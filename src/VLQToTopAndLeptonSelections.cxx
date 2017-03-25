@@ -38,21 +38,40 @@ bool STSelection::passes(const Event & event){
   return STmin<(event.get(ht)+event.met->pt()+event.get(h_primlep).pt());
 }
 
-HTLepSelection::HTLepSelection(Context & ctx, double HTLepmin_): HTLepmin(HTLepmin_){
+HTLepSelection::HTLepSelection(Context & ctx, double HTLepmin_, std::string metname_): HTLepmin(HTLepmin_),metname(metname_){
   h_primlep = ctx.get_handle<FlavorParticle>("PrimaryLepton");
+  if(!metname.empty())
+    h_met = ctx.get_handle<MET>(metname);
 }
 
 bool HTLepSelection::passes(const Event & event){
-  return HTLepmin < event.met->pt()+event.get(h_primlep).pt();
+  if(metname.empty()){
+    return HTLepmin < event.met->pt()+event.get(h_primlep).pt();
+  }
+  else{
+    //cout<<"HTLep "<<event.get(h_met).pt()+event.get(h_primlep).pt() <<endl;
+    return HTLepmin < event.get(h_met).pt()+event.get(h_primlep).pt();
+  }
 }
-
-METSelection::METSelection(double METmin_): METmin(METmin_){}
+METSelection::METSelection(double METmin_): METmin(METmin_){
+  metcoll="";
+}
+METSelection::METSelection(double METmin_, Context & ctx, string metcoll_): METmin(METmin_),metcoll(metcoll_){
+  if(!metcoll.empty())
+    h_met = ctx.get_handle<MET>(metcoll);
+}
 
 bool METSelection::passes(const Event & event){
-  return METmin < event.met->pt();
+  if(metcoll.empty())
+    return METmin < event.met->pt();
+  else{
+    //cout<<"MET "<< event.get(h_met).pt() <<endl;
+    return METmin < event.get(h_met).pt();
+  }
 }
+
 bool RelIso::passes(const Event & event){
-  assert((event.muons || event.electrons) && event.jets);
+  assert((event.muons || event.electrons));
   Muon leading_muon;
   for(auto & muon : *event.muons)
     if(muon.pt()>leading_muon.pt()) leading_muon = muon;
@@ -64,20 +83,22 @@ bool RelIso::passes(const Event & event){
   }
   else
     return leading_ele.relIso() < reliso;
-
 }
-bool TwoDCut::passes(const Event & event){
+  
+TwoDCut::TwoDCut(uhh2::Context & ctx, std::string jetcoll_,float min_deltaR, float min_pTrel): min_deltaR_(min_deltaR), min_pTrel_(min_pTrel) {
+  h_jets = ctx.get_handle<std::vector<Jet> >(jetcoll_);
+}
 
-  assert((event.muons || event.electrons) && event.jets);/*
-  if((event.muons->size()+event.electrons->size()) != 1){
-    std::cout << "\n @@@ WARNING -- TwoDCut::passes -- unexpected number of muons+electrons in the event (!=1). returning 'false'\n";
-    cout<<"muons "<<event.muons->size()<<" ele "<<event.electrons->size()<<endl;
-    for(auto muon : *event.muons)
-      cout<<muon.pt()<<" ";
-    cout<<endl;
-    return false;
-  }
-							 */
+bool TwoDCut::passes(const Event & event){
+  vector<Jet> all_jets;
+  if(jetcoll.empty())
+    all_jets = *event.jets;
+  else 
+    all_jets = event.get(h_jets);
+
+  if(all_jets.size()==0)return false;
+  //assert((event.muons || event.electrons));
+
   Muon leading_muon;
   for(auto & muon : *event.muons)
     if(muon.pt()>leading_muon.pt()) leading_muon = muon;
@@ -87,8 +108,9 @@ bool TwoDCut::passes(const Event & event){
     if(ele.pt()>leading_ele.pt())leading_ele = ele;
 
   vector<Jet> jets;
-  for(const auto jet : *event.jets)
+  for(const auto jet :all_jets)
     if(abs(jet.eta())<2.4 && jet.pt()>=30) jets.push_back(jet);
+  if(jets.size()==0)return false;
 
   float drmin, ptrel;  
   if(event.muons->size()){
@@ -110,6 +132,8 @@ bool TwoDCut::passes(const Event & event){
   cout<<"pt "<<leading_muon.pt()<<" eta "<<leading_muon.eta()<<endl;
   cout<<"ptrel "<<ptrel<<" drmin "<<drmin<<endl;
   */
+
+  //cout<<"drmin "<<drmin<<" ptrel "<<ptrel <<endl;
 
   return (drmin > min_deltaR_) || (ptrel > min_pTrel_);
 }

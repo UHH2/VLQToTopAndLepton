@@ -8,6 +8,7 @@
 #include "UHH2/core/include/Selection.h"
 
 #include "UHH2/common/include/CommonModules.h"
+#include "UHH2/common/include/CleaningModules.h"
 #include "UHH2/common/include/EventVariables.h"
 #include "UHH2/common/include/ElectronIds.h"
 #include "UHH2/common/include/MuonIds.h"
@@ -39,9 +40,6 @@
 #include "UHH2/VLQToTopAndLepton/include/JetReweight.h"
 #include "UHH2/VLQToTopAndLepton/include/TopTagScalefactor.h"
 
-#include "UHH2/VLQToTopAndLepton/include/WJetsReweight.h"
-
-
 using namespace std;
 using namespace uhh2;
 
@@ -72,7 +70,6 @@ private:
   std::unique_ptr<JetHists> btag_jetHists;
   std::unique_ptr<Hists> jetHists_sortbyeta, genjet_hists;
   std::unique_ptr<Hists> twoDjetHists_sortbyeta;
-  //std::unique_ptr<TopJetCleaner> topjetcleaner;
   JetId subBtag, btag_medium,btag_tight,btag_loose, eta_cut, ak4ForwardId, ak4CentralId, jet;
   TopJetId topjetid,wjetId,heptopjetid;
   std::unique_ptr<Selection> hepselection;  
@@ -80,8 +77,7 @@ private:
   std::unique_ptr<AnalysisModule> BTagScaleFactors,SF_muonID, SF_electronID, SF_muonTrigger;
   std::unique_ptr<AnalysisModule> pdf_scale_unc;
   std::unique_ptr<AnalysisModule> toptag_scale;
-  std::unique_ptr<AnalysisModule> WJetsReweight_module;
-
+  std::unique_ptr<AnalysisModule> jetcleaner;
   uhh2::Event::Handle<double> weight;
   uhh2::Event::Handle<double> numberofjets;
 
@@ -106,7 +102,6 @@ SelectionModule::SelectionModule(Context& ctx){
   ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819));
   pdf_scale_unc.reset(new UncertaintyWeightsModule(ctx));
   toptag_scale.reset(new TopTagScalefactor(ctx,"TopTagDis"));
-  WJetsReweight_module.reset(new WJetsReweight(ctx));
 
   vector<int> topLepIds {6,24,13};
   vector<int> topHadIds {6,24,-54321};
@@ -119,7 +114,8 @@ SelectionModule::SelectionModule(Context& ctx){
 
   //OptTree.reset(new OptTreeModule(ctx));
   jet = PtEtaCut(30,2.4);
-  
+  jetcleaner.reset(new JetCleaner(ctx,jet));
+
   double forward_low = 2.0;
   double forward_upper = 5;
   double forwardJet_pt = 25;
@@ -172,7 +168,7 @@ SelectionModule::SelectionModule(Context& ctx){
   ak4CentralId = PtEtaCut(30.0,2,-1,-1);
   heptopjetid = HEPTopTagV2();
   hepselection.reset(new NTopJetSelection(1,-1,heptopjetid));
-  btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
+  btag_medium = AndId<Jet>(CSVBTag(CSVBTag::WP_MEDIUM),PtEtaCut(30, 2.4));
   //subBtag = CSVBTag(0.79f);
   subBtag = CSVBTag(0.46f);
   btag_tight = CSVBTag(CSVBTag::WP_TIGHT);
@@ -291,7 +287,8 @@ SelectionModule::SelectionModule(Context& ctx){
 }
 
 bool SelectionModule::process(Event & event){ 
-  WJetsReweight_module->process(event);
+  if(event.met->pt() <0) return false;
+  jetcleaner->process(event);
   common->process(event);
   ht->process(event);
   lepton->process(event);

@@ -54,7 +54,7 @@ private:
   std::unique_ptr<HistFactory> CutPlots;
   std::unique_ptr<MCPileupReweight> pileup_weights;
   JetId btag_medium, eta_cut, twojet, onejet, softjet, secondjet,wide_softjet;
-  MuonId muid_cut, softMuon,isoMuon;
+  MuonId muid_cut, softMuon,isoMuon, hardMuon;
   ElectronId softElectron;
   TopJetId topjet, topjetid, heptopjetid,wjetId;
   std::unique_ptr<JetCleaner> jet_preclean;
@@ -72,15 +72,15 @@ OptSelModule::OptSelModule(Context& ctx){
 
   btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
 
-  wide_softjet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 5.0));
-  //hardMuon = AndId<Muon>(MuonIDLoose(), PtEtaCut(55.0, 2.4));
+  wide_softjet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 5.0));
+  hardMuon = AndId<Muon>(MuonIDLoose(), PtEtaCut(55.0, 2.4));
   softMuon = AndId<Muon>(MuonIDMedium_ICHEP(), PtEtaCut(27.0, 2.4));
   isoMuon =  AndId<Muon>(MuonIDMedium_ICHEP(), PtEtaCut(27.0, 2.4),MuonIso(0.15));
   softElectron = AndId<Electron>(ElectronID_Spring16_veto_noIso, PtEtaCut(50.0, 2.5));
   softjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
   topjet = PtEtaCut(150.0, 2.4); 
   topjetid = AndId<TopJet>(Type2TopTag(110,220, Type2TopTag::MassType::groomed,btag_medium),Tau32());
-  onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(130.0, 2.4)); secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4)); 
+  onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(130.0, 2.4)); secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(40.0, 2.4)); 
 
   common.reset(new CommonModules());
   common->set_jet_id(wide_softjet);
@@ -102,6 +102,7 @@ OptSelModule::OptSelModule(Context& ctx){
   OptTree.reset(new OptTreeModule(ctx));
  
   Reco.reset(new BprimeReco(ctx));
+  Reco->set_jetRecoId(secondjet);
   TopTagReco.reset(new BprimeReco(ctx,"TopTagReco"));
   TopTagReco->set_topjetRecoId(topjetid);
 
@@ -118,12 +119,13 @@ OptSelModule::OptSelModule(Context& ctx){
   CutPlots->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Mu50_v*"),make_unique<TriggerSelection>("HLT_TkMu50_v*"),make_unique<TriggerSelection>("HLT_IsoMu24_v*"),make_unique<TriggerSelection>("HLT_IsoTkMu24_v*")),"muonTrigger");
   CutPlots->addSelection(make_unique<NElectronSelection>(0,0),"0_eleCut");
   CutPlots->addSelection(make_unique<NMuonSelection>(1,1,softMuon),"1_muonCut");
-  CutPlots->addSelection(make_unique<NJetSelection>(1,-1,softjet),"15GeV_JetCut");
+  CutPlots->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
   CutPlots->addOrSelection(make_uvec(make_unique<TwoDCut>(0.4,40),make_unique<NMuonSelection>(1,1,isoMuon)),"Iso");
+  CutPlots->addOrSelection(make_uvec(make_unique<NMuonSelection>(1,1,hardMuon),make_unique<NMuonSelection>(1,1,isoMuon)),"MuonCut");
   CutPlots->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"50GeV_JetCut");
   CutPlots->addSelection(make_unique<NTopJetSelection>(1,-1,topjet),"150GeV_TopJetCut");
   //CutPlots->addSelection(make_unique<ForwardJetPtEtaCut>(1.5,40),"ForwardJetCut");
-  CutPlots->addSelection(make_unique<METSelection>(20),"20GeV_METCut");
+  CutPlots->addSelection(make_unique<METSelection>(40,ctx),"40GeV_METCut");
   CutPlots->addSelection(make_unique<HTLepSelection>(ctx,100),"100_HTLep");
   CutPlots->addHists("ElectronHists","ElectronHists");
   CutPlots->addHists("MuonHists","MuonHists");

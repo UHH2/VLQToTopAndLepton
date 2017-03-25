@@ -52,6 +52,10 @@ HistFactory::~HistFactory(){
     effiFile.close();  
   }
 }
+void HistFactory::addCounter(){
+  weighted_count.push_back(0);
+  count.push_back(0);
+}
 
 void HistFactory::addSelection(unique_ptr<Selection> selection, const string& cutName){
   selectionClasses.push_back(move(selection)); 
@@ -73,14 +77,25 @@ void HistFactory::addOrSelection(vector<unique_ptr<Selection>> selection, const 
     myOrSel->add(move(selection.at(i)));
   addSelection(move(myOrSel),cutName);
 }
-void HistFactory::addCounter(){
-  weighted_count.push_back(0);
-  count.push_back(0);
+void HistFactory::addJetUncSelection(vector<unique_ptr<Selection>> selection, vector<uhh2::Event::Handle<MET>> results, const string& cutName){
+  unique_ptr<JetUncSel> myJetUncSel;
+  myJetUncSel.reset(new JetUncSel());
+  if(selection.size() != results.size()){
+    cerr<<"For the Jet Unc estimation the result vector and the selection vector are of different size"<<endl;
+    cerr<<"This will end in a segmentation violation now. Sorry ;)"<<endl;
+    assert(selection.size() == results.size());
+  }
+  myJetUncSel->AddSelections(move(selection));    
+  myJetUncSel->AddResultCollection(results);
+  addAnalysisModule(move(myJetUncSel),cutName);
 }
-
-void HistFactory::addAnalysisModule(unique_ptr<uhh2::AnalysisModule> module){
+void HistFactory::addAnalysisModule(unique_ptr<uhh2::AnalysisModule> module, std::string cutName){
   AnalysisModules.push_back(move(module));
+  selectionClasses.push_back(unique_ptr<Selection>());
   orderAnalysisModules.push_back(selectionClasses.size());
+  cutNames.push_back(cutName);
+  if(effiprint)addCounter();
+  count_cuts++;
 }
 
 void HistFactory::addHists(const string& histClass, const string& histName, const string & hyp_name){
@@ -228,7 +243,7 @@ void HistFactory::addHists(const string& histName, TopJetId topjetid){
 }
 
 //passOption: 0 event has to pass all cuts, 1 event passes this cut
-bool HistFactory::passAndFill(Event & event, int passOption){
+bool HistFactory::passAndFill(Event & event, int passOption){  
   bool passCuts =true;
   unsigned int hist_number = factoryHists.size()/(selectionClasses.size()+1);
   unsigned int cuti = 0; 
@@ -241,17 +256,38 @@ bool HistFactory::passAndFill(Event & event, int passOption){
     count[cuti] = count[cuti]+1;
     weighted_count[cuti] = weighted_count[cuti]+event.weight;
   }
+  /*
+  cout<<"======================================"<<endl;
+  cout<<"List of cuts "<<endl;
+  for(auto name : cutNames)
+    cout<<name<<endl;	
+  cout<<"analysis module numbers"<<endl;
+  for(auto module : orderAnalysisModules) 
+     cout<<module<<endl;
+  cout<<"count cut "<<count_cuts<<endl;
+  cout<<"number of selections "<<selectionClasses.size()<<endl;
+  */
   for(unsigned int i = 0;i<hist_number;++i)
     factoryHists[i*(selectionClasses.size()+1)]->fill(event);
   for(auto & selection : selectionClasses){
-    for(auto & module : orderAnalysisModules)
-      if(module == cuti){
-	  bool modulePass = AnalysisModules.at(&module-&orderAnalysisModules[0])->process(event);
-	  if(!modulePass && passOption==0) return false;
-	  else if(!modulePass && passOption==1) passCuts = false;  
-      }	
+    //cout<<cutNames[cuti+1]<<endl;
     cuti++;
-    if(selection->passes(event)){
+    bool pass_step = false;
+    bool analysisModule_step = false;
+    for(auto & module : orderAnalysisModules){
+      if(module == cuti){
+	//cout<<"module number"<<module<<endl;
+	analysisModule_step=true;
+	pass_step = AnalysisModules.at(&module-&orderAnalysisModules[0])->process(event);
+	break;
+      }	
+    }
+    // cout<<"cut number "<<cuti<<endl;
+    if(!analysisModule_step)
+      pass_step=selection->passes(event);
+    string survive = pass_step ? "Yes" : "No";
+    //cout<<"Histfactory level answere "<<survive<<endl;
+    if(pass_step){
       if(cutflow_raw){
 	cutflow_raw->Fill(cuti);
 	cutflow_weighted->Fill(cuti, event.weight);

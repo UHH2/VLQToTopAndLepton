@@ -47,32 +47,42 @@ class STSelection: public uhh2::Selection{
 class HTLepSelection: public uhh2::Selection{
 public:
   //enum htType{HT, HtLep};
-  explicit HTLepSelection(uhh2::Context & ctx, double HTLepmin);
+  explicit HTLepSelection(uhh2::Context & ctx, double HTLepmin, std::string metname_="");
   virtual bool passes(const uhh2::Event & event);
   
  private:
   //htType type;
   double HTLepmin;
   uhh2::Event::Handle<FlavorParticle> h_primlep;
+  std::string metname;
+  uhh2::Event::Handle<MET> h_met;  
 };
+
+
 class METSelection: public uhh2::Selection{
 public:
   //enum htType{HT, HtLep};
   explicit METSelection(double METmin);
+  explicit METSelection(double METmin, uhh2::Context & ctx, std::string metcoll_="");
   virtual bool passes(const uhh2::Event & event);
   
  private:
   //htType type;
   double METmin;
+  uhh2::Event::Handle<MET> h_met;  
+  std::string metcoll;
 };
 
 class TwoDCut: public uhh2::Selection {
  public:
-  explicit TwoDCut(float min_deltaR, float min_pTrel): min_deltaR_(min_deltaR), min_pTrel_(min_pTrel) {}
+  TwoDCut(uhh2::Context & ctx, std::string jetcoll_, float min_deltaR, float min_pTrel);
+  TwoDCut(float min_deltaR, float min_pTrel): min_deltaR_(min_deltaR), min_pTrel_(min_pTrel) {}
   virtual bool passes(const uhh2::Event & event) override;
   
  private:
   float min_deltaR_, min_pTrel_;
+  uhh2::Event::Handle<std::vector<Jet> > h_jets;
+  std::string jetcoll ="";
 };
 
 class RelIso: public uhh2::Selection {

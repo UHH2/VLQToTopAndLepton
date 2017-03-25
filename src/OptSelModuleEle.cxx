@@ -130,7 +130,7 @@ OptSelModuleEle::OptSelModuleEle(Context& ctx){
   CutPlots->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
   CutPlots->addSelection(make_unique<NTopJetSelection>(1,-1,topjet),"150GeV_TopJetCut");
   //CutPlots->addSelection(make_unique<ForwardJetPtEtaCut>(1.5,40),"ForwardJetCut");
-  CutPlots->addSelection(make_unique<METSelection>(20),"20GeV_METCut");
+  CutPlots->addSelection(make_unique<METSelection>(20,ctx),"20GeV_METCut");
   CutPlots->addSelection(make_unique<HTLepSelection>(ctx,100),"100_HTLep");
   CutPlots->addHists("ElectronHists","ElectronHists");
   CutPlots->addHists("MuonHists","MuonHists");

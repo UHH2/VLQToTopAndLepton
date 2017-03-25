@@ -231,13 +231,13 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
 	toplep_gen =false;
 
       if(!toplep_gen){ 
-	gen_chi = pow(deltaR(genPart.get_topHad(),(whad+topJets)),2)/0.16+pow((whad+topJets).M()-genPart.get_topHad().M(),2)/8;
+	gen_chi = pow(deltaR(genPart.get_topHad(),(whad+topJets)),2)/0.25+pow((whad+topJets).M()-genPart.get_topHad().M(),2)/1;
 	if(deltaR(genPart.get_topHad(),(whad+topJets))>0.4  || deltaR(genPart.get_wHad(),whad)>0.4 || deltaR(genPart.get_wLep(),wlep)>0.4|| round((genPart.get_topHad()+genPart.get_wLep()).M()) != round(genPart.get_bprime().M()))
 	  gen_chi +=99999;
 	//cout<<"Gen B Mass from TW "<<round((genPart.get_topHad()+genPart.get_wLep()).M())<<" from Gen particle "<<round(genPart.get_bprime().M())<<" "<< bool(round((genPart.get_topHad()+genPart.get_wLep()).M()) != round(genPart.get_bprime().M())) <<endl;      
       }
       else{ 
-	gen_chi = pow(deltaR(genPart.get_topLep(),wlep+topJets),2)+pow(deltaR(genPart.get_wHad(),whad),2)+pow((wlep+topJets).M()-genPart.get_topLep().M(),2)/8+pow(whad.M()-genPart.get_wHad().M(),2)/8;
+	gen_chi = pow(deltaR(genPart.get_topLep(),wlep+topJets),2)/0.16+pow(deltaR(genPart.get_wHad(),whad),2)/0.16+pow((wlep+topJets).M()-genPart.get_topLep().M(),2)/8+pow(whad.M()-genPart.get_wHad().M(),2)/8;
 	if(deltaR(genPart.get_topLep(),(wlep+topJets))>0.4  || deltaR(genPart.get_wHad(),whad)>0.4 || deltaR(genPart.get_wLep(),wlep)>0.4 || round((genPart.get_topLep()+genPart.get_wHad()).M()) != round(genPart.get_bprime().M()))
 	  gen_chi +=99999;
 	//cout<<"Gen B Mass from TW "<<round((genPart.get_topLep()+genPart.get_wHad()).M())<<" from Gen particle "<<round(genPart.get_bprime().M())<<" "<<bool(round((genPart.get_topLep()+genPart.get_wHad()).M()) != round(genPart.get_bprime().M()))<<endl;
