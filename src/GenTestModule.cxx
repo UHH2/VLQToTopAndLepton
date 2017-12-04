@@ -19,6 +19,8 @@
 #include "UHH2/common/include/JetCorrections.h" 
 #include "UHH2/common/include/JetIds.h"
 #include "UHH2/common/include/TTbarReconstruction.h"
+#include "UHH2/common/include/MCWeight.h"
+
 
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonSelections.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQToTopAndLeptonHists.h"
@@ -29,6 +31,8 @@
 #include "UHH2/VLQToTopAndLepton/include/HTCalc.h"
 #include "UHH2/VLQToTopAndLepton/include/BprimeReco.h"
 #include "UHH2/VLQToTopAndLepton/include/Utils.h"
+#include "UHH2/VLQToTopAndLepton/include/custom_jetcorr.h"
+
 
 using namespace std;
 using namespace uhh2;
@@ -51,63 +55,69 @@ private:
   std::unique_ptr<HistFactory> topWMuonFactory, wMuonFactory;
   std::unique_ptr<HistFactory> muonTrigger;
   std::unique_ptr<Selection> HiggsFilter, ZFilter;
-  std::unique_ptr<Selection> genMttbar, test;
-  AndSelection  channelSel;
-  JetId btag_medium;
+  std::unique_ptr<Selection> genMttbar, genW;
+
   ElectronId softElectron;
-  MuonId muid_cut, softMuon;
-  JetId secondjet, onejet, softjet, wide_softjet, ak4ForwardId, ak4CentralId;;
+  MuonId muid_cut, softMuon, selMuon;
+  JetId secondjet, onejet, softjet, wide_softjet, ak4ForwardId, ak4CentralId, btag_medium;
   TopJetId topjet,topjetid, hardtopjet;
   //std::unique_ptr<BprimeReco> Reco;
   std::unique_ptr<JetCleaner> jet_preclean;
-  bool mttbar_sample=false;
+  bool mttbar_sample=false,genW_sample=false;
 
   //jet uncertainties
   uhh2::Event::Handle<std::vector<Jet>> jet_jer_up, jet_jer_down, jet_jec_up, jet_jec_down;
   uhh2::Event::Handle<MET> met_jer_up, met_jer_down, met_jec_up, met_jec_down;
   std::vector<uhh2::Event::Handle<MET>>  met_handles;// = {met_jer_up, met_jer_down, met_jec_up, met_jec_down};
-  std::string jercor_string="", jeccor_string=""; 
-  std::unique_ptr<JetCorrector>  corrector_jec_up, corrector_jec_down;
-  std::unique_ptr<JetResolutionSmearer> corrector_jer_up, corrector_jer_down;
+  std::string jercor_string="", jeccor_string="";
+  
+  std::unique_ptr<JetCorrector>  corrector_jec_up, corrector_jec_down, corrector_jec_central_jer_up;
+  std::unique_ptr<JetCleaner>  clean_jec_up, clean_jec_down, clean_jer_up, clean_jer_down;
+  std::unique_ptr<JetResolutionSmearer> corrector_jer_up, corrector_jer_down, corrector_jec_jer_up, corrector_jec_jer_down,corrector_jer_up_jec_central,corrector_jer_down_jec_central;
   bool do_jer_unc = false;
   bool do_jec_unc = false;
   bool do_jet_uncer = false;
+  bool run_muonid = false, run_muontrigger = false, run_eleid =false;
+
+  std::unique_ptr<AnalysisModule> SF_muonID, SF_electronID, SF_muonTrigger;
+  std::unique_ptr<custom_jetcorr> jet_uncer_provider;
 };
 
-GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
-  //set up the ttbar high mass samples
-  mttbar_sample=false;
+GenTestModule::GenTestModule(Context& ctx){
   jercor_string = ctx.get("jersmear_direction", "nominal");
   jeccor_string = ctx.get("jecsmear_direction", "nominal");
-  if(jercor_string=="custom"){
-    do_jer_unc = true;
-    jet_jer_up   = ctx.declare_event_output<std::vector<Jet>>("jet_jer_up");
-    jet_jer_down = ctx.declare_event_output<std::vector<Jet>>("jet_jer_down");
-    met_jer_up   = ctx.declare_event_output<MET>("met_jer_up");
-    met_jer_down = ctx.declare_event_output<MET>("met_jer_down");
-    corrector_jer_up.reset(new JetResolutionSmearer(ctx,JERSmearing::SF_13TeV_2016,"jet_jer_up",1));
-    corrector_jer_down.reset(new JetResolutionSmearer(ctx,JERSmearing::SF_13TeV_2016,"jet_jer_down",-1));
-  }
-  if(jeccor_string=="custom"){
+
+  if(jercor_string=="custom")
+    do_jer_unc = true;   
+  if(jeccor_string=="custom")
     do_jec_unc = true;
-    jet_jec_up   = ctx.declare_event_output<std::vector<Jet>>("jet_jec_up");
-    jet_jec_down = ctx.declare_event_output<std::vector<Jet>>("jet_jec_down");
-    met_jec_up   = ctx.declare_event_output<MET>("met_jec_up");
-    met_jec_down = ctx.declare_event_output<MET>("met_jec_down");
-    corrector_jec_up.reset(new JetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC, {},"jet_jec_up","met_jec_up",1));
-    corrector_jec_down.reset(new JetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC, {},"jet_jec_down","met_jec_down",-1));
-  }
-  do_jet_uncer = do_jec_unc && do_jer_unc;
-  if(do_jet_uncer)	
-    met_handles = {met_jer_up, met_jer_down, met_jec_up, met_jec_down};
+  do_jet_uncer = do_jec_unc || do_jer_unc;
 
-
-
+  //set up the ttbar high mass samples
   string sample(ctx.get("dataset_version"));
   if(sample == "TTbar_Tune"){
     genMttbar.reset(new MttbarGenSelection(0,700));
     mttbar_sample=true;
   }
+  if(sample =="WJets_comp"){
+    genW.reset(new Wgenptcut(100));
+    genW_sample=true;
+  }
+
+  //Muon ScaleFactors
+  if(!ctx.get("MounIDScaleFactors","").empty()){ 
+    SF_muonID.reset(new MCMuonScaleFactor(ctx, ctx.get("MounIDScaleFactors"), "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta", 1, "tight", "nominal")); 
+    run_muonid = true;
+  }
+  if(!ctx.get("MuonTriggerScaleFactors","").empty()){
+    SF_muonTrigger.reset(new MCMuonScaleFactor(ctx, ctx.get("MuonTriggerScaleFactors"), "IsoMu50_OR_IsoTkMu50_PtEtaBins", 1, "muonTrigger", "nominal")); 
+    run_muontrigger = true;
+  }
+  if(!ctx.get("EleScaleFactors","").empty()){
+    SF_electronID.reset(new MCElecScaleFactor(ctx,ctx.get("EleScaleFactors"),1,"eleid","nominal" ));
+    run_eleid =true;
+  }
+                                     
 
   btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
   lepton.reset(new PrimaryLepton(ctx));
@@ -117,19 +127,19 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   double pTrel_2D = 25.;
   double MET_val = 50. ;
   double HTLep_val = 240.;
-  double hardjetpt = 150.;
+  double hardtopjetpt = 150.;
   double minjetpt = 30.;
 
-
-  muid_cut = AndId<Muon>(MuonIDMedium_ICHEP(), PtEtaCut(55.0, 2.1)); //MuonIDTight()
-  softMuon = AndId<Muon>(MuonIDLoose(), PtEtaCut(55.0, 2.1));
-  softElectron = AndId<Electron>(ElectronID_Spring16_veto_noIso, PtEtaCut(115.0, 2.4));
+  wide_softjet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(minjetpt, 5.0));
+  muid_cut = AndId<Muon>(MuonIDTight(), PtEtaCut(55.0, 2.4)); //MuonIDTight()
+  selMuon = AndId<Muon>(MuonIDTight(), PtEtaCut(55.0, 2.4));
+  softMuon = AndId<Muon>(PtEtaCut(40.0, 2.4),MuonIDTight());
+  softElectron = AndId<Electron>(PtEtaCut(40.0, 2.4),ElectronID_MVAGeneralPurpose_Spring16_tight);
   onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(130.0, 2.4)); 
   secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4)); 
   softjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(minjetpt, 3.0));
-  wide_softjet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(minjetpt, 5.0));
   topjet = PtEtaCut(150.0, 2.4); 
-  hardtopjet = PtEtaCut(hardjetpt, 2.4); 
+  hardtopjet = PtEtaCut(hardtopjetpt, 2.4); 
   topjetid = AndId<TopJet>(Type2TopTag(150,210, Type2TopTag::MassType::groomed,btag_medium),Tau32());
   ak4ForwardId = PtEtaCut(30.0,5,-1,2);
   ak4CentralId = PtEtaCut(30.0,2,-1,-1);
@@ -138,58 +148,70 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
 
   //get rid of jets that are outside the range of jet corrections and do a first cleaning
   jet_preclean.reset(new JetCleaner(ctx, wide_softjet));
- 
+  if(jercor_string=="custom"){
+    clean_jer_up.reset(new JetCleaner(ctx,wide_softjet,"jet_jer_up"));
+    clean_jer_down.reset(new JetCleaner(ctx,wide_softjet,"jet_jer_down"));
+  }
+  if(jeccor_string=="custom"){
+    clean_jec_up.reset(new JetCleaner(ctx,wide_softjet,"jet_jec_up"));
+    clean_jec_down.reset(new JetCleaner(ctx,wide_softjet,"jet_jec_up"));
+  }
+  
   common.reset(new CommonModules());
   if(!do_jet_uncer)common->set_jet_id(wide_softjet);
   common->set_electron_id(softElectron);
-  common->set_muon_id(softMuon);
+  common->set_muon_id(selMuon);
   common->switch_jetlepcleaner();
   common->switch_jetPtSorter();
   common->set_HTjetid(softjet);
   common->init(ctx);
- 
-  jetlepcleaning.reset(new CommonModules());
-  //disable reweighting that was already done in common
-  jetlepcleaning->disable_mclumiweight();
-  jetlepcleaning->disable_mcpileupreweight();
-  jetlepcleaning->disable_jec();
-  jetlepcleaning->disable_jersmear();
-  jetlepcleaning->disable_lumisel();
-  jetlepcleaning->disable_metfilters();
-  jetlepcleaning->disable_pvfilter();
-  jetlepcleaning->disable_jetpfidfilter();
-  //put all id such that it runs hopefully correctly
-  jetlepcleaning->set_jet_id(wide_softjet);
-  jetlepcleaning->set_electron_id(softElectron);
-  jetlepcleaning->set_muon_id(softMuon);
-  //jetlepcleaning->switch_jetlepcleaner();
-  jetlepcleaning->switch_jetPtSorter();
-  jetlepcleaning->set_HTjetid(softjet);
-  jetlepcleaning->init(ctx);
   
-  channelSel.add<NElectronSelection>("0Electrons",0,0);
-  channelSel.add<NMuonSelection>("1Muon",1,1,muid_cut);
-
   muonFactory.reset(new HistFactory(ctx));
   muonFactory->setEffiHistName("muonEffis");
   muonFactory->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Mu50_v*"),make_unique<TriggerSelection>("HLT_TkMu50_v*")),"muonTrigger");
   //muonFactory->addSelection(make_unique<TriggerSelection>("HLT_Mu50_v*"),"muonTrigger");
   muonFactory->addSelection(make_unique<NElectronSelection>(0,0,softElectron),"0_eleCut");
   muonFactory->addSelection(make_unique<NMuonSelection>(1,1,softMuon),"1_softMuonCut");
+  muonFactory->addSelection(make_unique<NMuonSelection>(1,1,selMuon),"1_selMuonCut");
   muonFactory->addSelection(make_unique<NMuonSelection>(1,1,muid_cut),"1_muonCut");
-  if(!do_jet_uncer)muonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
-  else muonFactory->addJetUncSelection(make_uvec(make_unique<NJetSelection>(1,-1,softjet,jet_jer_up),make_unique<NJetSelection>(1,-1,softjet,jet_jer_down),make_unique<NJetSelection>(1,-1,softjet,jet_jec_up),make_unique<NJetSelection>(1,-1,softjet,jet_jec_down)),met_handles,"30GeV_JetCut");
-  if(!do_jet_uncer)muonFactory->addSelection(make_unique<TwoDCut>(delR_2D,pTrel_2D),"2DCut");
-  else muonFactory->addJetUncSelection(make_uvec(make_unique<TwoDCut>(ctx,"jet_jer_up",delR_2D,pTrel_2D),make_unique<TwoDCut>(ctx,"jet_jer_down",delR_2D,pTrel_2D),make_unique<TwoDCut>(ctx,"jet_jec_up",delR_2D,pTrel_2D),make_unique<TwoDCut>(ctx,"jet_jec_down",delR_2D,pTrel_2D)),met_handles,"2DCut");
-  muonFactory->addAnalysisModule(move(jetlepcleaning),"JetLep_Cleaning");
-  if(!do_jet_uncer)muonFactory->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"50GeV_JetCut");
-  else muonFactory->addJetUncSelection(make_uvec(make_unique<NJetSelection>(2,-1,secondjet,jet_jer_up),make_unique<NJetSelection>(2,-1,secondjet,jet_jer_down),make_unique<NJetSelection>(2,-1,secondjet,jet_jec_up),make_unique<NJetSelection>(2,-1,secondjet,jet_jec_down)),met_handles,"50GeV_JetCut");
-  muonFactory->addSelection(make_unique<NTopJetSelection>(1,-1,hardtopjet),to_string((int)hardjetpt)+"GeV_TopJetCut");
-  if(!do_jet_uncer)muonFactory->addSelection(make_unique<METSelection>(MET_val,ctx),to_string((int)MET_val)+"GeV_METCut");
-  else muonFactory->addJetUncSelection(make_uvec(make_unique<METSelection>(MET_val,ctx,"met_jer_up"),make_unique<METSelection>(MET_val,ctx,"met_jer_down"),make_unique<METSelection>(MET_val,ctx,"met_jec_up"),make_unique<METSelection>(MET_val,ctx,"met_jec_down")),met_handles,to_string((int)MET_val)+"GeV_METCut");
-  if(!do_jet_uncer)muonFactory->addSelection(make_unique<HTLepSelection>(ctx,HTLep_val),to_string((int)HTLep_val)+"GeV_HTLep");
-  else muonFactory->addJetUncSelection(make_uvec(make_unique<HTLepSelection>(ctx,HTLep_val,"met_jer_up"),make_unique<HTLepSelection>(ctx,HTLep_val,"met_jer_down"),make_unique<HTLepSelection>(ctx,HTLep_val,"met_jec_up"),make_unique<HTLepSelection>(ctx,HTLep_val,"met_jec_down")),met_handles,to_string((int)HTLep_val)+"GeV_HTLep");
+  muonFactory->addSelection(make_unique<NTopJetSelection>(1,-1,hardtopjet),to_string((int)hardtopjetpt)+"GeV_TopJetCut");
 
+  if(!do_jet_uncer){
+    muonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
+    muonFactory->addSelection(make_unique<TwoDCut>(delR_2D,pTrel_2D),"2DCut");
+    muonFactory->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"50GeV_JetCut");
+    muonFactory->addSelection(make_unique<METSelection>(MET_val,ctx),to_string((int)MET_val)+"GeV_METCut");
+    muonFactory->addSelection(make_unique<HTLepSelection>(ctx,HTLep_val),to_string((int)HTLep_val)+"GeV_HTLep");
+  }
+
+  if(do_jet_uncer){	
+    jet_uncer_provider.reset(new custom_jetcorr(ctx));
+    met_handles = jet_uncer_provider->get_methandles();
+    std::vector<std::unique_ptr<Selection>> widejet_sel;
+    std::vector<std::unique_ptr<Selection>> twod_sel;	 
+    std::vector<std::unique_ptr<AnalysisModule>> jetlep_sel;	 
+    std::vector<std::unique_ptr<Selection>> hardjet_sel; 
+    std::vector<std::unique_ptr<Selection>> met_sel;	 
+    std::vector<std::unique_ptr<Selection>> htlep_sel;   
+    
+    for(unsigned int i=0; i< met_handles.size();++i ){
+      widejet_sel.push_back(make_unique<NJetSelection>(1,-1,softjet, jet_uncer_provider->get_jetHandle(i))); 
+      twod_sel.push_back(make_unique<TwoDCut>(ctx,"jet_"+ jet_uncer_provider->get_namestring(i),delR_2D,pTrel_2D));	 
+      jetlep_sel.push_back(make_unique<JetLeptonCleaner_by_KEYmatching>(ctx,JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC,"jet_"+ jet_uncer_provider->get_namestring(i)));	 
+      hardjet_sel.push_back(make_unique<NJetSelection>(2,-1,secondjet,jet_uncer_provider->get_jetHandle(i)));     
+      met_sel.push_back(make_unique<METSelection>(MET_val,ctx,"met_"+jet_uncer_provider->get_namestring(i)));	 
+      htlep_sel.push_back(make_unique<HTLepSelection>(ctx,HTLep_val,"met_"+jet_uncer_provider->get_namestring(i)));   
+    }
+    muonFactory->addJetUncSelection(widejet_sel,met_handles,"30GeV_JetCut");
+    muonFactory->addJetUncSelection(twod_sel,met_handles,"2DCut");
+    muonFactory->addJetUncAnlysisModule(jetlep_sel,met_handles,"JetLep_Cleaning_jetcorr");
+    muonFactory->addJetUncSelection(hardjet_sel,met_handles,"50GeV_JetCut");
+    muonFactory->addJetUncSelection(met_sel,met_handles,to_string((int)MET_val)+"GeV_METCut");
+    muonFactory->addJetUncSelection(htlep_sel,met_handles,to_string((int)HTLep_val)+"GeV_HTLep");
+    return;
+  }
+
+  
   muonFactory->addHists("GenJetHists","muonChannel_GenJetHists");
   muonFactory->addHists("ElectronHists","muonChannel_ElectronHists");
   muonFactory->addHists("MuonHists","muonChannel_MuonHists");
@@ -202,7 +224,9 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   muonFactory->addHists("Central_muonChannel_JetHists",ak4CentralId);
   muonFactory->addHists("Forward_muonChannel_JetHists",ak4ForwardId);
   muonFactory->addHists("50GeV_muonChannel_JetHists",secondjet);
+  return;
 
+  
   vector<int> bBprimeDecay {5, 6000007};
 
   bBprimeFactory.reset(new HistFactory(ctx));
@@ -217,7 +241,7 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   topWMuonFactory->addSelection(make_unique<GenFamilySelection>(topLep,2),"topLep");
   topWMuonFactory->addSelection(make_unique<GenFamilySelection>(wHad,2),"wHad");
   topWMuonFactory->addSelection(make_unique<NElectronSelection>(0,0,softElectron),"0_eleCut");
-  topWMuonFactory->addSelection(make_unique<NMuonSelection>(1,-1,softMuon),"1_sofMuonCut");
+  topWMuonFactory->addSelection(make_unique<NMuonSelection>(1,-1,selMuon),"1_selMuonCut");
   topWMuonFactory->addSelection(make_unique<NMuonSelection>(1,-1,muid_cut),"1_muonCut");
   topWMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
   topWMuonFactory->addSelection(make_unique<TwoDCut>(delR_2D,pTrel_2D),"2DCut");
@@ -243,7 +267,7 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
   wMuonFactory->addSelection(make_unique<GenFamilySelection>(topHad,2),"topHad");
   wMuonFactory->addSelection(make_unique<GenFamilySelection>(wLep,2),"wLep");
   wMuonFactory->addSelection(make_unique<NElectronSelection>(0,0,softElectron),"0_eleCut");
-  wMuonFactory->addSelection(make_unique<NMuonSelection>(1,-1,softMuon),"1_softMuonCut");
+  wMuonFactory->addSelection(make_unique<NMuonSelection>(1,-1,selMuon),"1_selMuonCut");
   wMuonFactory->addSelection(make_unique<NMuonSelection>(1,-1,muid_cut),"1_muonCut");
   wMuonFactory->addSelection(make_unique<NJetSelection>(1,-1,softjet),"30GeV_JetCut");
   wMuonFactory->addSelection(make_unique<TwoDCut>(delR_2D,pTrel_2D),"2DCut");
@@ -279,37 +303,32 @@ GenTestModule::GenTestModule(Context& ctx):channelSel(ctx){
 bool GenTestModule::process(Event & event){
   if(mttbar_sample)
     if(!genMttbar->passes(event))return false;
+  if(genW_sample)
+    if(!genW->passes(event))return false;
   jet_preclean->process(event);
   if(event.jets->size()==0) return false;
   if(do_jet_uncer){
-    event.set(jet_jer_up, *event.jets);
-    event.set(jet_jer_down, *event.jets);
-    event.set(jet_jec_up, *event.jets);
-    event.set(jet_jec_down, *event.jets);
-    
-    event.set(met_jec_up, *event.met);
-    event.set(met_jec_down, *event.met);
-
-    corrector_jer_up->process(event);
-    corrector_jer_down->process(event);
-    corrector_jec_up->process(event);
-    corrector_jec_down->process(event);
-  }
+    jet_uncer_provider->copy_jets(event);
+    jet_uncer_provider->apply_corr(event);
+    jet_uncer_provider->set_met(event);  
+  } 
   if(!common->process(event)) return false;
+  if(run_muontrigger) SF_muonTrigger->process(event);
+  if(run_muonid) SF_muonID->process(event);
+  if(run_eleid) SF_electronID->process(event);
   if(do_jet_uncer){
-    event.set(met_jer_up, *event.met);
-    event.set(met_jer_down, *event.met);
+    jet_uncer_provider->clean(event);
   }
  
   lepton->process(event);
-  /*
-  if(!event.isRealData){
+  /*/
+  if(!event.isRealData && !do_jet_uncer){
     vlqGenHists->fill(event);  
     wMuonFactory->passAndFill(event);
     topWMuonFactory->passAndFill(event);
   }
-  */
-  bool muonChannel = muonFactory->passAndFill(event); 
+  /*/
+  bool muonChannel = muonFactory->passAndFill(event);
   return muonChannel;
 }
 

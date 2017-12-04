@@ -11,9 +11,14 @@
 
 #include <vector>
 
+#include "TF1.h" 
+#include "TFile.h"
+
 class BprimeReco :public uhh2::AnalysisModule {
  public:
   explicit BprimeReco(uhh2::Context & ctx, const std::string & label="BprimeReco");
+  ~BprimeReco();
+  
   virtual bool process(uhh2::Event & event) override;
   bool massReco(uhh2::Event & event);
   bool TopJetReco(uhh2::Event & event, double dRmin = 0);
@@ -31,7 +36,8 @@ class BprimeReco :public uhh2::AnalysisModule {
   void comb(int N, int K);
   int count_bjets(std::vector<Jet> & jets, uhh2::Event & event);
   double forwardeta(std::vector<Jet> & jets, uhh2::Event & event);
-  std::vector<BprimeContainer> reconstruct_WHyps(const std::vector<Jet> & jets, const std::vector<LorentzVector> & Wleps, double cutoff_WHad_min=50, double cutoff_WHad_max=400);
+  double calc_wtag_corr(double eta, double pt);
+  std::vector<BprimeContainer> reconstruct_WHyps(const std::vector<Jet> & jets, const std::vector<LorentzVector> & Wleps, double cutoff_WHad_min=0, double cutoff_WHad_max=4000000000);
   template<typename T>
     bool passes_id(const T & object, const uhh2::Event & event, const boost::optional<std::function<bool (const T &, const uhh2::Event & )>> & object_id);
   uhh2::Event::Handle<std::vector<BprimeContainer>> hypothesis;
@@ -47,6 +53,9 @@ class BprimeReco :public uhh2::AnalysisModule {
 
   NeutrinoFit FitNeutrino;
 
+  bool wtag = false;
+  TF1* puppisd_corrGEN, *puppisd_corrRECO_cen, *puppisd_corrRECO_for;
+  TFile* file;
 };
 
 

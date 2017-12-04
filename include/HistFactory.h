@@ -30,6 +30,11 @@ class JetUncSel : public uhh2::AnalysisModule{
     for(unsigned int i =0 ; i<selection.size();++i)
       selection_store.push_back(move(selection.at(i)));
   }
+  void AddModules(vector<unique_ptr<uhh2::AnalysisModule>> module){
+    for(unsigned int i =0 ; i<module.size();++i)
+      module_store.push_back(move(module.at(i)));
+  }
+
   bool process(Event & event){
     bool final = false;
     for(unsigned int i=0; i<selection_store.size();i++){
@@ -40,11 +45,21 @@ class JetUncSel : public uhh2::AnalysisModule{
 	//std::cout<<"something failed, tzz met.pt =-1"<<std::endl;
 	MET & tmpmet = event.get(store_results.at(i));
 	tmpmet.set_pt(-1.);
-	//event.set(store_results[i],tmpmet);
-      }
+	event.set(store_results[i],tmpmet);
+      }     
     }
-
-    string survive = final ? "Yes" : "No";
+    for(unsigned int i=0; i<module_store.size();i++){
+      if(module_store[i]->process(event)){
+	final = true;
+      }
+      else{
+	//std::cout<<"something failed, tzz met.pt =-1"<<std::endl;
+	MET & tmpmet = event.get(store_results.at(i));
+	tmpmet.set_pt(-1.);
+	event.set(store_results[i],tmpmet);
+      }     
+    }
+    //string survive = final ? "Yes" : "No";
     //cout<<"final analysis module answere: "<<survive<<endl;
     return final;
   }
@@ -53,6 +68,7 @@ class JetUncSel : public uhh2::AnalysisModule{
  private:
   vector<bool> pass_vec = vector<bool>(4,false);
   vector<unique_ptr<Selection>> selection_store;
+  vector<unique_ptr<uhh2::AnalysisModule>> module_store;
   vector<uhh2::Event::Handle<MET>> store_results;
 };
 
@@ -67,8 +83,9 @@ class HistFactory{
   void addSelection(unique_ptr<Selection> selection, const string& cutName);
   void addAndSelection(vector<unique_ptr<Selection>> selection, const string& cutName);
   void addOrSelection(vector<unique_ptr<Selection>> selection, const string& cutName);
-  void addJetUncSelection(vector<unique_ptr<Selection>> selection, vector<uhh2::Event::Handle<MET>> results, const string& cutName);
-
+  void addAndOrSelection(vector<vector<unique_ptr<Selection>>> sel_vec, const string& cutName);
+  void addJetUncSelection(vector<unique_ptr<Selection>>& selection, vector<uhh2::Event::Handle<MET>> results, const string& cutName);
+  void addJetUncAnlysisModule(vector<unique_ptr<uhh2::AnalysisModule>>& module, vector<uhh2::Event::Handle<MET>> results, const string& cutName);
   void addHists(const string& histClass, const string& histName, const std::string & hyp_name = "");
   void addHists(const string& histName, JetId jetid);
   void addHists(const string& histName, TopJetId topjetid);

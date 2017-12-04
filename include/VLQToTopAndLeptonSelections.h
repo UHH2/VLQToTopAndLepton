@@ -152,4 +152,10 @@ class TopJetMassCut: public uhh2::Selection{
   float mass;
 };
 
-
+class Wgenptcut : public uhh2::Selection{
+ public:
+  explicit Wgenptcut(float up_pt_, float down_pt_=-1);
+  virtual bool passes(const uhh2::Event & event) override;
+ private:
+  float up_pt, down_pt;
+};

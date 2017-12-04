@@ -25,7 +25,7 @@ bool UncertaintyWeightsModule::process(uhh2::Event & event){
       pdf_final = -1;
       break;
     }
-    double tmp_weight = fabs(event.genInfo->systweights().at(i)/event.genInfo->originalXWGTUP());
+    double tmp_weight = (event.genInfo->systweights().at(i)/event.genInfo->originalXWGTUP());
     pdf_final += (pdf_weight-tmp_weight)*(pdf_weight-tmp_weight);
   }
   //get the sign correctly

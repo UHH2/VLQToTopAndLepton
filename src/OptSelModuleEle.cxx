@@ -59,8 +59,8 @@ private:
   TopJetId topjet, topjetid, heptopjetid,wjetId;
   std::unique_ptr<JetCleaner> jet_preclean;
   
-  uhh2::Event::Handle<double> iso;
-  uhh2::Event::Handle<double> trigger;
+  //uhh2::Event::Handle<double> iso;
+  //uhh2::Event::Handle<double> trigger;
   
   std::unique_ptr<Selection> iso_sel;
   std::unique_ptr<OrSelection> trigger_sel;
@@ -69,13 +69,15 @@ private:
 OptSelModuleEle::OptSelModuleEle(Context& ctx){
   //get rid of jets that are outside the range of jet corrections
   jet_preclean.reset(new JetCleaner(ctx, PtEtaCut(5, 5)));
-
+  
   btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
 
   wide_softjet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 5.0));
   muid_cut = AndId<Muon>(MuonIDMedium_ICHEP(), PtEtaCut(50.0, 2.4));
   softMuon = AndId<Muon>(MuonIDMedium_ICHEP(), PtEtaCut(50.0, 2.4));
   softElectron = AndId<Electron>(ElectronID_Spring16_tight_noIso, PtEtaCut(50.0, 2.5));
+  ElectronId lowtriggerele =  AndId<Electron>(ElectronID_Spring16_tight_noIso, PtEtaCut(55.0, 2.4));
+  JetId hardtriggerjet=  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(170.0, 2.4));
   softjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
   topjet = PtEtaCut(150.0, 2.4); 
   topjetid = AndId<TopJet>(Type2TopTag(150,210, Type2TopTag::MassType::groomed,btag_medium),Tau32());
@@ -93,17 +95,31 @@ OptSelModuleEle::OptSelModuleEle(Context& ctx){
   common->init(ctx);
 
 
-  iso =  ctx.declare_event_output<double>("IsoCriterion");
-  trigger  =  ctx.declare_event_output<double>("trigger");
-  iso_sel.reset(new NElectronSelection(1,1,isoEle));
-  trigger_sel.reset(new OrSelection());
-  trigger_sel->add(make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*"));
+  //iso =  ctx.declare_event_output<double>("IsoCriterion");
+  //trigger  =  ctx.declare_event_output<double>("trigger");
+  //iso_sel.reset(new NElectronSelection(1,1,isoEle));
+  //trigger_sel.reset(new OrSelection());
+  //trigger_sel->add(make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*"));
   //trigger_sel->add(make_unique<TriggerSelection>(""));
 
 
   OptTree.reset(new OptTreeModule(ctx));
   topjetid = AndId<TopJet>(Type2TopTag(150,210, Type2TopTag::MassType::groomed,btag_medium),Tau32());
- 
+
+
+  std::unique_ptr<OrSelection> trigger;
+  trigger.reset(new OrSelection());
+  unique_ptr<AndSelection> singleEle(new AndSelection(ctx));
+  singleEle->add("ele115",move(make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*")));
+  singleEle->add("elept120",move(make_unique<NElectronSelection>(1,1,eleId_cut)));
+  unique_ptr<AndSelection> jetEle(new AndSelection(ctx));
+  jetEle->add("ele50_jet165pt",move(make_unique<TriggerSelection>("HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v*")));
+  jetEle->add("ak4_170",move(make_unique<NJetSelection>(1,-1,hardtriggerjet)));
+  jetEle->add("elept55",move(make_unique<NElectronSelection>(1,1,lowtriggerele)));
+  trigger->add(move(singleEle));
+  trigger->add(move(jetEle));
+
+  
   //wjetId = AndId<TopJet>(WMass(),Tau21(0.5));
   //btag_medium = CSVBTag(CSVBTag::WP_TIGHT);
   Reco.reset(new BprimeReco(ctx));
@@ -120,12 +136,13 @@ OptSelModuleEle::OptSelModuleEle(Context& ctx){
 
   CutPlots.reset(new HistFactory(ctx));
   CutPlots->setEffiHistName("CutsOpt");
-  CutPlots->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*"),make_unique<TriggerSelection>("HLT_Ele105_CaloIdVT_GsfTrkIdT_v*"),make_unique<TriggerSelection>("HLT_Ele27_WPLoose_Gsf_v*")),"eleTrigger");
+  CutPlots->addSelection(move(trigger),"eleTrigger");
+  //CutPlots->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*"),make_unique<TriggerSelection>("HLT_Ele105_CaloIdVT_GsfTrkIdT_v*"),make_unique<TriggerSelection>("HLT_Ele27_WPLoose_Gsf_v*")),"eleTrigger");
   CutPlots->addSelection(make_unique<NMuonSelection>(0,0,softMuon),"0_softMuonCut");
-  CutPlots->addSelection(make_unique<NElectronSelection>(1,1,softElectron),"1_softeleCut");
-  CutPlots->addSelection(make_unique<NElectronSelection>(1,1,eleId_cut),"1_eleCut");
+  //CutPlots->addSelection(make_unique<NElectronSelection>(1,1,softElectron),"1_softeleCut");
+  //CutPlots->addSelection(make_unique<NElectronSelection>(1,1,eleId_cut),"1_eleCut");
   CutPlots->addSelection(make_unique<NJetSelection>(1,-1,softjet),"15GeV_JetCut");
-  CutPlots->addOrSelection(make_uvec(make_unique<TwoDCut>(0.4,40),make_unique<NElectronSelection>(1,1,isoEle)),"Iso");
+  //CutPlots->addOrSelection(make_uvec(make_unique<TwoDCut>(0.4,40),make_unique<NElectronSelection>(1,1,isoEle)),"Iso");
   CutPlots->addSelection(make_unique<NJetSelection>(2,-1,secondjet),"70GeV_JetCut");
   CutPlots->addSelection(make_unique<NJetSelection>(1,-1,onejet),"250GeV_JetCut");
   CutPlots->addSelection(make_unique<NTopJetSelection>(1,-1,topjet),"150GeV_TopJetCut");
@@ -144,17 +161,21 @@ OptSelModuleEle::OptSelModuleEle(Context& ctx){
 
 bool OptSelModuleEle::process(Event & event){
   jet_preclean->process(event);
+  if(!event.jets || !event.genjets)return false;
   if(!common->process(event)) return false;
   lepton->process(event);
   if(!CutPlots->passAndFill(event))return false;
-   if(trigger_sel->passes(event))
+  /*
+  if(trigger_sel->passes(event))
     event.set(trigger,0.);
   else
     event.set(trigger,1.);
+  
   if(iso_sel->passes(event))
     event.set(iso,1.);
   else
     event.set(iso,.0);
+  */
   Reco->massReco(event);
   ttbar->process(event);
   chi2_combo->process(event);

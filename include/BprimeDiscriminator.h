@@ -31,4 +31,5 @@ class BprimeDiscriminator :public uhh2::AnalysisModule {
   double forwardjeteta = -1;
   uhh2::Event::Handle<FlavorParticle> primlep;
   uhh2::Event::Handle<BprimeContainer> resultHyp;
+
 };

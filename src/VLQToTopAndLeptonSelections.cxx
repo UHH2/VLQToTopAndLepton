@@ -243,3 +243,13 @@ bool TopJetMassCut::passes(const uhh2::Event & event){
   TopJet topjet = (*event.topjets)[0];
   return topjet.prunedmass() > mass;
 }
+
+
+Wgenptcut::Wgenptcut(float up_pt_,float down_pt_): up_pt(up_pt), down_pt(down_pt_){}
+
+bool Wgenptcut::passes(const uhh2::Event & event){
+  for(const auto & genp: *event.genparticles)
+    if (fabs(genp.pdgId()) == 24)
+      return genp.pt()>down_pt && genp.pt()<up_pt;
+  return false;
+}

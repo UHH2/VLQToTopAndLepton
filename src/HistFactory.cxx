@@ -12,6 +12,7 @@
 #include "UHH2/VLQToTopAndLepton/include/BprimeUncerHists.h"
 #include "UHH2/VLQToTopAndLepton/include/VLQGenHists.h"
 #include "UHH2/VLQToTopAndLepton/include/EventKinematicHists.h"
+#include "UHH2/VLQToTopAndLepton/include/Lepton2DHist.h"
 
 #include "TH1D.h"
 #include <math.h> 
@@ -77,7 +78,19 @@ void HistFactory::addOrSelection(vector<unique_ptr<Selection>> selection, const 
     myOrSel->add(move(selection.at(i)));
   addSelection(move(myOrSel),cutName);
 }
-void HistFactory::addJetUncSelection(vector<unique_ptr<Selection>> selection, vector<uhh2::Event::Handle<MET>> results, const string& cutName){
+void HistFactory::addAndOrSelection(vector<vector<unique_ptr<Selection>>> sel_vec, const string& cutName){
+  unique_ptr<OrSelection> myOrSel;
+  myOrSel.reset(new OrSelection());
+  for(unsigned int i=0; i<sel_vec.size(); i++){
+    unique_ptr<AndSelection> selection;
+    for(unsigned int m=0; m<sel_vec.at(i).size(); m++){
+      selection->add(to_string(i)+"_"+to_string(m), move(sel_vec.at(i).at(m)));
+    }
+    myOrSel->add(move(selection));
+  }
+  addSelection(move(myOrSel),cutName);
+}
+void HistFactory::addJetUncSelection(vector<unique_ptr<Selection>>& selection, vector<uhh2::Event::Handle<MET>> results, const string& cutName){
   unique_ptr<JetUncSel> myJetUncSel;
   myJetUncSel.reset(new JetUncSel());
   if(selection.size() != results.size()){
@@ -89,6 +102,21 @@ void HistFactory::addJetUncSelection(vector<unique_ptr<Selection>> selection, ve
   myJetUncSel->AddResultCollection(results);
   addAnalysisModule(move(myJetUncSel),cutName);
 }
+void HistFactory::addJetUncAnlysisModule(vector<unique_ptr<AnalysisModule>>& module, vector<uhh2::Event::Handle<MET>> results, const string& cutName){
+  unique_ptr<JetUncSel> myJetUncSel;
+  myJetUncSel.reset(new JetUncSel());
+  if(module.size() != results.size()){
+    cerr<<"For the Jet Unc estimation the result vector and the selection vector are of different size"<<endl;
+    cerr<<"This will end in a segmentation violation now. Sorry ;)"<<endl;
+    assert(module.size() == results.size());
+  }
+  myJetUncSel->AddModules(move(module));    
+  myJetUncSel->AddResultCollection(results);
+  addAnalysisModule(move(myJetUncSel),cutName);
+}
+
+
+
 void HistFactory::addAnalysisModule(unique_ptr<uhh2::AnalysisModule> module, std::string cutName){
   AnalysisModules.push_back(move(module));
   selectionClasses.push_back(unique_ptr<Selection>());
@@ -158,6 +186,14 @@ void HistFactory::addHists(const string& histClass, const string& histName, cons
       for(auto & name : uncerNames){
 	unique_ptr<Hists> uncerHists;
 	uncerHists.reset(new VLQGenHists(m_ctx,(ss.str()+"_"+name).c_str()));
+	uncerHistsTemplate.push_back(move(uncerHists));
+      }
+    }
+    else if(histClass.compare("Lepton2DHist")==0){
+      histTemplate.reset(new Lepton2DHist(m_ctx,ss.str().c_str()));
+      for(auto & name : uncerNames){
+	unique_ptr<Hists> uncerHists;
+	uncerHists.reset(new Lepton2DHist(m_ctx,(ss.str()+"_"+name).c_str()));
 	uncerHistsTemplate.push_back(move(uncerHists));
       }
     }
@@ -285,7 +321,7 @@ bool HistFactory::passAndFill(Event & event, int passOption){
     // cout<<"cut number "<<cuti<<endl;
     if(!analysisModule_step)
       pass_step=selection->passes(event);
-    string survive = pass_step ? "Yes" : "No";
+    //string survive = pass_step ? "Yes" : "No";
     //cout<<"Histfactory level answere "<<survive<<endl;
     if(pass_step){
       if(cutflow_raw){

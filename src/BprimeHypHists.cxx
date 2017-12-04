@@ -174,7 +174,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
 
   if(btagdis != -1)
     btagReco_csv->Fill(btagdis,weight);
-  
+  /*
   if(recotype ==2 && !event.isRealData){
     if(thad.pt()>=400 && thad.pt()<=550){
       //event.weight *= 0.91;
@@ -186,7 +186,7 @@ void BprimeHypHists::fill(const uhh2::Event & event){
       weight *= 0.97;
       toptag_weight = 0.97;
     }
-  }
+    }*/
 
   /*
   event.set(weight_toptag,toptag_weight);

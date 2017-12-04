@@ -39,6 +39,8 @@
 //#include "UHH2/VLQToTopAndLepton/include/OptTreeModule.h"
 #include "UHH2/VLQToTopAndLepton/include/JetReweight.h"
 #include "UHH2/VLQToTopAndLepton/include/TopTagScalefactor.h"
+#include "UHH2/VLQToTopAndLepton/include/RunDependendJetCorr.h"
+#include "UHH2/VLQToTopAndLepton/include/AK8_cor_reco.h"
 
 using namespace std;
 using namespace uhh2;
@@ -70,15 +72,17 @@ private:
   std::unique_ptr<JetHists> btag_jetHists;
   std::unique_ptr<Hists> jetHists_sortbyeta, genjet_hists;
   std::unique_ptr<Hists> twoDjetHists_sortbyeta;
-  JetId subBtag, btag_medium,btag_tight,btag_loose, eta_cut, ak4ForwardId, ak4CentralId, jet;
+  JetId subBtag, btag_medium,btag_tight,btag_loose, eta_cut, ak4ForwardId, ak4CentralId, jet,recojet;
   TopJetId topjetid,wjetId,heptopjetid;
   std::unique_ptr<Selection> hepselection;  
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffiHists;
-  std::unique_ptr<AnalysisModule> BTagScaleFactors,SF_muonID, SF_electronID, SF_muonTrigger;
+  std::unique_ptr<AnalysisModule> BTagScaleFactors,SF_muonID, SF_electronID, SF_muonTrigger, SF_eleReco, SF_muonTrk;
   std::unique_ptr<AnalysisModule> pdf_scale_unc;
   std::unique_ptr<AnalysisModule> toptag_scale;
   std::unique_ptr<AnalysisModule> jetcleaner;
-  uhh2::Event::Handle<double> weight;
+  std::unique_ptr<RunDependendJetCorr> topjetCorr;
+
+  uhh2::Event::Handle<double> weight ;
   uhh2::Event::Handle<double> numberofjets;
 
   string SF_muonID_variation ="nominal";
@@ -86,39 +90,45 @@ private:
   string BTag_variation ="central";
   string PU_variation ="central";
 
-  bool run_muonid = false, run_muontrigger = false, run_eleid =false;
+  bool run_muonid = false, run_muontrigger = false, run_eleid =false, run_muontrk=false, run_elereco =false;
 
   std::unique_ptr<TopPtReweight> ttbar_reweight;
 
   uhh2::Event::Handle<FlavorParticle> primlep;
 
   int event_number = 0;
+  
+  std::unique_ptr<AK8_cor_reco> jec_topjet_recos;
 };
 
 SelectionModule::SelectionModule(Context& ctx){
+  
   weight = ctx.declare_event_output<double>("weight");
   numberofjets= ctx.declare_event_output<double>("numberofjets");
+
   primlep = ctx.get_handle<FlavorParticle>("PrimaryLepton");
-  ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819));
+  
+  ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819)); //8 TeV values l+jets
+  //ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true,0.9910819)); // 13 TeV values
+
   pdf_scale_unc.reset(new UncertaintyWeightsModule(ctx));
-  toptag_scale.reset(new TopTagScalefactor(ctx,"TopTagDis"));
+  toptag_scale.reset(new TopTagScalefactor(ctx,"TopTagDis","WTagDis"));
 
   vector<int> topLepIds {6,24,13};
   vector<int> topHadIds {6,24,-54321};
   vector<int> wHadIds {24,-54321};
   vector<int> wLepIds {24,13};
-  //topLep.reset(new GenFamilySelection(topLepIds,2));
-  //topHad.reset(new GenFamilySelection(topHadIds,2));;
-  //Reco_wHad.reset(new BprimeRecoHists(ctx, "Gen_wHad"));
-  //Reco_wLep.reset(new BprimeRecoHists(ctx, "Gen_wLep"));
-
+  
   //OptTree.reset(new OptTreeModule(ctx));
-  jet = PtEtaCut(30,2.4);
+  recojet = PtEtaCut(30,2.4);
+  jet = PtEtaCut(30,5);
   jetcleaner.reset(new JetCleaner(ctx,jet));
+
+  topjetCorr.reset(new RunDependendJetCorr(ctx,"patJetsAk8PuppiJetsSoftDropPacked_daughters"));
 
   double forward_low = 2.0;
   double forward_upper = 5;
-  double forwardJet_pt = 25;
+  double forwardJet_pt = 30;
   double drminForJet = 1000.0;
   double ForJetE = 250.;
   
@@ -138,50 +148,64 @@ SelectionModule::SelectionModule(Context& ctx){
   common.reset(new CommonModules());
   common->disable_jec();
   common->disable_jersmear();
-  common->disable_jec();
   common->disable_lumisel();
   common->disable_metfilters();
   common->disable_pvfilter();
-  common->disable_jetpfidfilter();
+  common->disable_jetpfidfilter();  
   common->init(ctx,PU_variation);
 
   //Muon ScaleFactors
   if(!ctx.get("MounIDScaleFactors","").empty()){ 
-    SF_muonID.reset(new MCMuonScaleFactor(ctx, ctx.get("MounIDScaleFactors"), "MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta", 1, "mediummuon2016", "nominal")); 
+    SF_muonID.reset(new MCMuonScaleFactor(ctx, ctx.get("MounIDScaleFactors"), "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta", 1, "tight", "nominal")); 
     run_muonid = true;
   }
   if(!ctx.get("MuonTriggerScaleFactors","").empty()){
     SF_muonTrigger.reset(new MCMuonScaleFactor(ctx, ctx.get("MuonTriggerScaleFactors"), "IsoMu50_OR_IsoTkMu50_PtEtaBins", 1, "muonTrigger", "nominal")); 
     run_muontrigger = true;
   }
+  cout<<"check if something is in the xml for MuonTkrScaleFactors "<<ctx.get("MuonTkrScaleFactors","")<<endl;
+  if(!ctx.get("MuonTkrScaleFactors","").empty()){
+    cout<<"muon trk scale factor"<<endl;
+    SF_muonTrk.reset(new MCMuonTrkScaleFactor(ctx, ctx.get("MuonTkrScaleFactors"), 1, "muontrk", "nominal")); 
+    run_muontrk = true;
+  }
   if(!ctx.get("EleScaleFactors","").empty()){ 
     SF_electronID.reset(new MCElecScaleFactor(ctx,ctx.get("EleScaleFactors"),1,"eleid","nominal" ));
     run_eleid =true;
+  }
+  if(!ctx.get("EleRecoScaleFactors","").empty()){
+    SF_eleReco.reset(new MCElecScaleFactor(ctx,ctx.get("EleRecoScaleFactors"),1,"elereco","nominal" ));
+    run_elereco=true;
   }
 
   //BTag Effi & Scale
   BTagEffiHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_MEDIUM));
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_MEDIUM,"jets",BTag_variation));
 
-  wjetId = AndId<TopJet>(WMass(),Tau21(0.5));
+  wjetId = AndId<TopJet>(Tau21(1.),PtEtaCut(200,2.4));//Tau21(0.4),
   ak4ForwardId = PtEtaCut(30.0,5,-1,2);
   ak4CentralId = PtEtaCut(30.0,2,-1,-1);
   heptopjetid = HEPTopTagV2();
   hepselection.reset(new NTopJetSelection(1,-1,heptopjetid));
   btag_medium = AndId<Jet>(CSVBTag(CSVBTag::WP_MEDIUM),PtEtaCut(30, 2.4));
   //subBtag = CSVBTag(0.79f);
-  subBtag = CSVBTag(0.46f);
+  subBtag = CSVBTag(0.5426f);
   btag_tight = CSVBTag(CSVBTag::WP_TIGHT);
   btag_loose = CSVBTag(CSVBTag::WP_LOOSE);
   //topjetid = AndId<TopJet>(Type2TopTag(110,210, Type2TopTag::MassType::groomed,subBtag),Tau32(0.54));
   topjetid = AndId<TopJet>(Type2TopTag(105,220, Type2TopTag::MassType::groomed,subBtag),Tau32(0.5));
   Reco.reset(new BprimeReco(ctx));
-  Reco->set_jetRecoId(jet);
+  Reco->set_jetRecoId(recojet);
   TopTagReco.reset(new BprimeReco(ctx,"TopTagReco"));
   TopTagReco->set_topjetRecoId(topjetid);
+  WTagReco.reset(new BprimeReco(ctx,"WTagReco"));
+  WTagReco->set_topjetRecoId(wjetId);  
+  WTagReco->set_topjetCollection(ctx,"patJetsAk8PuppiJetsSoftDropPacked_daughters");
 
+  jec_topjet_recos.reset(new AK8_cor_reco(ctx,"patJetsAk8PuppiJetsSoftDropPacked_daughters", topjetid, wjetId));
+    
   Gen.reset(new BprimeGen(ctx)); 
-  eta_cut = PtEtaCut(20.0,2.6);
+  eta_cut = PtEtaCut(30.0,2.4);
   ht.reset(new HTCalc(ctx,eta_cut));
   lepton.reset(new PrimaryLepton(ctx));
 
@@ -197,10 +221,12 @@ SelectionModule::SelectionModule(Context& ctx){
   cmstoptagDis->set_emptyHyp(true);
   ttbar.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::ttbar,"BprimeReco","TTbarDis"));
   ttbar->set_emptyHyp(true);
-  chi2_combo.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::chi2_combo,"BprimeReco","Chi2Dis"));
+  chi2_combo.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::chi2_combo,"BprimeReco","Chi2Dis")); 
   chi2_combo->set_emptyHyp(true);
-  bestchi2_Dis.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::chi_bestfit,"BprimeReco","BestFit"));
+  bestchi2_Dis.reset(new  BprimeDiscriminator(ctx,BprimeDiscriminator::chi_bestfit,"BprimeReco","BestFit"));
   bestchi2_Dis->set_emptyHyp(true);
+  chi2_wtag.reset(new BprimeDiscriminator(ctx,BprimeDiscriminator::wTag,"WTagReco","WTagDis"));
+  chi2_wtag->set_emptyHyp(true);
   ttbar_Hists.reset(new BprimeHypHists(ctx,"TTbarHists","TTbarDis"));
   ttbar_chi2.reset(new ChiSquareCut(ctx,35,0,"TTbarDis"));
 
@@ -286,17 +312,33 @@ SelectionModule::SelectionModule(Context& ctx){
   TopTagPlots->addHists("EventKinematicHists","TopTagReco_EventKinematicHists");
 }
 
-bool SelectionModule::process(Event & event){ 
-  if(event.met->pt() <0) return false;
+bool SelectionModule::process(Event & event){
+  if(event.met->pt() <5.) return false;
   jetcleaner->process(event);
   common->process(event);
   ht->process(event);
   lepton->process(event);
   ttbar_reweight->process(event);
-  Gen->process(event);  
+  Gen->process(event);
+  topjetCorr->process(event);
+  
   if(run_muontrigger) SF_muonTrigger->process(event);
   if(run_muonid) SF_muonID->process(event);
+  if(run_muontrk) SF_muonTrk->process(event);
   if(run_eleid) SF_electronID->process(event);
+  if(run_elereco) SF_eleReco->process(event);
+
+  /*/
+  TLorentzVector gsfele(0,0,0,0);
+  Electron ele = event.electrons->at(0);
+  gsfele.SetPx(ele.gsfTrack_px());
+  gsfele.SetPy(ele.gsfTrack_py());
+  gsfele.SetPz(ele.gsfTrack_pz());
+  if(fabs(ele.eta()-gsfele.Eta())>0.2){
+    cout<<"Delta eta "<<fabs(ele.eta()-gsfele.Eta())<<" event run "<<event.run<<" lumi block "<<event.luminosityBlock<<" number "<<event.event<<endl;
+  }
+  return false;
+  /*/
   BTagEffiHists->fill(event);
   if(!event.isRealData){ 
     genjet_hists->fill(event);
@@ -307,22 +349,22 @@ bool SelectionModule::process(Event & event){
   btag_jetHists->fill(event);
   twoDjetHists_sortbyeta->fill(event);
   sort_by_pt(*event.jets);
-
+  
   bool reconstructed = false;
-  //bool wreco = false; 
-
   bool toptagreco_bool = TopTagReco->TopJetReco(event,2);
   bool toptagdis_bool = cmstoptagDis->process(event);
+  bool wtag_reco_bool = WTagReco->hadronicW(event,2);
+  bool wtagdis_bool = chi2_wtag->process(event);
   bool reco_bool = Reco->massReco(event);
   bool ttbardis_bool = ttbar->process(event);
   bool chi2dis_bool =  chi2_combo->process(event);
   bestchi2_Dis->process(event);
-
+  jec_topjet_recos->process(event);
   if(toptagreco_bool && toptagdis_bool){
     reconstructed =true;
     TopTagPlots->passAndFill(event,1); 
   }
-
+  //cout<<"event weight "<<event.weight;
   BTagScaleFactors->process(event);
   if(reco_bool){
     if(ttbardis_bool)
@@ -332,29 +374,6 @@ bool SelectionModule::process(Event & event){
     }
   }
   toptag_scale->process(event);
-  
-  /*
-   *
-   * This is the version where I do not write out the tree and try to save some computing time
-   * only considering certain possible reconstructions
-   *
-   */
-  /*
-  if(TopTagReco->TopJetReco(event,2)){
-    if(cmstoptagDis->process(event)){
-      reconstructed =true;
-      TopTagPlots->passAndFill(event,1);
-    }
-  }
-  if(Reco->massReco(event)){
-    BTagScaleFactors->process(event);
-    if(ttbar->process(event))
-      if(btagSel->passes(event) && ttbar_chi2->passes(event)) ttbar_Hists->fill(event); 
-    if(chi2_combo->process(event) && !reconstructed){
-      Chi2Plots->passAndFill(event,1);
-    }
-  }
-    */
 
   event.set(numberofjets,event.jets->size()); 
   event.set(weight,event.weight);

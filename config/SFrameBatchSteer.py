@@ -8,15 +8,15 @@ import shutil
 #simple script that runs several sframe batch jobs and creates everything you might need
 if __name__ == "__main__":
     #options
-    debug = False
+    debug = True
     remove = False #remove directories with old results
     resume = True
     variatons_uncer = False # not needed anymore, done as weights
     jet_uncer = True
     sframe_plotter = False 
 
-    submission_options = 'slac'
-    resume_options = 'rlac' 
+    submission_options = 'slc'
+    resume_options = 'rlc' 
 
     #put your local sfram_batch dir in search path
     sys.path.append('/nfs/dust/cms/user/gonvaq/SFrameBatch/')
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     #Do the jer and jec uncertainties, since they need to be done before any selction
     jet_variables = ["jecsmear_direction","jersmear_direction"]
     jet_variatons = ['up','down']
-    jet_xmlfiles = ['MuPreSel.xml','ElePreSel.xml']
+    jet_xmlfiles = ['MuPreSelUNC.xml','ElePreSelUNC.xml']
 
     for xml in jet_xmlfiles:
         sel_type = 'Mu'
@@ -61,7 +61,7 @@ if __name__ == "__main__":
                 elif resume and (os.path.isdir("workdir."+var+"_"+value+'_'+step+"_"+sel_type) or os.path.isdir(var+"_"+value+'_'+step+"_"+sel_type)):
                      command_string = "-"+resume_options+" "+xml+" -w workdir."+var+"_"+value+"_"+step+"_"+sel_type+" -o ./"+var+"_"+value+"_"+step+"_"+sel_type+" --ReplaceUserItem "+var+","+value+" --addTree -1"
                 print command_string
-                #if not debug: SFrameBatchMain(command_string.split(" "))
+                if not debug: SFrameBatchMain(command_string.split(" "))
                 if sframe_plotter:
                     os.chdir(sframePlotterDir)
                     with open(sframePlotterDst, "wt") as fout:

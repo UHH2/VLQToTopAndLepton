@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
+<!ENTITY SingleEleDataB SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016B_03Feb.xml">
+<!ENTITY SingleEleDataD SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016D_03Feb.xml">
+<!ENTITY SingleEleDataG SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016G_03Feb.xml">
+<!ENTITY SingleEleDataF SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016F_03Feb.xml">
+<!ENTITY SingleEleDataE SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016E_03Feb.xml">
+<!ENTITY SingleEleDataC SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016C_03Feb.xml">
+<!ENTITY SingleEleDataH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016H_03Feb.xml">
+<!ENTITY SingleMuDataE SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleMuon_Run2016E_03Feb.xml">
+<!ENTITY SingleMuDataF SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleMuon_Run2016F_03Feb.xml">
+<!ENTITY SingleMuDataG SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleMuon_Run2016G_03Feb.xml">
+<!ENTITY SingleMuDataH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleMuon_Run2016H_03Feb.xml">
+<!ENTITY SingleMuDataC SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleMuon_Run2016C_03Feb.xml">
+<!ENTITY SingleMuDataD SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleMuon_Run2016D_03Feb.xml">
+<!ENTITY SingleMuDataB SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/DATA_SingleMuon_Run2016B_03Feb.xml">
+
 <!ENTITY BprimeB-1200_RH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/Bprime/BprimeBToTW_M-1200_RH.xml">
 <!ENTITY BprimeB-1600_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/Bprime/BprimeBToTW_M-1600_LH.xml">
 <!ENTITY BprimeB-1500_LH SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/Bprime/BprimeBToTW_M-1500_LH.xml">
@@ -51,8 +66,8 @@
 ]>
 
 <!--
-   <ConfigParse NEventsBreak="0" FileSplit="3" AutoResubmit="3" MaxJobsPerProcess="10"/>
-   <ConfigSGE RAM ="2" DISK ="10" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.Trigger_v1"/>
+   <ConfigParse NEventsBreak="0" FileSplit="5" AutoResubmit="3" MaxJobsPerProcess="350"/>
+   <ConfigSGE RAM ="4" DISK ="10" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.Trigger"/>
 -->
 
 
@@ -61,276 +76,361 @@
     <Library Name="libSUHH2VLQToTopAndLepton"/>
     <Package Name="SUHH2VLQToTopAndLepton.par" />
 
-     <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Trigger_v1/" PostFix="" TargetLumi="2225">
-		<InputData Lumi="99988.0" NEventsMax="-1" Type="MC" Version="BprimeB-1200_RH" Cacheable="False">
+    <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./Trigger/" PostFix="" TargetLumi="35867">
+      <!--
+                <InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleEleDataB" Cacheable="False">
+			&SingleEleDataB;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleEleDataC" Cacheable="False">
+			&SingleEleDataC;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleEleDataD" Cacheable="False">
+			&SingleEleDataD;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleEleDataE" Cacheable="False">
+			&SingleEleDataE;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleEleDataF" Cacheable="False">
+			&SingleEleDataF;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleEleDataG" Cacheable="False">
+			&SingleEleDataG;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleEleDataH" Cacheable="False">
+			&SingleEleDataH;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+
+
+	        <InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleMuDataB" Cacheable="False">
+			&SingleMuDataB;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleMuDataC" Cacheable="False">
+			&SingleMuDataC;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleMuDataD" Cacheable="False">
+			&SingleMuDataD;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleMuDataE" Cacheable="False">
+			&SingleMuDataE;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleMuDataF" Cacheable="False">
+			&SingleMuDataF;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleMuDataG" Cacheable="False">
+			&SingleMuDataG;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+		<InputData Lumi="1.0" NEventsMax="-1" Type="DATA" Version="SingleMuDataH" Cacheable="False">
+			&SingleMuDataH;
+			<InputTree Name="AnalysisTree" />
+			
+		</InputData>
+
+
+
+     		<InputData Lumi="99988.0" NEventsMax="-1" Type="MC" Version="BprimeB-1200_RH" Cacheable="False">
 			&BprimeB-1200_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
+-->
 		<InputData Lumi="99984.0" NEventsMax="-1" Type="MC" Version="BprimeB-1600_LH" Cacheable="False">
 			&BprimeB-1600_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
+<!--
 		<InputData Lumi="99778.0" NEventsMax="-1" Type="MC" Version="BprimeB-1500_LH" Cacheable="False">
 			&BprimeB-1500_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99992.0" NEventsMax="-1" Type="MC" Version="BprimeB-900_LH" Cacheable="False">
 			&BprimeB-900_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99989.0" NEventsMax="-1" Type="MC" Version="BprimeB-1000_LH" Cacheable="False">
 			&BprimeB-1000_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99987.0" NEventsMax="-1" Type="MC" Version="BprimeB-1000_RH" Cacheable="False">
 			&BprimeB-1000_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="94795.0" NEventsMax="-1" Type="MC" Version="BprimeB-700_RH" Cacheable="False">
 			&BprimeB-700_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99779.0" NEventsMax="-1" Type="MC" Version="BprimeB-1300_LH" Cacheable="False">
 			&BprimeB-1300_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99994.0" NEventsMax="-1" Type="MC" Version="BprimeB-800_RH" Cacheable="False">
 			&BprimeB-800_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99975.0" NEventsMax="-1" Type="MC" Version="BprimeB-1600_RH" Cacheable="False">
 			&BprimeB-1600_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99993.0" NEventsMax="-1" Type="MC" Version="BprimeB-900_RH" Cacheable="False">
 			&BprimeB-900_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
-		<InputData Lumi="89777.0" NEventsMax="-1" Type="MC" Version="BprimeB-1200_LH" Cacheable="False">
+-->		<InputData Lumi="89777.0" NEventsMax="-1" Type="MC" Version="BprimeB-1200_LH" Cacheable="False">
 			&BprimeB-1200_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
+<!--
 		<InputData Lumi="99983.0" NEventsMax="-1" Type="MC" Version="BprimeB-1300_RH" Cacheable="False">
 			&BprimeB-1300_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99986.0" NEventsMax="-1" Type="MC" Version="BprimeB-1100_RH" Cacheable="False">
 			&BprimeB-1100_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
+-->
 		<InputData Lumi="99989.0" NEventsMax="-1" Type="MC" Version="BprimeB-800_LH" Cacheable="False">
 			&BprimeB-800_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
+<!--
 		<InputData Lumi="99994.0" NEventsMax="-1" Type="MC" Version="BprimeB-700_LH" Cacheable="False">
 			&BprimeB-700_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
 		</InputData>
 		<InputData Lumi="99979.0" NEventsMax="-1" Type="MC" Version="BprimeB-1400_RH" Cacheable="False">
 			&BprimeB-1400_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99968.0" NEventsMax="-1" Type="MC" Version="BprimeB-1700_RH" Cacheable="False">
 			&BprimeB-1700_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="94960.0" NEventsMax="-1" Type="MC" Version="BprimeB-1700_LH" Cacheable="False">
 			&BprimeB-1700_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="198380.0" NEventsMax="-1" Type="MC" Version="BprimeB-1100_LH" Cacheable="False">
 			&BprimeB-1100_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99971.0" NEventsMax="-1" Type="MC" Version="BprimeB-1800_LH" Cacheable="False">
 			&BprimeB-1800_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="99785.0" NEventsMax="-1" Type="MC" Version="BprimeB-1400_LH" Cacheable="False">
 			&BprimeB-1400_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
+-->
 		<InputData Lumi="99963.0" NEventsMax="-1" Type="MC" Version="BprimeB-1800_RH" Cacheable="False">
 			&BprimeB-1800_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+
 		</InputData>
-		<InputData Lumi="99973.0" NEventsMax="-1" Type="MC" Version="BprimeB-1500_RH" Cacheable="False">
+<!--		<InputData Lumi="99973.0" NEventsMax="-1" Type="MC" Version="BprimeB-1500_RH" Cacheable="False">
 			&BprimeB-1500_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299924.0" NEventsMax="-1" Type="MC" Version="BprimeT-1500_RH" Cacheable="False">
 			&BprimeT-1500_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299978.0" NEventsMax="-1" Type="MC" Version="BprimeT-700_RH" Cacheable="False">
 			&BprimeT-700_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299894.0" NEventsMax="-1" Type="MC" Version="BprimeT-1700_LH" Cacheable="False">
 			&BprimeT-1700_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299973.0" NEventsMax="-1" Type="MC" Version="BprimeT-800_LH" Cacheable="False">
 			&BprimeT-800_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299560.0" NEventsMax="-1" Type="MC" Version="BprimeT-1100_RH" Cacheable="False">
 			&BprimeT-1100_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299933.0" NEventsMax="-1" Type="MC" Version="BprimeT-1400_LH" Cacheable="False">
 			&BprimeT-1400_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="289753.0" NEventsMax="-1" Type="MC" Version="BprimeT-900_LH" Cacheable="False">
 			&BprimeT-900_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299965.0" NEventsMax="-1" Type="MC" Version="BprimeT-1000_RH" Cacheable="False">
 			&BprimeT-1000_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="259128.0" NEventsMax="-1" Type="MC" Version="BprimeT-1700_RH" Cacheable="False">
 			&BprimeT-1700_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299929.0" NEventsMax="-1" Type="MC" Version="BprimeT-1300_LH" Cacheable="False">
 			&BprimeT-1300_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299875.0" NEventsMax="-1" Type="MC" Version="BprimeT-1800_LH" Cacheable="False">
 			&BprimeT-1800_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
-		<InputData Lumi="294369.0" NEventsMax="-1" Type="MC" Version="BprimeT-700_LH" Cacheable="False">
+         	<InputData Lumi="294369.0" NEventsMax="-1" Type="MC" Version="BprimeT-700_LH" Cacheable="False">
 			&BprimeT-700_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299726.0" NEventsMax="-1" Type="MC" Version="BprimeT-1600_RH" Cacheable="False">
 			&BprimeT-1600_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299360.0" NEventsMax="-1" Type="MC" Version="BprimeT-1000_LH" Cacheable="False">
 			&BprimeT-1000_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299916.0" NEventsMax="-1" Type="MC" Version="BprimeT-1600_LH" Cacheable="False">
 			&BprimeT-1600_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299754.0" NEventsMax="-1" Type="MC" Version="BprimeT-1200_RH" Cacheable="False">
 			&BprimeT-1200_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299740.0" NEventsMax="-1" Type="MC" Version="BprimeT-1200_LH" Cacheable="False">
 			&BprimeT-1200_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="293525.0" NEventsMax="-1" Type="MC" Version="BprimeT-1400_RH" Cacheable="False">
 			&BprimeT-1400_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="0.0" NEventsMax="-1" Type="MC" Version="BprimeT-1100_LH" Cacheable="False">
 			&BprimeT-1100_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299091.0" NEventsMax="-1" Type="MC" Version="BprimeT-1800_RH" Cacheable="False">
 			&BprimeT-1800_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299764.0" NEventsMax="-1" Type="MC" Version="BprimeT-900_RH" Cacheable="False">
 			&BprimeT-900_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299899.0" NEventsMax="-1" Type="MC" Version="BprimeT-1500_LH" Cacheable="False">
 			&BprimeT-1500_LH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
 		<InputData Lumi="299949.0" NEventsMax="-1" Type="MC" Version="BprimeT-1300_RH" Cacheable="False">
 			&BprimeT-1300_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			
 		</InputData>
+
 		<InputData Lumi="299766.0" NEventsMax="-1" Type="MC" Version="BprimeT-800_RH" Cacheable="False">
 			&BprimeT-800_RH;
 			<InputTree Name="AnalysisTree" />
-			<OutputTree Name="AnalysisTree" />
+			             
 		</InputData>
+-->
 	<UserConfig>
-		  <!-- Please add all the collections and stuff you need -->
-			<Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices" />
-			<Item Name="ElectronCollection" Value="slimmedElectronsUSER" />
-			<Item Name="MuonCollection" Value="slimmedMuonsUSER" />
-			<Item Name="TauCollection" Value="slimmedTaus" />
-			<Item Name="JetCollection" Value="slimmedJets" />
-			<Item Name="GenJetCollection" Value="slimmedGenJets" />
-			<Item Name="TopJetCollection" Value="slimmedJetsAK8_SoftDrop" />
-			<Item Name="METName" Value="slimmedMETs" />
-			<Item Name="GenParticleCollection" Value="GenParticles" />
-			<Item Name="additionalBranches" Value="slimmedJetsPuppi slimmedMETsPuppi patJetsHepTopTagCHSPacked_daughters patJetsAk8CHSJetsSoftDropPacked_daughters" />
+	  <!-- Please add all the collections and stuff you need -->
+	                <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+			<Item Name="ElectronCollection" Value="slimmedElectronsUSER"/>
+			<Item Name="MuonCollection" Value="slimmedMuonsUSER"/>
+			<Item Name="TauCollection" Value="slimmedTaus"/>
+			<Item Name="JetCollection" Value="slimmedJets"/>
+			<Item Name="GenJetCollection" Value="slimmedGenJets"/>
+			<Item Name="TopJetCollection" Value="slimmedJetsAK8_SoftDrop"/>
+			<Item Name="METName" Value="slimmedMETs"/>
+			<Item Name="GenParticleCollection" Value="GenParticles"/>
+			<!--<Item Name="additionalBranches" Value="slimmedJetsPuppi slimmedMETsPuppi patJetsHepTopTagCHSPacked_daughters patJetsAk8PuppiJetsSoftDropPacked_daughters patJetsAk8CHSJetsSoftDropPacked_daughters"/>-->
 			<Item Name="SelectionTriggerName" Value=""/>
-			<Item Name="lumi_file" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root" />
-			<Item Name="lumihists_lumi_per_bin" Value="200"/>
-			<Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram.root" />
+			<Item Name="lumi_file" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
+			<Item Name="lumihists_lumi_per_bin" Value="800"/>
+			<Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram.root"/>
 			<Item Name="pileup_directory_25ns" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyMCPileupHistogram.root"/>
 			<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_72383.root" />
 			<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root" />
-			<Item Name="jecsmear_direction" Value="nominal" />
-			<Item Name="jersmear_direction" Value="nominal" />
-			<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/scripts/BTagMCEfficiencyHistsMu.root" />
-			<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_ichep.csv" />
-			<Item Name="SF_muonID" Value="nominal" />
-			<Item Name="BTag_variation" Value="central" />
-			<Item Name="PU_variation" Value="central" />
+			<Item Name="jecsmear_direction" Value="nominal"/>
+			<Item Name="jersmear_direction" Value="nominal"/>
+			<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/scripts/BTagMCEfficiencyHistsEle.root"/>
+			<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv"/>
+			<Item Name="EleScaleFactors"  Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_MVA80_ID.root"/>
+			<Item Name="MounIDScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root"/>
+                        <Item Name="MuonTriggerScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root"/>
+			<Item Name="SF_muonID" Value="nominal"/>
+			<Item Name="BTag_variation" Value="central"/>
+			<Item Name="PU_variation" Value="central"/>
 			<Item Name="AnalysisModule" Value="TriggerModule" />
-			<!-- set this to the name of an AndSelection to control what is written to the output. If not given, *all* events are written to the output tree. -->
-			<Item Name="TestKey" Value="TestKeyValue" />
+			
       </UserConfig>
     </Cycle>
 </JobConfiguration>

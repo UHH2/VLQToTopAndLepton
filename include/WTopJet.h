@@ -9,7 +9,7 @@
 
 class WMass {
 public:
-  explicit WMass(double min_=50,double max_=120): min(min_),max(max_){}
+  explicit WMass(double min_=60,double max_=110): min(min_),max(max_){}
     
     bool operator()(const TopJet & topjet, const uhh2::Event & event) const;
     
