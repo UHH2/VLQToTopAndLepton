@@ -95,8 +95,12 @@ MuonTriggerMeasurement::MuonTriggerMeasurement(Context& ctx){
   
   //Muon ScaleFactors
   if(!ctx.get("MounIDScaleFactors","").empty()){ 
-    //SF_muonID.reset(new MCMuonScaleFactor(ctx, ctx.get("MounIDScaleFactors"), "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta", 1, "tight", "nominal")); 
-    SF_muonID.reset(new MCMuonScaleFactor(ctx, ctx.get("MounIDScaleFactors"), "MC_NUM_HighPtID_DEN_genTracks_PAR_pt_eta", 1, "highpt",true, "nominal")); 
+    if(ctx.get("MuonID","")=="tight") SF_muonID.reset(new MCMuonScaleFactor(ctx, ctx.get("MounIDScaleFactors"), "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta", 1, "tight", "nominal")); 
+    else if(ctx.get("MuonID","")=="highpt")SF_muonID.reset(new MCMuonScaleFactor(ctx, ctx.get("MounIDScaleFactors"), "MC_NUM_HighPtID_DEN_genTracks_PAR_pt_eta", 1, "highpt",true, "nominal")); 
+    else{
+      cout<<"MuonID not found. asssert(1==0)"<<endl;
+      assert(1==0);
+    }
     run_muonid = true;
   }
   if(!ctx.get("MuonTriggerScaleFactors","").empty()){
@@ -149,7 +153,9 @@ MuonTriggerMeasurement::MuonTriggerMeasurement(Context& ctx){
   common.reset(new CommonModules());
   common->set_jet_id(wide_softjet);
   common->set_electron_id(softElectron);
-  common->set_muon_id(PtEtaCut(20.0, 2.4));
+  //common->set_muon_id(PtEtaCut(20.0, 2.4));
+  if(ctx.get("MuonID","")=="tight") common->set_muon_id(muid_tight);
+  else if(ctx.get("MuonID","")=="highpt") common->set_muon_id(muid_highpt);
   common->switch_jetlepcleaner();
   common->switch_jetPtSorter();
   common->set_HTjetid(softjet);
@@ -171,7 +177,6 @@ MuonTriggerMeasurement::MuonTriggerMeasurement(Context& ctx){
   muonTrigger.reset(new HistFactory(ctx));
   muonTrigger->setEffiHistName("muonEffis");
   muonTrigger->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Mu50_v*"),make_unique<TriggerSelection>("HLT_TkMu50_v*")),"muonTrigger");
-  muonTrigger->addOrSelection(make_uvec(make_unique<TriggerSelection>("HLT_Mu50_v*"),make_unique<TriggerSelection>("HLT_TkMu50_v*"),make_unique<TriggerSelection>("HLT_PFMETNoMu90_PFMHTNoMu90_v*")),"MuonCombiTrigger");
   muonTrigger->addSelection(make_unique<TriggerSelection>("HLT_PFMETNoMu90_PFMHTNoMu90_v*"),"PFMETNoMu90");
   muonTrigger->addSelection(make_unique<NMuonSelection>(1,-1,muid_highpt),"1_muonCut_highpt");
   muonTrigger->addSelection(make_unique<NMuonSelection>(1,-1,muid_tight),"1_muonCut_tight");
@@ -196,16 +201,13 @@ MuonTriggerMeasurement::MuonTriggerMeasurement(Context& ctx){
   singlePhoton->add("ele50_jet165pt",move(make_unique<TriggerVeto>("HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v*")));
   singlePhoton->add("ele115",move(make_unique<TriggerVeto>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*")));
   ele_combi_trigger->add(move(singlePhoton));
-  ele_combi_trigger->add(move(singleEle));
-  ele_combi_trigger->add(move(jetEle));
+  //ele_combi_trigger->add(move(singleEle));
+  //ele_combi_trigger->add(move(jetEle));
  
   elesel.reset(new HistFactory(ctx));
   elesel->addSelection(move(ele_combi_trigger),"eleTrigger_jet_electron_req");
-  elesel->addSelection(make_unique<NElectronSelection>(1,-1,eleId_cut),"1_eleCut");
   elesel->addSelection(make_unique<TwoDCut>(delR_2D,pTrel_2D),"2DCut");
   elesel->addSelection(make_unique<NMuonSelection>(1,-1),"1_muon");
-  //elesel->addSelection(make_unique<NMuonSelection>(1,-1,muid_tight),"1_muonCut_tight");
-  //elesel->addSelection(make_unique<NMuonSelection>(1,-1,muid_highpt),"1_muonCut_highpt");
   
   elesel->addHists("GenJetHists","trigger_presel_GenJetHists");
   elesel->addHists("ElectronHists","trigger_presel_ElectronHists");

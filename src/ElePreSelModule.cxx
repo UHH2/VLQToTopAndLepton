@@ -63,7 +63,7 @@ private:
 
   JetId btag_medium;
   ElectronId softElectron, eleId_cut,lowtriggerele, highptele;
-  MuonId muid_cut, softMuon;
+  MuonId softMuon;
   JetId secondjet, onejet, hardtriggerjet, softjet, wide_softjet, ak4ForwardId, ak4CentralId;
   TopJetId topjet,topjetid, hardtopjet;
   //std::unique_ptr<BprimeReco> Reco;
@@ -78,7 +78,6 @@ private:
   std::vector<uhh2::Event::Handle<MET>>  met_handles;// = {met_jer_up, met_jer_down, met_jec_up, met_jec_down};
   std::string jercor_string="", jeccor_string=""; 
   std::unique_ptr<JetCorrector>  corrector_jec_up, corrector_jec_down;
-  std::unique_ptr<JetCleaner>  clean_jec_up, clean_jec_down, clean_jer_up, clean_jer_down;
   std::unique_ptr<JetResolutionSmearer> corrector_jer_up, corrector_jer_down;
   bool do_jer_unc = false;
   bool do_jec_unc = false;
@@ -95,7 +94,15 @@ private:
 };
 
 ElePreSelModule::ElePreSelModule(Context& ctx){
+  jercor_string = ctx.get("jersmear_direction", "nominal");
+  jeccor_string = ctx.get("jecsmear_direction", "nominal");
 
+  if(jercor_string=="custom")
+    do_jer_unc = true;   
+  if(jeccor_string=="custom")
+    do_jec_unc = true;
+  do_jet_uncer = do_jec_unc || do_jer_unc;
+  
   //put all variables here so that changes are applied to all cuts similar
   double delR_2D  = 0.4;
   double pTrel_2D = 25.;
@@ -111,16 +118,8 @@ ElePreSelModule::ElePreSelModule(Context& ctx){
   }  
   //get rid of jets that are outside the range of jet corrections
   jet_preclean.reset(new JetCleaner(ctx, PtEtaCut(15, 5)));
-  if(jercor_string=="custom"){
-    clean_jer_up.reset(new JetCleaner(ctx,wide_softjet,"jet_jer_up"));
-    clean_jer_down.reset(new JetCleaner(ctx,wide_softjet,"jet_jer_down"));
-  }
-  if(jeccor_string=="custom"){
-    clean_jec_up.reset(new JetCleaner(ctx,wide_softjet,"jet_jec_up"));
-    clean_jec_down.reset(new JetCleaner(ctx,wide_softjet,"jet_jec_up"));
-  }
-
-  //Muon ScaleFactors
+  
+  //muon & electron scale factors
   if(!ctx.get("MounIDScaleFactors","").empty()){ 
     SF_muonID.reset(new MCMuonScaleFactor(ctx, ctx.get("MounIDScaleFactors"), "MC_NUM_MediumID2016_DEN_genTracks_PAR_pt_eta", 1, "mediummuon2016", "nominal")); 
     run_muonid = true;
@@ -138,13 +137,12 @@ ElePreSelModule::ElePreSelModule(Context& ctx){
   btag_medium = CSVBTag(CSVBTag::WP_MEDIUM);
   lepton.reset(new PrimaryLepton(ctx));
 
-  muid_cut = AndId<Muon>(MuonIDMedium_ICHEP(), PtEtaCut(55.0, 2.1));//MuonIDTight()
-  softMuon = AndId<Muon>(MuonIDLoose(), PtEtaCut(55.0, 2.1));
-  softElectron = AndId<Electron>(ElectronID_Spring16_loose_noIso, PtEtaCut(55.0, 2.4));
-  eleId_cut =  AndId<Electron>(ElectronID_Spring16_tight_noIso, PtEtaCut(120.0, 2.4));
-  highptele =  AndId<Electron>(ElectronID_Spring16_tight_noIso, PtEtaCut(250.0, 2.4));
+  softMuon = AndId<Muon>(MuonIDTight(), PtEtaCut(40.0, 2.4));
+  softElectron = AndId<Electron>(ElectronID_MVAGeneralPurpose_Spring16_tight, PtEtaCut(40.0, 2.4));
+  eleId_cut =  AndId<Electron>(ElectronID_MVAGeneralPurpose_Spring16_tight, PtEtaCut(120.0, 2.4));
+  highptele =  AndId<Electron>(ElectronID_MVAGeneralPurpose_Spring16_tight, PtEtaCut(250.0, 2.4));
   lowtriggerele =  AndId<Electron>(ElectronID_Spring16_tight_noIso, PtEtaCut(55.0, 2.4));
-  hardtriggerjet=  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(170.0, 2.4));
+  hardtriggerjet=  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(185.0, 2.4));
   onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(130.0, 2.4));
   secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4)); 
   softjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(minjetpt, 2.4));
@@ -154,17 +152,6 @@ ElePreSelModule::ElePreSelModule(Context& ctx){
   topjetid = AndId<TopJet>(Type2TopTag(150,210, Type2TopTag::MassType::groomed,btag_medium),Tau32());
   ak4ForwardId = PtEtaCut(30.0,5,-1,2);
   ak4CentralId = PtEtaCut(30.0,2,-1,-1);
-
-  //get rid of jets that are outside the range of jet corrections and do a first cleaning
-  jet_preclean.reset(new JetCleaner(ctx, wide_softjet));
-  if(jercor_string=="custom"){
-    clean_jer_up.reset(new JetCleaner(ctx,wide_softjet,"jet_jer_up"));
-    clean_jer_down.reset(new JetCleaner(ctx,wide_softjet,"jet_jer_down"));
-  }
-  if(jeccor_string=="custom"){
-    clean_jec_up.reset(new JetCleaner(ctx,wide_softjet,"jet_jec_up"));
-    clean_jec_down.reset(new JetCleaner(ctx,wide_softjet,"jet_jec_up"));
-  }
 
   common.reset(new CommonModules());
   if(!do_jet_uncer)common->set_jet_id(wide_softjet);
@@ -191,9 +178,9 @@ ElePreSelModule::ElePreSelModule(Context& ctx){
   photon->add("ElePt250",move(make_unique<NElectronSelection>(1,1,highptele)));
   photon->add("ele50_jet165pt",move(make_unique<TriggerVeto>("HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v*")));
   photon->add("ele115",move(make_unique<TriggerVeto>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*")));
-  trigger->add(move(photon));
-  //trigger->add(move(singleEle));
-  //trigger->add(move(jetEle));
+  //trigger->add(move(photon));
+  trigger->add(move(singleEle));
+  trigger->add(move(jetEle));
   
   eleFactory.reset(new HistFactory(ctx));
   eleFactory->setEffiHistName("eleEffis");
@@ -222,13 +209,13 @@ ElePreSelModule::ElePreSelModule(Context& ctx){
     std::vector<std::unique_ptr<Selection>> htlep_sel;   
 
     std::vector<unique_ptr<Selection>> trigger_unc; 
-    for(unsigned int i=0;i<4 && do_jet_uncer ;++i){
+    for(unsigned int i=0;i< met_handles.size()&& do_jet_uncer ;++i){
       unique_ptr<AndSelection> singleEle_unc(new AndSelection(ctx));
       singleEle_unc->add("ele115",move(make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*")));
       singleEle_unc->add("elept120",move(make_unique<NElectronSelection>(1,1,eleId_cut)));
       unique_ptr<AndSelection> jetEle_unc(new AndSelection(ctx));
       jetEle_unc->add("ele50_jet165pt",move(make_unique<TriggerSelection>("HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v*")));
-      jetEle_unc->add("ak4_170",move(make_unique<NJetSelection>(1,-1,hardtriggerjet,jet_collections[i])));
+      jetEle_unc->add("ak4_185",move(make_unique<NJetSelection>(1,-1,hardtriggerjet,jet_uncer_provider->get_jetHandle(i))));
       jetEle_unc->add("elept55",move(make_unique<NElectronSelection>(1,1,lowtriggerele)));
       unique_ptr<OrSelection> trigger_help;
       trigger_help.reset(new OrSelection);

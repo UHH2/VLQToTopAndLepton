@@ -45,6 +45,7 @@
 using namespace std;
 using namespace uhh2;
 
+
 class SelectionModule: public AnalysisModule {
 public:
 
@@ -73,17 +74,19 @@ private:
   std::unique_ptr<Hists> jetHists_sortbyeta, genjet_hists;
   std::unique_ptr<Hists> twoDjetHists_sortbyeta;
   JetId subBtag, btag_medium,btag_tight,btag_loose, eta_cut, ak4ForwardId, ak4CentralId, jet,recojet;
+  boost::optional<JetId> bjetId_loose,bjetId_medium,bjetId_tight;
   TopJetId topjetid,wjetId,heptopjetid;
   std::unique_ptr<Selection> hepselection;  
-  std::unique_ptr<BTagMCEfficiencyHists> BTagEffiHists;
-  std::unique_ptr<AnalysisModule> BTagScaleFactors,SF_muonID, SF_electronID, SF_muonTrigger, SF_eleReco, SF_muonTrk;
+  std::unique_ptr<BTagMCEfficiencyHists> BTagEffiHists_loose,BTagEffiHists_medium,BTagEffiHists_tight ;
+  std::unique_ptr<AnalysisModule> BTagScaleFactors, SF_muonID, SF_electronID, SF_muonTrigger, SF_eleReco, SF_muonTrk;
+  std::unique_ptr<AnalysisModule> BTagScaleFactors_loose, BTagScaleFactors_tight;
   std::unique_ptr<AnalysisModule> pdf_scale_unc;
   std::unique_ptr<AnalysisModule> toptag_scale;
   std::unique_ptr<AnalysisModule> jetcleaner;
   std::unique_ptr<RunDependendJetCorr> topjetCorr;
 
   uhh2::Event::Handle<double> weight ;
-  uhh2::Event::Handle<double> numberofjets;
+  uhh2::Event::Handle<double> numberofjets, numberofloosebjets,numberofmediumbjets,numberoftightbjets;
 
   string SF_muonID_variation ="nominal";
   //string SF_electronID_variation = "nominal";
@@ -105,6 +108,9 @@ SelectionModule::SelectionModule(Context& ctx){
   
   weight = ctx.declare_event_output<double>("weight");
   numberofjets= ctx.declare_event_output<double>("numberofjets");
+  numberofloosebjets= ctx.declare_event_output<double>("numberofloosebjets");
+  numberoftightbjets= ctx.declare_event_output<double>("numberoftightbjets");
+  numberofmediumbjets= ctx.declare_event_output<double>("numberofmediumbjets");
 
   primlep = ctx.get_handle<FlavorParticle>("PrimaryLepton");
   
@@ -179,9 +185,14 @@ SelectionModule::SelectionModule(Context& ctx){
   }
 
   //BTag Effi & Scale
-  BTagEffiHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_MEDIUM));
-  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_MEDIUM,"jets",BTag_variation));
-
+  BTagEffiHists_medium.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag_medium",CSVBTag::WP_MEDIUM));
+  BTagEffiHists_loose.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag_loose",CSVBTag::WP_LOOSE));
+  BTagEffiHists_tight.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag_tight",CSVBTag::WP_TIGHT));
+  
+  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_MEDIUM,"jets",BTag_variation));  
+  //BTagScaleFactors_loose.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_LOOSE,"jets",BTag_variation,"mujets","incl","MCBtagEff_loose","_loose","BTagCalibration",false));
+  //BTagScaleFactors_tight.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation,"mujets","incl","MCBtagEff_tight","_tight","BTagCalibration",false));
+    
   wjetId = AndId<TopJet>(Tau21(1.),PtEtaCut(200,2.4));//Tau21(0.4),
   ak4ForwardId = PtEtaCut(30.0,5,-1,2);
   ak4CentralId = PtEtaCut(30.0,2,-1,-1);
@@ -190,10 +201,14 @@ SelectionModule::SelectionModule(Context& ctx){
   btag_medium = AndId<Jet>(CSVBTag(CSVBTag::WP_MEDIUM),PtEtaCut(30, 2.4));
   //subBtag = CSVBTag(0.79f);
   subBtag = CSVBTag(0.5426f);
-  btag_tight = CSVBTag(CSVBTag::WP_TIGHT);
-  btag_loose = CSVBTag(CSVBTag::WP_LOOSE);
-  //topjetid = AndId<TopJet>(Type2TopTag(110,210, Type2TopTag::MassType::groomed,subBtag),Tau32(0.54));
-  topjetid = AndId<TopJet>(Type2TopTag(105,220, Type2TopTag::MassType::groomed,subBtag),Tau32(0.5));
+  btag_tight = AndId<Jet>(CSVBTag(CSVBTag::WP_TIGHT),PtEtaCut(30, 2.4));
+  btag_loose = AndId<Jet>(CSVBTag(CSVBTag::WP_LOOSE),PtEtaCut(30, 2.4));
+  bjetId_tight = AndId<Jet>(CSVBTag(CSVBTag::WP_TIGHT),PtEtaCut(30, 2.4));
+  bjetId_medium = AndId<Jet>(CSVBTag(CSVBTag::WP_MEDIUM),PtEtaCut(30, 2.4));
+  bjetId_loose = AndId<Jet>(CSVBTag(CSVBTag::WP_LOOSE),PtEtaCut(30, 2.4));
+  //topjetid = AndId<TopJet>(Type2TopTag(105,220, Type2TopTag::MassType::groomed,subBtag),Tau32(0.5));
+  topjetid = AndId<TopJet>(Type2TopTag(105,220, Type2TopTag::MassType::groomed),Tau32(0.5));
+
   Reco.reset(new BprimeReco(ctx));
   Reco->set_jetRecoId(recojet);
   TopTagReco.reset(new BprimeReco(ctx,"TopTagReco"));
@@ -339,7 +354,11 @@ bool SelectionModule::process(Event & event){
   }
   return false;
   /*/
-  BTagEffiHists->fill(event);
+  BTagEffiHists_loose->fill(event);
+  BTagEffiHists_medium->fill(event);
+  BTagEffiHists_tight->fill(event);
+
+    
   if(!event.isRealData){ 
     genjet_hists->fill(event);
   }
@@ -366,6 +385,8 @@ bool SelectionModule::process(Event & event){
   }
   //cout<<"event weight "<<event.weight;
   BTagScaleFactors->process(event);
+  //BTagScaleFactors_loose->process(event);
+  //BTagScaleFactors_tight->process(event);
   if(reco_bool){
     if(ttbardis_bool)
       if(btagSel->passes(event) && ttbar_chi2->passes(event)) ttbar_Hists->fill(event); 
@@ -378,8 +399,17 @@ bool SelectionModule::process(Event & event){
   event.set(numberofjets,event.jets->size()); 
   event.set(weight,event.weight);
   pdf_scale_unc->process(event);
-  
-
+  /*/
+  int loose_btag = 0;
+  int tight_btag = 0;
+  for(auto jet : *event.jets){
+    if(sel_passes_id(jet,event,bjetId_loose))loose_btag++;
+    if(sel_passes_id(jet,event,bjetId_tight))tight_btag++;
+  }
+  /*/
+  event.set(numberofloosebjets,count_objects(*event.jets,event,bjetId_loose));
+  event.set(numberoftightbjets,count_objects(*event.jets,event,bjetId_tight));
+  event.set(numberofmediumbjets,count_objects(*event.jets,event,bjetId_medium));
   return true;
 }
 // make sure the class is found by class name. This is ensured by this macro:

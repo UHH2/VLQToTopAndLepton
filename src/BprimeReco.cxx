@@ -199,9 +199,13 @@ bool BprimeReco::TopJetReco(Event & event, double dRmin){
   for(auto & topjet : topjets){
     const vector<Jet> & Top_subjets = topjet.subjets();
     LorentzVector TopCand(0,0,0,0);
-    for(auto &subjet :Top_subjets)
+    double btag_value = 0;
+    for(auto &subjet :Top_subjets){
       TopCand += subjet.v4();
+      if(btag_value < subjet.btag_combinedSecondaryVertex())btag_value=subjet.btag_combinedSecondaryVertex();
+    }
     tmp_hyp.set_topHad(TopCand);
+    tmp_hyp.set_btag_discriminator(btag_value);
     //tmp_hyp.set_topJets(TopCand);
     for(auto & neutrino : neutrinos){
       if(deltaR(topjet.v4(),neutrino+lep)>dRmin){

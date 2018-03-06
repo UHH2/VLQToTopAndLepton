@@ -35,8 +35,8 @@ class custom_jetcorr {
   
   std::vector<uhh2::Event::Handle<MET>> met_handles;
 
-  std::vector<std::string> combination_names = {"jer_up","jer_down","jec_up","jec_down","jec_jer_down","jec_jer_up","jec_jer_up_down","jec_jer_down_up","nominal"};
+  std::vector<std::string> combination_names = {"jer_up","jer_down","jec_up","jec_down","jec_jer_down","jec_jer_up","jec_jer_up_down","jec_jer_down_up","nominal","2jec_jer_up","2jec_jer_down"};
   //first entry is jer, second is jec
-  std::vector<std::vector<int>> combination_ints = {{1,0},{-1,0},{0,1},{0,-1},{-1,-1},{1,1},{-1,1},{1,-1},{0,0}};
+  std::vector<std::vector<int>> combination_ints = {{1,0},{-1,0},{0,1},{0,-1},{-1,-1},{1,1},{-1,1},{1,-1},{0,0},{2,1},{-2,-1}};
   
 };

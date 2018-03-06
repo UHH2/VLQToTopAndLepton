@@ -8,6 +8,15 @@ custom_jetcorr::custom_jetcorr(uhh2::Context& ctx){
   
   for(auto name : combination_names){
     i++;
+    if(abs(combination_ints[i][0]) == 2){
+	combination_ints[i][0] = combination_ints[i][0]/2;
+	jer_correctors.push_back(uhh2::make_unique<JetResolutionSmearer>(ctx,JERSmearing::SF_13TeV_2016,"jet_"+name,combination_ints[i][0]));
+    }
+    if(combination_ints[i][1]==2){
+        combination_ints[i][1] = combination_ints[i][1]/2;
+        jec_correctors.push_back(uhh2::make_unique<JetCorrector>(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC, empty_string_vec,"jet_"+name,"met_"+name,combination_ints[i][1]));
+    }
+
     jet_handles.push_back(ctx.declare_event_output<std::vector<Jet>>("jet_"+name));
     met_handles.push_back(ctx.declare_event_output<MET>("met_"+name));
     

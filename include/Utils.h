@@ -60,6 +60,18 @@ inline std::vector<std::unique_ptr<AnalysisModule>> make_uvec(std::unique_ptr<An
 }
 
 
+template<typename T>
+int count_objects(const vector<T> & objects, const Event & event, const boost::optional<std::function<bool (const T &, const Event & )>> & object_id){
+  int n_objects = objects.size();
+  if(object_id){
+    n_objects = 0;
+    for(const auto & obj : objects){
+      if((*object_id)(obj, event)) ++n_objects;
+    }
+  }  
+  return n_objects;
+} 
+ 
 /*
 //template<typename T>
 vector<unique_ptr<Selection>> make_uvec(std::initializer_list<unique_ptr<Selection>> list){

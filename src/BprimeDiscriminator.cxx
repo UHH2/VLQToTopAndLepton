@@ -229,32 +229,38 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
     double mean_distance = 3.14, sigma_distance = 0.8;
     double mean_ptratio = 1, sigma_ptratio = 0.4;
 
-    double factor = 1;
+    double factor = 1.;
     sigma_topLep *= factor; sigma_wHad *= factor; sigma_topHad *=factor; sigma_distance *= factor; sigma_ptratio *=factor;
 
 
 
     if(topJets.pt()>0&&( dis==1 || dis ==2))lepTop = (((topJets+wlep).M()-mean_topLep)*((topJets+wlep).M()-mean_topLep)/(sigma_topLep*sigma_topLep)+(whad.M()-mean_wHad)*(whad.M()-mean_wHad)/(sigma_wHad*sigma_wHad)+pow(deltaR(whad,wlep+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(whad.pt()/(wlep+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//*0.25*0.25;
-    if(dis==1 || dis ==3)hadTop = (((topJets+whad).M()-mean_topHad)*((topJets+whad).M()-mean_topHad)/(sigma_topHad*sigma_topHad)+pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));///9; 
+    if(dis==1 || dis ==3)hadTop = (((topJets+whad).M()-mean_topHad)*((topJets+whad).M()-mean_topHad)/(sigma_topHad*sigma_topHad)+pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));///9;
+    
     lepTop = boost::math::cdf(four_param,lepTop);
     hadTop = boost::math::cdf(three_param,hadTop);
     
     if(hyp.get_whad_num()==1){
-      if(topJets.pt()>0){
+      if(topJets.pt()>0.){	
         if(dis==1 || dis ==2){
 	  lepTop = (((topJets+wlep).M()-mean_topLep)*((topJets+wlep).M()-mean_topLep)/(sigma_topLep*sigma_topLep)+pow(deltaR(whad,wlep+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(whad.pt()/(wlep+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//9;
 	  lepTop = boost::math::cdf(three_param,lepTop);
         }
         if(dis==1 || dis ==3){
+	  // Andrews request
+	  //if(hyp.get_top_num()==1 && (topJets+whad).pt()<400) continue;
 	  hadTop = (((topJets+whad).M()-mean_topHad)*((topJets+whad).M()-mean_topHad)/(sigma_topHad*sigma_topHad)+pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//9; 
   	  hadTop = boost::math::cdf(three_param,hadTop);
         }
      }
-     else
-       if(dis==1 || dis ==3){
-  	 hadTop = (pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//4; 
-         hadTop = boost::math::cdf(two_param,hadTop);
-       }
+      else{
+	// Andrews request 
+	//if(whad.pt()<800)continue; 
+	if(dis==1 || dis ==3){
+	  hadTop = (pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//4; 
+	  hadTop = boost::math::cdf(two_param,hadTop);
+	}
+      }
    }     
    
      //cout<<"chi2 p top lep "<<lepTop<<endl;//" p-value "<< boost::math::cdf(four_param,lepTop)<<endl;
@@ -311,8 +317,6 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
       //gen_chi = sqrt(gen_chi);
       //gen_chi /= chi2_tophad<chi2_toplep ? 2 : 3;
       
-      
-
       if(genPart.get_wLep().pt()==0 || genPart.get_wHad().pt()==0)
 	continue;
       bool toplep_gen =true;
@@ -437,16 +441,19 @@ BprimeContainer BprimeDiscriminator::cmsTopTag_dis(uhh2::Event & event){
   double bprimechi =-1;
   int recoType = -1;
   double mass =-1;
+  double subjetbtag = -1;
   LorentzVector bprime(0,0,0,0);
 
   for(auto hyp :  event.get(hyps)){
     const LorentzVector & wlep = hyp.get_wLep();
     const LorentzVector & topHad = hyp.get_topHad();
-    
+
+
     // chi2/nodf
     double chi = pow(deltaR(wlep,topHad)-3.1,2);
     if(chi<bprimechi || bprimechi==-1){
       bestHyp=hyp;
+      subjetbtag = hyp.get_btag_discriminator();
       bprimechi=chi;
       recoType=2;
       mass = sqrt((wlep+topHad).M2());
@@ -454,6 +461,7 @@ BprimeContainer BprimeDiscriminator::cmsTopTag_dis(uhh2::Event & event){
     }
   }
   if(bprimechi==-1) return bestHyp;
+  bestHyp.set_btag_discriminator(subjetbtag);
   bestHyp.set_chiVal(bprimechi);
   bestHyp.set_RecoTyp(recoType);
   bestHyp.set_Mass(mass);
