@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
+<!ENTITY WJets_HT100to200 SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_HT-100To200.xml">
+<!ENTITY WJets_HT200to400 SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_HT-200To400.xml">
+<!ENTITY WJets_HT400to600 SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_HT-400To600.xml">
+<!ENTITY WJets_HT600to800 SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_HT-600To800.xml">
+<!ENTITY WJets_HT800to1200 SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_HT-800To1200.xml">
+<!ENTITY WJets_HT1200to2500 SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_HT-1200To2500.xml">
+<!ENTITY WJets_HT2500toInf SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_HT-2500ToInf.xml">
+<!ENTITY WJets_comp SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu.xml">
+<!ENTITY WJets_Pt100to250 SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_Pt-100To250.xml">
+<!ENTITY WJets_Pt250to400 SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_Pt-250To400.xml">
+<!ENTITY WJets_Pt400to600 SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_Pt-400To600.xml">
+<!ENTITY WJets_Pt600toInf SYSTEM "/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/datasets/RunII_80X_v3/MC_WJetsToLNu_Pt-600ToInf.xml">
+
+]>
+
+<!-- 
+<ConfigParse NEventsBreak="0" FileSplit="10" AutoResubmit="3" MaxJobsPerProcess="250"/>
+<ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.WJetsFit"/>
+-->
+
+<JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
+	<Library Name="libSUHH2VLQToTopAndLepton"/>
+	<Package Name="SUHH2VLQToTopAndLepton.par" />
+	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./WJetsFitGenHT/" PostFix="" TargetLumi="1">
+<!--		
+		<InputData Lumi="48629.562813" NEventsMax="-1" Type="MC" Version="WJets_HT100to200" Cacheable="False">
+			&WJets_HT100to200;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Lumi="90848.5652644" NEventsMax="-1" Type="MC" Version="WJets_HT200to400" Cacheable="False">
+			&WJets_HT200to400;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Lumi="131111.114866" NEventsMax="-1" Type="MC" Version="WJets_HT400to600" Cacheable="False">
+			&WJets_HT400to600;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Lumi="1254954.42543" NEventsMax="-1" Type="MC" Version="WJets_HT600to800" Cacheable="False">
+			&WJets_HT600to800;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Lumi="1163509.114" NEventsMax="-1" Type="MC" Version="WJets_HT800to1200" Cacheable="False">
+			&WJets_HT800to1200;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Lumi="4059973.633" NEventsMax="-1" Type="MC" Version="WJets_HT1200to2500" Cacheable="False">
+			&WJets_HT1200to2500;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Lumi="67214110.234" NEventsMax="-1" Type="MC" Version="WJets_HT2500toInf" Cacheable="False">
+			&WJets_HT2500toInf;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+
+		<InputData Lumi="59569753.4877" NEventsMax="-1" Type="MC" Version="WJets_comp" Cacheable="False">
+			&WJets_comp;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+-->
+		<InputData Lumi="261411503.121" NEventsMax="-1" Type="MC" Version="WJets_Pt100to250" Cacheable="False">
+			&WJets_Pt100to250;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Lumi="25802848.7822" NEventsMax="-1" Type="MC" Version="WJets_Pt250to400" Cacheable="False">
+			&WJets_Pt250to400;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Lumi="3857113.82234" NEventsMax="-1" Type="MC" Version="WJets_Pt400to600" Cacheable="False">
+			&WJets_Pt400to600;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Lumi="3925568.67533" NEventsMax="-1" Type="MC" Version="WJets_Pt600toInf" Cacheable="False">
+			&WJets_Pt600toInf;
+			<InputTree Name="AnalysisTree" />
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<UserConfig>
+		  <!-- Please add all the collections and stuff you need -->
+			<Item Name="GenParticleCollection" Value="GenParticles" />
+			<Item Name="AnalysisModule" Value="WJetsFit" />
+		</UserConfig>
+	</Cycle>
+</JobConfiguration>

@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
+]>
+
+<!-- 
+<ConfigParse NEventsBreak="0" FileSplit="2" AutoResubmit="3" MaxJobsPerProcess="250" RemoveEmptyFileSplit="1"/>
+<ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.MuSel_wtag_corr"/>
+-->
+
+<JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
+	<Library Name="libSUHH2VLQToTopAndLepton"/>
+	<Package Name="libSUHH2VLQToTopAndLepton"/>
+	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./MuSel_wtag_corr/" TargetLumi="35867">
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataB">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.DATA.SingleMuDataB_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataBv3">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataBv3_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataC">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataC_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataD">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataD_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataE">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataE_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataF">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataF_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataG">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataG_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+<!--
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataHv3">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataHv3_*.root" Lumi="0.0"/>
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1600_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99778.0" Type="MC" Version="BprimeB-1500_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1500_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99992.0" Type="MC" Version="BprimeB-900_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-900_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99989.0" Type="MC" Version="BprimeB-1000_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1000_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99987.0" Type="MC" Version="BprimeB-1000_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1000_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="94795.0" Type="MC" Version="BprimeB-700_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-700_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99779.0" Type="MC" Version="BprimeB-1300_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1300_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99994.0" Type="MC" Version="BprimeB-800_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-800_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99975.0" Type="MC" Version="BprimeB-1600_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1600_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99993.0" Type="MC" Version="BprimeB-900_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-900_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="89777.0" Type="MC" Version="BprimeB-1200_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1200_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99983.0" Type="MC" Version="BprimeB-1300_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1300_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99986.0" Type="MC" Version="BprimeB-1100_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1100_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99989.0" Type="MC" Version="BprimeB-800_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-800_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99994.0" Type="MC" Version="BprimeB-700_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-700_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99979.0" Type="MC" Version="BprimeB-1400_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1400_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99968.0" Type="MC" Version="BprimeB-1700_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1700_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="94960.0" Type="MC" Version="BprimeB-1700_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1700_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="198380.0" Type="MC" Version="BprimeB-1100_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1100_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99971.0" Type="MC" Version="BprimeB-1800_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1800_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99785.0" Type="MC" Version="BprimeB-1400_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1400_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99963.0" Type="MC" Version="BprimeB-1800_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1800_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="99973.0" Type="MC" Version="BprimeB-1500_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1500_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299924.0" Type="MC" Version="BprimeT-1500_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1500_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299978.0" Type="MC" Version="BprimeT-700_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-700_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299894.0" Type="MC" Version="BprimeT-1700_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1700_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299973.0" Type="MC" Version="BprimeT-800_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-800_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299560.0" Type="MC" Version="BprimeT-1100_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1100_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299933.0" Type="MC" Version="BprimeT-1400_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1400_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="289753.0" Type="MC" Version="BprimeT-900_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-900_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299965.0" Type="MC" Version="BprimeT-1000_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1000_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="259128.0" Type="MC" Version="BprimeT-1700_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1700_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299929.0" Type="MC" Version="BprimeT-1300_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1300_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299875.0" Type="MC" Version="BprimeT-1800_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1800_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="294369.0" Type="MC" Version="BprimeT-700_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-700_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299726.0" Type="MC" Version="BprimeT-1600_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1600_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299360.0" Type="MC" Version="BprimeT-1000_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1000_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299916.0" Type="MC" Version="BprimeT-1600_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1600_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299754.0" Type="MC" Version="BprimeT-1200_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1200_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299740.0" Type="MC" Version="BprimeT-1200_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1200_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="293525.0" Type="MC" Version="BprimeT-1400_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1400_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="0.0" Type="MC" Version="BprimeT-1100_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1100_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299091.0" Type="MC" Version="BprimeT-1800_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1800_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299764.0" Type="MC" Version="BprimeT-900_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-900_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299899.0" Type="MC" Version="BprimeT-1500_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1500_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299949.0" Type="MC" Version="BprimeT-1300_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-1300_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299766.0" Type="MC" Version="BprimeT-800_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeT-800_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="295558.0" Type="MC" Version="X53-1100_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1100_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="295915.0" Type="MC" Version="X53-1600_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1600_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="269775.0" Type="MC" Version="X53-700_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-700_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="289759.0" Type="MC" Version="X53-900_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-900_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="287167.0" Type="MC" Version="X53-1000_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1000_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="293917.0" Type="MC" Version="X53-1500_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1500_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="293420.0" Type="MC" Version="X53-1000_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1000_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="296537.0" Type="MC" Version="X53-1300_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1300_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299576.0" Type="MC" Version="X53-700_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-700_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="294163.0" Type="MC" Version="X53-800_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-800_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="290111.0" Type="MC" Version="X53-1600_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1600_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="291151.0" Type="MC" Version="X53-1100_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1100_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="287758.0" Type="MC" Version="X53-1300_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1300_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="285571.0" Type="MC" Version="X53-1500_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1500_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299743.0" Type="MC" Version="X53-1200_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1200_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299738.0" Type="MC" Version="X53-1400_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1400_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="281826.0" Type="MC" Version="X53-1200_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1200_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="289120.0" Type="MC" Version="X53-1400_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-1400_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="299963.0" Type="MC" Version="X53-900_RH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-900_RH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="294769.0" Type="MC" Version="X53-800_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.X53-800_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		
+		<InputData Cacheable="False" Lumi="92847.9104549" Type="MC" Version="TTbar_Tune">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.TTbar_Tune_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="498911.715945" Type="MC" Version="TTbar_Mtt700to1000">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.TTbar_Mtt700to1000_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1189652.93031" Type="MC" Version="TTbar_Mtt1000toInf">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.TTbar_Mtt1000toInf_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+                <InputData Cacheable="False" Lumi="261411503.121" Type="MC" Version="WJets_Pt100to250">
+                        <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.WJets_Pt100to250_*.root" Lumi="0.0"/>
+                        <InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+                </InputData>
+                <InputData Cacheable="False" Lumi="25802848.7822" Type="MC" Version="WJets_Pt250to400">
+                        <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.WJets_Pt250to400_*.root" Lumi="0.0"/>
+                        <InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+                </InputData>
+                <InputData Cacheable="False" Lumi="3857113.82234" Type="MC" Version="WJets_Pt400to600">
+                        <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.WJets_Pt400to600_*.root" Lumi="0.0"/>
+                        <InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+                </InputData>
+                <InputData Cacheable="False" Lumi="3925568.67533" Type="MC" Version="WJets_Pt600toInf">
+                        <In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.WJets_Pt600toInf_*.root" Lumi="0.0"/>
+                        <InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+                </InputData>
+		<InputData Cacheable="False" Lumi="44562.43652" Type="MC" Version="ZJets_HT70to100">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.ZJets_HT70to100_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="58504.1863851" Type="MC" Version="ZJets_HT100to200">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.ZJets_HT100to200_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="191321.857205" Type="MC" Version="ZJets_HT200to400">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.ZJets_HT200to400_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1433022.19091" Type="MC" Version="ZJets_HT400to600">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.ZJets_HT400to600_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="4931670.44326" Type="MC" Version="ZJets_HT600to800">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.ZJets_HT600to800_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="3441241.33342" Type="MC" Version="ZJets_HT800to1200">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.ZJets_HT800to1200_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="3199976.37229" Type="MC" Version="ZJets_HT1200to2500">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.ZJets_HT1200to2500_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.08420790822" Type="MC" Version="QCD_15to20_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_15to20_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="10.6327650201" Type="MC" Version="QCD_20to30_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_20to30_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="18.1211716661" Type="MC" Version="QCD_30to50_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_30to50_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="45.2716100261" Type="MC" Version="QCD_50to80_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_50to80_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="129.941524005" Type="MC" Version="QCD_80to120_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_80to120_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="319.273343769" Type="MC" Version="QCD_120to170_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_120to170_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="918.217030422" Type="MC" Version="QCD_170to300_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_170to300_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="9953.51881236" Type="MC" Version="QCD_300to470_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_300to470_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="48724.3251883" Type="MC" Version="QCD_470to600_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_470to600_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="159720.683949" Type="MC" Version="QCD_600to800_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_600to800_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="841182.752485" Type="MC" Version="QCD_800to1000_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_800to1000_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="2452373.71605" Type="MC" Version="QCD_1000toInf_Mu">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.QCD_1000toInf_Mu_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="48523.5330451" Type="MC" Version="SingleT_t">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleT_t_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="44063.8876636" Type="MC" Version="SingleT_t_top">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleT_t_top_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="195025.477528" Type="MC" Version="SingleTWtop">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleTWtop_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="194744.466292" Type="MC" Version="SingleTWAntitop">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleTWAntitop_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1003149.359" Type="MC" Version="SingleT_s">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleT_s_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+			
+		<UserConfig>
+			<Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+			<Item Name="ElectronCollection" Value="slimmedElectronsUSER"/>
+			<Item Name="MuonCollection" Value="slimmedMuonsUSER"/>
+			<Item Name="TauCollection" Value="slimmedTaus"/>
+			<Item Name="JetCollection" Value="slimmedJets"/>
+			<Item Name="GenJetCollection" Value="slimmedGenJets"/>
+			<Item Name="TopJetCollection" Value="slimmedJetsAK8_SoftDrop"/>
+			<Item Name="METName" Value="slimmedMETs"/>
+			<Item Name="GenParticleCollection" Value="GenParticles"/>
+			<Item Name="additionalBranches" Value="slimmedJetsPuppi slimmedMETsPuppi patJetsHepTopTagCHSPacked_daughters patJetsAk8PuppiJetsSoftDropPacked_daughters"/>
+			<Item Name="SelectionTriggerName" Value=""/>
+			<Item Name="lumi_file" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
+			<Item Name="lumihists_lumi_per_bin" Value="50"/>
+			<Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram.root"/>
+			<Item Name="pileup_directory_25ns" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyMCPileupHistogram.root"/>
+			<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_72383.root" />
+			<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root" />
+			<Item Name="jecsmear_direction" Value="nominal"/>
+			<Item Name="jersmear_direction" Value="nominal"/>
+			<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/scripts/BTagMCEfficiencyHistsMu.root"/>
+			<Item Name="MCBtagEff_loose" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/scripts/BTag_loose.root"/>
+			<Item Name="MCBtagEff_tight" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/scripts/BTag_tight.root"/>
+			<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv"/>
+                        <Item Name="MounIDScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root"/>
+			<Item Name="MuonTriggerScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root"/>
+			<Item Name="MuonTrkScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/Tracking_EfficienciesAndSF_BCDEFGH.root"/>
+			<Item Name="SF_muonID" Value="nominal"/>
+			<Item Name="BTag_variation" Value="central"/>
+			<Item Name="PU_variation" Value="central"/>
+			<Item Name="AnalysisModule" Value="SelectionModule"/>
+		</UserConfig>
+	</Cycle>
+</JobConfiguration>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
+]>
+
+<!-- 
+<ConfigParse NEventsBreak="0" FileSplit="2" AutoResubmit="3" MaxJobsPerProcess="250" RemoveEmptyFileSplit="1"/>
+<ConfigSGE RAM ="4" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.MuSel_btags_v3"/>
+-->
+
+<JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
+	<Library Name="libSUHH2VLQToTopAndLepton"/>
+	<Package Name="libSUHH2VLQToTopAndLepton"/>
+	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./MuSel_btags_v3/" TargetLumi="35867">
+	  
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataB">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.DATA.SingleMuDataB_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataC">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataC_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataD">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataD_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree" />
+		</InputData>
+		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataE">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataE_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<Item Name="lumihists_lumi_per_bin" Value="50"/>
+			<Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram.root"/>
+			<Item Name="pileup_directory_25ns" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyMCPileupHistogram.root"/>
+			<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_72383.root" />
+			<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root" />
+			<Item Name="jecsmear_direction" Value="nominal"/>
+			<Item Name="jersmear_direction" Value="nominal"/>
+			<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/scripts/BTagMCEfficiencyHistsMu.root"/>
+			<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv"/>
+			
+                        <Item Name="MounIDScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root"/>
+			<Item Name="MuonTriggerScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root"/>
+			<Item Name="SF_muonID" Value="nominal"/>
+		
+			<Item Name="BTag_variation" Value="central"/>
+			<Item Name="PU_variation" Value="central"/>
+			<Item Name="AnalysisModule" Value="SelectionModule"/>
+		</UserConfig>
+	</Cycle>
+</JobConfiguration>
