@@ -141,7 +141,7 @@ ElePreSelModule::ElePreSelModule(Context& ctx){
   softElectron = AndId<Electron>(ElectronID_MVAGeneralPurpose_Spring16_tight, PtEtaCut(40.0, 2.4));
   eleId_cut =  AndId<Electron>(ElectronID_MVAGeneralPurpose_Spring16_tight, PtEtaCut(120.0, 2.4));
   highptele =  AndId<Electron>(ElectronID_MVAGeneralPurpose_Spring16_tight, PtEtaCut(250.0, 2.4));
-  lowtriggerele =  AndId<Electron>(ElectronID_Spring16_tight_noIso, PtEtaCut(55.0, 2.4));
+  lowtriggerele =  AndId<Electron>(ElectronID_MVAGeneralPurpose_Spring16_tight, PtEtaCut(55.0, 2.4));
   hardtriggerjet=  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(185.0, 2.4));
   onejet =  AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(130.0, 2.4));
   secondjet = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4)); 

@@ -171,14 +171,20 @@ BprimeContainer BprimeDiscriminator::ttbar_dis(uhh2::Event & event){
   double ttbarchi =-1;
   double recoType =-1;
   double mass =-1;
+  
+  double mean_topLep = 170.1, sigma_topLep = 19.1;
+  double mean_topHad = 172.6, sigma_topHad = 14.29;
+  boost::math::chi_squared two_param(1);
+
   for(auto hyp :  event.get(hyps)){
     const LorentzVector & whad    = hyp.get_wHad();
     const LorentzVector & wlep    = hyp.get_wLep();
     const LorentzVector & topJets = hyp.get_topJets();
     
     //this is the chi2
-    double ttbar = (((topJets+wlep).M()-174.7)*((topJets+wlep).M()-174.7)/(14*14)+(whad.M()-172.1)*(whad.M()-172.1)/(21.8*21.8));
-    if(ttbar < ttbarchi || ttbarchi == -1){
+    double ttbar = pow(((topJets+wlep).M()-mean_topLep)/sigma_topLep,2)+pow((whad.M()-mean_topHad)/sigma_topHad,2);
+    ttbar =  boost::math::cdf(two_param,ttbar);
+    if(ttbar > ttbarchi || ttbarchi == -1){
       ttbarchi=ttbar;
       bestHyp =hyp;
       recoType =0;
@@ -204,10 +210,10 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
   if(dis==7) genPart = event.get(gen);
 
   //cout<<"================================================"<<endl;
- 
-  boost::math::chi_squared four_param(4);
-  boost::math::chi_squared three_param(3);
-  boost::math::chi_squared two_param(2);
+  // values for phi+eta and after // for deltaR
+  boost::math::chi_squared four_param(4); //3
+  boost::math::chi_squared three_param(3); //2
+  boost::math::chi_squared two_param(2); //1
  
   for(auto hyp :  event.get(hyps)){
     const LorentzVector & whad    = hyp.get_wHad();
@@ -224,18 +230,26 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
 
     //double mean_topLep = 175., sigma_topLep = 18.7, mean_wHad = 81., sigma_wHad = 9.6; 
     //double mean_topHad = 167., sigma_topHad = 21.93;
-    double mean_topLep = 170.1, sigma_topLep = 19.1, mean_wHad = 85.5, sigma_wHad = 8.7; 
-    double mean_topHad = 172.6, sigma_topHad = 14.29;
+    double mean_topLep = 170.1,  sigma_topLep = 19.1, mean_wHad = 85.5, sigma_wHad = 8.7; 
+    double mean_topHad = 172.6,  sigma_topHad = 14.29;
     double mean_distance = 3.14, sigma_distance = 0.8;
-    double mean_ptratio = 1, sigma_ptratio = 0.4;
-
+    double mean_ptratio = 1, sigma_ptratio = 0.5;
+    double mean_phi = 3.14,  sigma_phi = 0.8;
+    double mean_eta = 0.0,   sigma_eta = 0.8;
+    
     double factor = 1.;
+
+    //double distance_tlep = pow(deltaR(whad,wlep+topJets)-mean_distance,2)/(sigma_distance*sigma_distance);
+    //double distance_thad = pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance);
+    double distance_tlep = pow(deltaPhi(whad,wlep+topJets)-mean_phi,2)/(sigma_phi*sigma_phi)+pow(fabs(whad.eta()-(wlep+topJets).eta())-mean_eta,2)/(sigma_eta*sigma_eta);
+    double distance_thad = pow(deltaPhi(wlep,whad+topJets)-mean_phi,2)/(sigma_phi*sigma_phi)+pow(fabs(wlep.eta()-(whad+topJets).eta())-mean_eta,2)/(sigma_eta*sigma_eta);
+
+    
     sigma_topLep *= factor; sigma_wHad *= factor; sigma_topHad *=factor; sigma_distance *= factor; sigma_ptratio *=factor;
 
+    if(topJets.pt()>0&&( dis==1 || dis ==2))lepTop = (((topJets+wlep).M()-mean_topLep)*((topJets+wlep).M()-mean_topLep)/(sigma_topLep*sigma_topLep)+(whad.M()-mean_wHad)*(whad.M()-mean_wHad)/(sigma_wHad*sigma_wHad)+distance_tlep+pow(whad.pt()/(wlep+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//*0.25*0.25;
 
-
-    if(topJets.pt()>0&&( dis==1 || dis ==2))lepTop = (((topJets+wlep).M()-mean_topLep)*((topJets+wlep).M()-mean_topLep)/(sigma_topLep*sigma_topLep)+(whad.M()-mean_wHad)*(whad.M()-mean_wHad)/(sigma_wHad*sigma_wHad)+pow(deltaR(whad,wlep+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(whad.pt()/(wlep+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//*0.25*0.25;
-    if(dis==1 || dis ==3)hadTop = (((topJets+whad).M()-mean_topHad)*((topJets+whad).M()-mean_topHad)/(sigma_topHad*sigma_topHad)+pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));///9;
+    if(dis==1 || dis ==3)hadTop = (((topJets+whad).M()-mean_topHad)*((topJets+whad).M()-mean_topHad)/(sigma_topHad*sigma_topHad)+distance_thad+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));///9;
     
     lepTop = boost::math::cdf(four_param,lepTop);
     hadTop = boost::math::cdf(three_param,hadTop);
@@ -243,13 +257,13 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
     if(hyp.get_whad_num()==1){
       if(topJets.pt()>0.){	
         if(dis==1 || dis ==2){
-	  lepTop = (((topJets+wlep).M()-mean_topLep)*((topJets+wlep).M()-mean_topLep)/(sigma_topLep*sigma_topLep)+pow(deltaR(whad,wlep+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(whad.pt()/(wlep+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//9;
+	  lepTop = (((topJets+wlep).M()-mean_topLep)*((topJets+wlep).M()-mean_topLep)/(sigma_topLep*sigma_topLep)+ distance_tlep+pow(whad.pt()/(wlep+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//9;
 	  lepTop = boost::math::cdf(three_param,lepTop);
         }
         if(dis==1 || dis ==3){
 	  // Andrews request
 	  //if(hyp.get_top_num()==1 && (topJets+whad).pt()<400) continue;
-	  hadTop = (((topJets+whad).M()-mean_topHad)*((topJets+whad).M()-mean_topHad)/(sigma_topHad*sigma_topHad)+pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//9; 
+	  hadTop = (((topJets+whad).M()-mean_topHad)*((topJets+whad).M()-mean_topHad)/(sigma_topHad*sigma_topHad)+distance_thad+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//9; 
   	  hadTop = boost::math::cdf(three_param,hadTop);
         }
      }
@@ -257,7 +271,7 @@ BprimeContainer BprimeDiscriminator::chiCombo_dis(uhh2::Event & event){
 	// Andrews request 
 	//if(whad.pt()<800)continue; 
 	if(dis==1 || dis ==3){
-	  hadTop = (pow(deltaR(wlep,whad+topJets)-mean_distance,2)/(sigma_distance*sigma_distance)+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//4; 
+	  hadTop = (distance_thad+pow(wlep.pt()/(whad+topJets).pt()-mean_ptratio,2)/(sigma_ptratio*sigma_ptratio));//4; 
 	  hadTop = boost::math::cdf(two_param,hadTop);
 	}
       }
@@ -444,17 +458,24 @@ BprimeContainer BprimeDiscriminator::cmsTopTag_dis(uhh2::Event & event){
   double subjetbtag = -1;
   LorentzVector bprime(0,0,0,0);
 
+  double mean_topHad = 172.6, sigma_topHad = 14.29;
+  double mean_distance = 3.14, sigma_distance = 0.8;
+  double mean_ptratio = 1, sigma_ptratio = 0.4;
+  boost::math::chi_squared three_param(2);
+  
   for(auto hyp :  event.get(hyps)){
     const LorentzVector & wlep = hyp.get_wLep();
     const LorentzVector & topHad = hyp.get_topHad();
 
 
     // chi2/nodf
-    double chi = pow(deltaR(wlep,topHad)-3.1,2);
-    if(chi<bprimechi || bprimechi==-1){
+    double chi2 = pow((topHad.M()-mean_topHad)/sigma_topHad,2)+pow((deltaR(wlep,topHad)-mean_distance)/sigma_distance,2)+pow((wlep.pt()/topHad.pt()-mean_ptratio)/sigma_ptratio,2);
+    double prob = boost::math::cdf(three_param,chi2);
+    
+    if(prob>bprimechi || bprimechi==-1){
       bestHyp=hyp;
       subjetbtag = hyp.get_btag_discriminator();
-      bprimechi=chi;
+      bprimechi=prob;
       recoType=2;
       mass = sqrt((wlep+topHad).M2());
       bprime = wlep+topHad;
@@ -476,6 +497,8 @@ BprimeContainer BprimeDiscriminator::wTag_dis(uhh2::Event & event){
   double mass =-1;
   LorentzVector bprime(0,0,0,0);
   LorentzVector empty(0,0,0,0);
+ 
+  
   for(auto hyp :  event.get(hyps)){
     const LorentzVector & wlep = hyp.get_wLep();
     const LorentzVector & wHad = hyp.get_wHad();

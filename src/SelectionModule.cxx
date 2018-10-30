@@ -102,6 +102,8 @@ private:
   int event_number = 0;
   
   std::unique_ptr<AK8_cor_reco> jec_topjet_recos;
+  std::unique_ptr<OrSelection> trigger;
+  
 };
 
 SelectionModule::SelectionModule(Context& ctx){
@@ -127,7 +129,7 @@ SelectionModule::SelectionModule(Context& ctx){
   
   //OptTree.reset(new OptTreeModule(ctx));
   recojet = PtEtaCut(30,2.4);
-  jet = PtEtaCut(30,5);
+  jet = PtEtaCut(30,4);
   jetcleaner.reset(new JetCleaner(ctx,jet));
 
   topjetCorr.reset(new RunDependendJetCorr(ctx,"patJetsAk8PuppiJetsSoftDropPacked_daughters"));
@@ -325,10 +327,27 @@ SelectionModule::SelectionModule(Context& ctx){
   //TopTagPlots->addHists("BprimeUncerHists","TopTagReco_BprimeUncerHists","TopTagDis");
   TopTagPlots->addHists("EventKinematicHists","TopTagReco_EventKinematicHists_Dis","TopTagDis");
   TopTagPlots->addHists("EventKinematicHists","TopTagReco_EventKinematicHists");
+
+
+  ElectronId highptele =  AndId<Electron>(ElectronID_MVAGeneralPurpose_Spring16_tight, PtEtaCut(250.0, 2.4));
+  trigger.reset(new OrSelection());
+  unique_ptr<AndSelection> photon(new AndSelection(ctx));
+  photon->add("Photon175",move(make_unique<TriggerSelection>("HLT_Photon175_v*")));
+  photon->add("ElePt250",move(make_unique<NElectronSelection>(1,1,highptele)));
+  photon->add("ele50_jet165pt",move(make_unique<TriggerVeto>("HLT_Ele50_CaloIdVT_GsfTrkIdT_PFJet165_v*")));
+  photon->add("ele115",move(make_unique<TriggerVeto>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*")));
+  //trigger->add(move(photon));
+  unique_ptr<AndSelection> electron(new AndSelection(ctx));
+  electron->add("Photon175",move(make_unique<TriggerVeto>("HLT_Photon175_v*")));
+  trigger->add(move(electron));
+
+
+  
 }
 
 bool SelectionModule::process(Event & event){
   if(event.met->pt() <5.) return false;
+  //if(!trigger->passes(event)) return false; 
   jetcleaner->process(event);
   common->process(event);
   ht->process(event);
@@ -336,7 +355,10 @@ bool SelectionModule::process(Event & event){
   ttbar_reweight->process(event);
   Gen->process(event);
   topjetCorr->process(event);
-  
+ 
+
+  //std::cout<<"MET "<<event.met->pt()<<" leading jet pt "<<event.jets->at(0).pt()<<std::endl;
+ 
   if(run_muontrigger) SF_muonTrigger->process(event);
   if(run_muonid) SF_muonID->process(event);
   if(run_muontrk) SF_muonTrk->process(event);

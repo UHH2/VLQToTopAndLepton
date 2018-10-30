@@ -3,13 +3,28 @@
 
 <!-- 
 <ConfigParse NEventsBreak="0" FileSplit="30" AutoResubmit="3" MaxJobsPerProcess="150"/>
-<ConfigSGE RAM ="4" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.EleSigSel_v1"/>
+<ConfigSGE RAM ="4" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.EleSigSel_v2"/>
 -->
 
 <JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
 	<Library Name="libSUHH2VLQToTopAndLepton"/>
 	<Package Name="libSUHH2VLQToTopAndLepton"/>
 	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./EleSigSel_v1/" TargetLumi="35867">
+		<InputData Cacheable="False" Lumi="94960.0" Type="MC" Version="BprimeB-1700_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/EleSigPreSel_v1//workdir.EleSigPreSel_v1/uhh2.AnalysisModuleRunner.*.BprimeB-1700_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree"/>
+		</InputData>
+		<InputData Cacheable="False" Lumi="198380.0" Type="MC" Version="BprimeB-1100_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/EleSigPreSel_v1//workdir.EleSigPreSel_v1/uhh2.AnalysisModuleRunner.*.BprimeB-1100_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree"/>
+		</InputData>
+		<InputData Cacheable="False" Lumi="99989.0" Type="MC" Version="BprimeB-800_LH">
+			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/EleSigPreSel_v1//workdir.EleSigPreSel_v1/uhh2.AnalysisModuleRunner.*.BprimeB-800_LH_*.root" Lumi="0.0"/>
+			<InputTree Name="AnalysisTree"/>
+			<OutputTree Name="AnalysisTree"/>
+		</InputData>
 	      <InputData Cacheable="False" Lumi="99988.0" Type="MC" Version="BprimeB-1000_Width-20p_LH">
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/EleSigPreSel_v1//workdir.EleSigPreSel_v1/uhh2.AnalysisModuleRunner.*.BprimeB-1000_Width-20p_LH_*.root" Lumi="0.0"/>
 			<InputTree Name="AnalysisTree"/>
@@ -140,11 +155,6 @@
 			<InputTree Name="AnalysisTree"/>
 			<OutputTree Name="AnalysisTree"/>
 		</InputData>
-		<InputData Cacheable="False" Lumi="99989.0" Type="MC" Version="BprimeB-800_LH">
-			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/EleSigPreSel_v1//workdir.EleSigPreSel_v1/uhh2.AnalysisModuleRunner.*.BprimeB-800_LH_*.root" Lumi="0.0"/>
-			<InputTree Name="AnalysisTree"/>
-			<OutputTree Name="AnalysisTree"/>
-		</InputData>
 		<InputData Cacheable="False" Lumi="99981.0" Type="MC" Version="BprimeB-1100_Width-10p_LH">
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/EleSigPreSel_v1//workdir.EleSigPreSel_v1/uhh2.AnalysisModuleRunner.*.BprimeB-1100_Width-10p_LH_*.root" Lumi="0.0"/>
 			<InputTree Name="AnalysisTree"/>
@@ -182,16 +192,6 @@
 		</InputData>
 		<InputData Cacheable="False" Lumi="99965.0" Type="MC" Version="BprimeB-2000_Width-20p_LH">
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/EleSigPreSel_v1//workdir.EleSigPreSel_v1/uhh2.AnalysisModuleRunner.*.BprimeB-2000_Width-20p_LH_*.root" Lumi="0.0"/>
-			<InputTree Name="AnalysisTree"/>
-			<OutputTree Name="AnalysisTree"/>
-		</InputData>
-		<InputData Cacheable="False" Lumi="94960.0" Type="MC" Version="BprimeB-1700_LH">
-			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/EleSigPreSel_v1//workdir.EleSigPreSel_v1/uhh2.AnalysisModuleRunner.*.BprimeB-1700_LH_*.root" Lumi="0.0"/>
-			<InputTree Name="AnalysisTree"/>
-			<OutputTree Name="AnalysisTree"/>
-		</InputData>
-		<InputData Cacheable="False" Lumi="198380.0" Type="MC" Version="BprimeB-1100_LH">
-			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/EleSigPreSel_v1//workdir.EleSigPreSel_v1/uhh2.AnalysisModuleRunner.*.BprimeB-1100_LH_*.root" Lumi="0.0"/>
 			<InputTree Name="AnalysisTree"/>
 			<OutputTree Name="AnalysisTree"/>
 		</InputData>

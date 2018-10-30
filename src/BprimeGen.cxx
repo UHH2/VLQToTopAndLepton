@@ -35,10 +35,20 @@ bool BprimeGen::process(uhh2::Event & event){
   if(!result.pt()> 0) result = family(lepWEle, event);
   myDecay.set_wLep(result);
 
-  //VLQ
+  //VLQ && Whadd decays and b from top
   for(auto genp : *event.genparticles){
+    const GenParticle* mother1 = genp.mother(event.genparticles,1);
+    const GenParticle* mother2 = genp.mother(event.genparticles,2);
+    int mother1_pdgId=0,mother2_pdgId=0;
+    if(mother1)mother1_pdgId = mother1->pdgId();
+    if(mother2)mother2_pdgId = mother2->pdgId();
+
     if(abs(genp.pdgId())>1000)
       myDecay.set_bprime(genp.v4());
+    else if(abs(genp.pdgId())==5 && (abs(mother2_pdgId) == 6 || abs(mother1_pdgId)==6 ))
+      myDecay.push_bquark(genp.v4());
+    else if(abs(genp.pdgId() < 6) && (abs(mother2_pdgId) == 24 || abs(mother1_pdgId)==24))
+      myDecay.push_Whadd(genp.v4());
   }
 
   /*

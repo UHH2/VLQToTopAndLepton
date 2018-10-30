@@ -4,13 +4,13 @@
 
 <!-- 
 <ConfigParse NEventsBreak="0" FileSplit="2" AutoResubmit="3" MaxJobsPerProcess="250" RemoveEmptyFileSplit="1"/>
-<ConfigSGE RAM ="3" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.EleSel_photon"/>
+<ConfigSGE RAM ="3" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.EleSel_new"/>
 -->
 
 <JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
 	<Library Name="libSUHH2VLQToTopAndLepton"/>
 	<Package Name="libSUHH2VLQToTopAndLepton"/>
-	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./EleSel_photon/" TargetLumi="35867">
+	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./EleSel_new/" TargetLumi="35867">
 	  
 	        <InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SinglePhotonDataB">
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/ElePreSel_photon//workdir.ElePreSel_photon/uhh2.AnalysisModuleRunner.*.SinglePhotonDataB_*.root" Lumi="0.0"/>
@@ -47,11 +47,7 @@
 			<InputTree Name="AnalysisTree"/>
 			<OutputTree Name="AnalysisTree" />
 		</InputData>
-
-
-
-	  
-<!--
+<!--		
 		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleEleDataB">
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/ElePreSel_cross//workdir.ElePreSel_cross/uhh2.AnalysisModuleRunner.*.SingleEleDataB_*.root" Lumi="0.0"/>
 			<InputTree Name="AnalysisTree"/>

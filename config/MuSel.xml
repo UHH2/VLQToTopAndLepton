@@ -4,23 +4,25 @@
 
 <!-- 
 <ConfigParse NEventsBreak="0" FileSplit="2" AutoResubmit="3" MaxJobsPerProcess="250" RemoveEmptyFileSplit="1"/>
-<ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.MuSel_wtag_corr"/>
+<ConfigSGE RAM ="2" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.MuSel_deltaPhi_deltaEta"/>
 -->
 
 <JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
 	<Library Name="libSUHH2VLQToTopAndLepton"/>
 	<Package Name="libSUHH2VLQToTopAndLepton"/>
-	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./MuSel_wtag_corr/" TargetLumi="35867">
+	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./MuSel_deltaPhi_deltaEta/" TargetLumi="35867">
 		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataB">
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.DATA.SingleMuDataB_*.root" Lumi="0.0"/>
 			<InputTree Name="AnalysisTree"/>
 			<OutputTree Name="AnalysisTree" />
 		</InputData>
+		<!--
 		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataBv3">
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataBv3_*.root" Lumi="0.0"/>
 			<InputTree Name="AnalysisTree"/>
 			<OutputTree Name="AnalysisTree" />
-		</InputData>
+			</InputData>
+		-->
 		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataC">
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataC_*.root" Lumi="0.0"/>
 			<InputTree Name="AnalysisTree"/>
@@ -57,7 +59,8 @@
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1600_LH_*.root" Lumi="0.0"/>
 			<InputTree Name="AnalysisTree"/>
 			<OutputTree Name="AnalysisTree" />
-		</InputData>
+			</InputData>
+-->
 		<InputData Cacheable="False" Lumi="99778.0" Type="MC" Version="BprimeB-1500_LH">
 			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.BprimeB-1500_LH_*.root" Lumi="0.0"/>
 			<InputTree Name="AnalysisTree"/>
@@ -573,58 +576,6 @@
 			<Item Name="MuonTriggerScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root"/>
 			<Item Name="MuonTrkScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/Tracking_EfficienciesAndSF_BCDEFGH.root"/>
 			<Item Name="SF_muonID" Value="nominal"/>
-			<Item Name="BTag_variation" Value="central"/>
-			<Item Name="PU_variation" Value="central"/>
-			<Item Name="AnalysisModule" Value="SelectionModule"/>
-		</UserConfig>
-	</Cycle>
-</JobConfiguration>
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd"[
-]>
-
-<!-- 
-<ConfigParse NEventsBreak="0" FileSplit="2" AutoResubmit="3" MaxJobsPerProcess="250" RemoveEmptyFileSplit="1"/>
-<ConfigSGE RAM ="4" DISK ="2" Mail="daniel.gonzalez@desy.de" Notification="as" Workdir="workdir.MuSel_btags_v3"/>
--->
-
-<JobConfiguration JobName="ExampleCycleJob" OutputLevel="INFO">
-	<Library Name="libSUHH2VLQToTopAndLepton"/>
-	<Package Name="libSUHH2VLQToTopAndLepton"/>
-	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="./MuSel_btags_v3/" TargetLumi="35867">
-	  
-		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataB">
-			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.DATA.SingleMuDataB_*.root" Lumi="0.0"/>
-			<InputTree Name="AnalysisTree"/>
-			<OutputTree Name="AnalysisTree" />
-		</InputData>
-		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataC">
-			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataC_*.root" Lumi="0.0"/>
-			<InputTree Name="AnalysisTree"/>
-			<OutputTree Name="AnalysisTree" />
-		</InputData>
-		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataD">
-			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataD_*.root" Lumi="0.0"/>
-			<InputTree Name="AnalysisTree"/>
-			<OutputTree Name="AnalysisTree" />
-		</InputData>
-		<InputData Cacheable="False" Lumi="1.0" Type="DATA" Version="SingleMuDataE">
-			<In FileName="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/VLQToTopAndLepton/config/MuPreSel_v2//workdir.MuPreSel_v2/uhh2.AnalysisModuleRunner.*.SingleMuDataE_*.root" Lumi="0.0"/>
-			<InputTree Name="AnalysisTree"/>
-			<Item Name="lumihists_lumi_per_bin" Value="50"/>
-			<Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram.root"/>
-			<Item Name="pileup_directory_25ns" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyMCPileupHistogram.root"/>
-			<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_72383.root" />
-			<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root" />
-			<Item Name="jecsmear_direction" Value="nominal"/>
-			<Item Name="jersmear_direction" Value="nominal"/>
-			<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/scripts/BTagMCEfficiencyHistsMu.root"/>
-			<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv"/>
-			
-                        <Item Name="MounIDScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root"/>
-			<Item Name="MuonTriggerScaleFactors" Value="/nfs/dust/cms/user/gonvaq/CMSSW/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root"/>
-			<Item Name="SF_muonID" Value="nominal"/>
-		
 			<Item Name="BTag_variation" Value="central"/>
 			<Item Name="PU_variation" Value="central"/>
 			<Item Name="AnalysisModule" Value="SelectionModule"/>

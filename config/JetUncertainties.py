@@ -4,18 +4,19 @@ import sys
 import subprocess
 import os
 import shutil
+import glob
 
 #simple script that runs several sframe batch jobs and creates everything you might need
 if __name__ == "__main__":
     #options
-    debug =  False 
+    debug = False 
     remove = False #remove directories with old results
     resume = True   
     sframe_plotter = False 
-    merge = True 
+    merge = False 
 
-    submission_options = 'slc'
-    resume_options = 'arcl' 
+    submission_options = 's'
+    resume_options = 'fc' 
 
     #put your local sfram_batch dir in search path
     sys.path.append('/nfs/dust/cms/user/gonvaq/SFrameBatch/')
@@ -29,12 +30,15 @@ if __name__ == "__main__":
     
     currentDir = os.getcwd()
 
-    print 'Starting jer and jec uncertainties'
-    #
-    variations  = ['jer_up','jer_down','jec_up','jec_down']
-    #jet_xmlfiles = ['MuSigSelUNC.xml']#,'EleSelUNC.xml']
-    jet_xmlfiles = ['MuSelUNC.xml']#,'EleSelUNC.xml']
-    #jet_xmlfiles = ['EleSelUNC.xml']
+    print 'Starting jer and jec uncertainties'   
+    jet_xmlfiles = ['MuSigSelUNC.xml','EleSigSelUNC.xml','EleSelUNC.xml','MuSelUNC.xml']
+    #merge for plotting
+    jet_xmlfiles = ['EleSelUNC.xml','MuSelUNC.xml']
+    #jet_xmlfiles = ['MuSigSelUNC.xml','EleSigSelUNC.xml']
+    #jet_xmlfiles = ['MuSigSelUNC.xml']
+    #variations  = ['jec_jer_up','jec_jer_down']
+    variations  = ['jec_up','jec_down','jer_up','jer_down',]
+    #variations  = ['jer_down']
 
     for xml in jet_xmlfiles:        
         for var in variations:
@@ -77,10 +81,17 @@ if __name__ == "__main__":
                 os.chdir(outputdir)
                 print 'Entering',os.getcwd()
                 prefix = 'uhh2.AnalysisModuleRunner.MC.'
+		for outfile in glob.glob(workdir+'/*.root'):
+		  final = (outfile.replace('_0.root','.root')).split('/')[1]
+		  subprocess.call(['cp',outfile,final])
+		  
+
+                """
                 list_of_merges = ['TTbar','SingleT', 'QCD', 'ZJets', 'WJets_Pt']
                 for item in list_of_merges:
                     #print 'rm',prefix+item+'.root'
                     #print 'hadd',prefix+item+'.root',prefix+item+'*.root'
                     subprocess.call(['rm',prefix+item+'.root'])
                     subprocess.call('hadd '+prefix+item+'.root '+prefix+item+'*.root', shell=True)
+		"""
                 os.chdir(currentDir)
